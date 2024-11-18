@@ -1,0 +1,175 @@
+{
+  "topics": [
+    {
+      "title": "General guidance",
+      "content": [
+        {
+          "title": "Where can I find my balance?",
+          "subContent": [
+            "Log in to your account.",
+            "Navigate to the 'Balance' section.",
+            "Your balance will be displayed on the main dashboard."
+          ]
+        },
+        {
+          "title": "How many coins are needed to send a gift?",
+          "subContent": [
+            "Different gifts require different amounts of coins.",
+            "Check the gift catalog for specific prices.",
+            "Ensure you have enough coins in your account."
+          ]
+        },
+        {
+          "title": "How can I find and manage my earnings and rewards?",
+          "subContent": [
+            "Access the 'Earnings' section from your profile.",
+            "View detailed reports of your earnings.",
+            "Manage your rewards by following the provided guidelines."
+          ]
+        },
+        {
+          "title": "What can I get with diamonds collected through Video Gifts?",
+          "subContent": [
+            "Diamonds can be exchanged for various rewards.",
+            "Visit the 'Rewards' section to see available options.",
+            "Follow the instructions to redeem your diamonds."
+          ]
+        },
+        {
+          "title": "What can I get with diamonds collected through LIVE Gifts?",
+          "subContent": [
+            "LIVE Gift diamonds can be converted to cash.",
+            "Check the conversion rates in the 'LIVE Gifts' section.",
+            "Initiate the conversion process to transfer diamonds to your account."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Rewards withdrawal issues",
+      "content": [
+        {
+          "title": "Where can I find my balance?",
+          "subContent": [
+            "Log in to your account.",
+            "Navigate to the 'Balance' section.",
+            "Your balance will be displayed on the main dashboard."
+          ]
+        },
+        {
+          "title": "How many coins are needed to send a gift?",
+          "subContent": [
+            "Different gifts require different amounts of coins.",
+            "Check the gift catalog for specific prices.",
+            "Ensure you have enough coins in your account."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Purchasing issues",
+      "content": [
+        {
+          "title": "Where can I find my balance?",
+          "subContent": [
+            "Log in to your account.",
+            "Navigate to the 'Balance' section.",
+            "Your balance will be displayed on the main dashboard."
+          ]
+        },
+        {
+          "title": "How many coins are needed to send a gift?",
+          "subContent": [
+            "Different gifts require different amounts of coins.",
+            "Check the gift catalog for specific prices.",
+            "Ensure you have enough coins in your account."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "LIVE Reward issues",
+      "content": [
+        {
+          "title": "Where can I find my balance?",
+          "subContent": [
+            "Log in to your account.",
+            "Navigate to the 'Balance' section.",
+            "Your balance will be displayed on the main dashboard."
+          ]
+        },
+        {
+          "title": "How many coins are needed to send a gift?",
+          "subContent": [
+            "Different gifts require different amounts of coins.",
+            "Check the gift catalog for specific prices.",
+            "Ensure you have enough coins in your account."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "LIVE Gifts",
+      "content": [
+        {
+          "title": "Where can I find my balance?",
+          "subContent": [
+            "Log in to your account.",
+            "Navigate to the 'Balance' section.",
+            "Your balance will be displayed on the main dashboard."
+          ]
+        },
+        {
+          "title": "How many coins are needed to send a gift?",
+          "subContent": [
+            "Different gifts require different amounts of coins.",
+            "Check the gift catalog for specific prices.",
+            "Ensure you have enough coins in your account."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Tax issues",
+      "content": [
+        {
+          "title": "Where can I find my balance?",
+          "subContent": [
+            "Log in to your account.",
+            "Navigate to the 'Balance' section.",
+            "Your balance will be displayed on the main dashboard."
+          ]
+        },
+        {
+          "title": "How many coins are needed to send a gift?",
+          "subContent": [
+            "Different gifts require different amounts of coins.",
+            "Check the gift catalog for specific prices.",
+            "Ensure you have enough coins in your account."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Other",
+      "content": [
+        {
+          "title": "Where can I find my balance?",
+          "subContent": [
+            "Log in to your account.",
+            "Navigate to the 'Balance' section.",
+            "Your balance will be displayed on the main dashboard."
+          ]
+        },
+        {
+          "title": "How many coins are needed to send a gift?",
+          "subContent": [
+            "Different gifts require different amounts of coins.",
+            "Check the gift catalog for specific prices.",
+            "Ensure you have enough coins in your account."
+          ]
+        }
+      ]
+    }
+  ]
+}
