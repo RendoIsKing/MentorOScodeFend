@@ -2,7 +2,7 @@
 import React from "react";
 import PageHeader from "@/components/shared/page-header";
 import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/components/ui/use-toast";
 import Logo from "@/components/shared/Logo";
 import AuthInputs from "@/components/shared/auth-input-fileds";
 import { ABeeZee } from "next/font/google";
@@ -19,8 +19,8 @@ import { useCountryCodeContext } from "@/context/countryCodeContext";
 import { phoneNumberRefine } from "@/lib/utils";
 
 const Signup = () => {
-  const {countryCode} = useCountryCodeContext();
-  const { toast } = useToast()
+  const { countryCode } = useCountryCodeContext();
+  const { toast } = useToast();
   const { isMobile } = useClientHardwareInfo();
   const appDispatcher = useAppDispatch();
   const router = useRouter();
@@ -36,22 +36,21 @@ const Signup = () => {
     useRegisterUserMutation();
 
   const onSubmit = async (data: z.infer<typeof authFormSchema>) => {
-
-     if(!countryCode)
-      {
-        form.setError("phoneNumber", {
-          type: "manual",
-          message: "Please select a country."
-        });
-        return ;
-      }
-      if (!phoneNumberRefine(data.phoneNumber, data.prefix, countryCode)) {
-        form.setError("phoneNumber", {
-          type: "manual",
-          message: "Please enter a valid phone number based on the selected country."
-        });
-        return ;
-      } 
+    if (!countryCode) {
+      form.setError("phoneNumber", {
+        type: "manual",
+        message: "Please select a country.",
+      });
+      return;
+    }
+    if (!phoneNumberRefine(data.phoneNumber, data.prefix, countryCode)) {
+      form.setError("phoneNumber", {
+        type: "manual",
+        message:
+          "Please enter a valid phone number based on the selected country.",
+      });
+      return;
+    }
 
     await registerUser(data)
       .unwrap()
@@ -93,7 +92,7 @@ const Signup = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <AuthInputs />
+                    <AuthInputs type="signup" />
                   </FormControl>
                 </FormItem>
               )}
@@ -105,10 +104,10 @@ const Signup = () => {
           <div className="flex justify-center">
             <img src="/assets/images/Signup/phone1.svg" alt="signup" />
             <div className="border lg:border-muted-foreground/30 lg:rounded-lg p-12 pl-8 ml-20 lg:w-[41%]">
-              <div className="p-4">
+              <div className="p-0">
                 <Logo />
               </div>
-              <div className="p-6">
+              <div className="p-2">
                 <PageHeader
                   title="Sign Up"
                   description="Enter Your Phone Number"
@@ -121,7 +120,7 @@ const Signup = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <AuthInputs />
+                            <AuthInputs type="signup" />
                           </FormControl>
                         </FormItem>
                       )}

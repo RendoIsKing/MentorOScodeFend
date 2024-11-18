@@ -19,14 +19,14 @@ import { authFormSchema } from "@/schemas/auth";
 import { useCountryCodeContext } from "@/context/countryCodeContext";
 
 const Signin = () => {
-  const {countryCode} = useCountryCodeContext();
+  const { countryCode } = useCountryCodeContext();
   const { isMobile } = useClientHardwareInfo();
   const pathname = usePathname();
   const appDispatcher = useAppDispatch();
   const router = useRouter();
   const { toast } = useToast();
   const form = useForm<z.infer<typeof authFormSchema>>({
-     resolver: zodResolver(authFormSchema),
+    resolver: zodResolver(authFormSchema),
     defaultValues: {
       phoneNumber: "",
       prefix: "",
@@ -36,22 +36,21 @@ const Signin = () => {
   const [loginUser, { isLoading, error, isError }] = useLoginUserMutation();
 
   const onSubmit = async (data: z.infer<typeof authFormSchema>) => {
-   
-    if(!countryCode)
-    {
+    if (!countryCode) {
       form.setError("phoneNumber", {
         type: "manual",
-        message: "Please select a country."
+        message: "Please select a country.",
       });
-      return ;
+      return;
     }
     if (!phoneNumberRefine(data.phoneNumber, data.prefix, countryCode)) {
       form.setError("phoneNumber", {
         type: "manual",
-        message: "Please enter a valid phone number based on the selected country."
+        message:
+          "Please enter a valid phone number based on the selected country.",
       });
-      return ;
-    } 
+      return;
+    }
     await loginUser(data)
       .unwrap()
       .then((res) => {
@@ -93,7 +92,7 @@ const Signin = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <AuthInputs />
+                    <AuthInputs type="singin" />
                   </FormControl>
                 </FormItem>
               )}
@@ -105,10 +104,10 @@ const Signin = () => {
           <div className="flex justify-center">
             <img src="/assets/images/Signup/phone1.svg" alt="Phone_Image" />
             <div className="border lg:border-muted-foreground/30 lg:rounded-lg p-12 pl-8 ml-20 lg:w-[41%] ">
-              <div className="p-4">
+              <div className="p-0">
                 <Logo />
               </div>
-              <div className="lg:p-6">
+              <div className="lg:p-2">
                 <PageHeader
                   title="Sign In"
                   description="Enter Your Phone Number"
@@ -121,7 +120,7 @@ const Signin = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <AuthInputs />
+                            <AuthInputs type="signin" />
                           </FormControl>
                         </FormItem>
                       )}
