@@ -26,7 +26,7 @@ RUN npm install -g serve
 WORKDIR /app
 
 # 10. Copy the built files from the previous stage
-COPY --from=build /app/build /app
+COPY --from=build /app/.next /app/.next
 
 # 11. Expose the port Vite will be served on (default is 3000, but you can change it)
 EXPOSE 3001
