@@ -1,36 +1,39 @@
-# 1. Use a base image that has Node.js
-FROM node:18-alpine as build
+# Stage 1: Build
+FROM node:18-alpine AS build
 
-# 2. Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# 3. Copy package.json and package-lock.json (if exists) to the working directory
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# 4. Install dependencies
+# Install dependencies
 RUN npm install
 
-# 5. Copy the rest of the application code to the working directory
+# Copy the rest of the application
 COPY . .
 
-# 6. Build the Vite project
+# Build the Next.js application
 RUN npm run build
 
-# 7. Use a lightweight web server to serve the static files (e.g., serve)
-FROM node:18-alpine as production
+# Stage 2: Production
+FROM node:18-alpine AS production
 
-# 8. Install a lightweight static server like `serve`
-RUN npm install -g serve
-
-# 9. Set the working directory
+# Set working directory
 WORKDIR /app
 
-# 10. Copy the built files from the previous stage
-COPY --from=build /app/.next /app/.next
+# Install production dependencies only
+COPY package*.json ./
+RUN npm install --production
 
-# 11. Expose the port Vite will be served on (default is 3000, but you can change it)
+# Copy built files from the build stage
+COPY --from=build /app/.next /app/.next
+COPY --from=build /app/public /app/public
+COPY --from=build /app/node_modules /app/node_modules
+COPY --from=build /app/package.json /app/package.json
+
+# Expose the port Next.js will run on
 EXPOSE 3001
 
-# 12. Command to serve the static files (replace '3000' with your desired port)
-CMD ["serve", "-s", ".", "-l", "3001"]
-
+# Start the application
+CMD ["npm", "run", "start"]
