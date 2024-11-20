@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { ABeeZee } from "next/font/google";
 import { FormMessage } from "@/components/ui/form";
+import GoogleButton from "../google-button";
+import CustomHr from "../custom-hr";
+import PasswordInput from "@/components/password-input";
 
 // TODO: Make this font definition dynamic
 export const fontItalic = ABeeZee({
@@ -14,13 +17,14 @@ export const fontItalic = ABeeZee({
   style: "italic",
 });
 
-const AuthInputs = () => {
+const AuthInputs = ({ type }) => {
   const router = useRouter();
   const pathname = usePathname();
   return (
     <div>
-      <PhoneInput className="mt-6" />
+      <PhoneInput className="mt-4" />
       <FormMessage />
+      {type === "signin" && <PasswordInput className="pt-4" />}
       <div className={`mt-6 lg:${fontItalic.className} font-light`}>
         <p>
           We will send a text with a verification code. Message and date rates
@@ -32,12 +36,11 @@ const AuthInputs = () => {
           <span className="text-primary">Privacy Policy</span>.
         </div>
       </div>
-      <Button
-        className="block w-full mt-12 text-base"
-        type="submit"
-      >
+      <Button className="block w-full my-4 text-base" type="submit">
         Continue
       </Button>
+      <CustomHr />
+      <GoogleButton />
       <div className="text-base flex justify-center mt-8">
         {pathname !== "/signup" ? (
           <p>{`Don’t have an account?`}</p>

@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { CheckIcon, ChevronsUpDown } from "lucide-react";
 
 import * as React from "react";
@@ -80,7 +80,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <Input
         className={cn(
-          "rounded-s-none rounded-tl-sm h-16 border-muted-foreground/30",
+          "rounded-s-none rounded-tl-sm h-12 border-muted-foreground/30",
           className
         )}
         {...props}
@@ -106,9 +106,7 @@ const CountrySelect = ({
   onChange,
   options,
 }: CountrySelectProps) => {
-
-  
-  const { updateCountryCode}  = useCountryCodeContext();
+  const { updateCountryCode } = useCountryCodeContext();
 
   updateCountryCode(value);
   const handleSelect = React.useCallback(
@@ -125,7 +123,7 @@ const CountrySelect = ({
           type="button"
           variant={"outline"}
           className={cn(
-            "flex gap-1 rounded-e-none rounded-tr-sm pr-1 pl-3 h-16 border-muted-foreground/30	"
+            "flex gap-1 rounded-e-none rounded-tr-sm pr-1 pl-3 h-12 border-muted-foreground/30	"
           )}
           disabled={disabled}
         >
