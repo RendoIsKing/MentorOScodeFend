@@ -72,7 +72,7 @@ export const havemeApi = createApi({
     TAG_GET_SEARCH_USERS,
   ],
   baseQuery: fetchBaseQuery({
-    baseUrl: `${process.env.NEXT_PUBLIC_API_SERVER}/api/v1`,
+    baseUrl: `${process.env.NEXT_PUBLIC_API_SERVER}/v1`,
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).auth.token;
       if (token) {
@@ -94,13 +94,22 @@ export const havemeApi = createApi({
     }),
     loginUser: builder.mutation<IUserLoginResponse, IUserLoginRequest>({
       query: (body) => {
+        // Dynamically construct the request body based on login method
+        const requestBody = body.email
+          ? {
+              email: body.email,
+              password: body.password,
+            }
+          : {
+              phoneNumber: body.phoneNumber,
+              dialCode: body.dialCode.replace("+", ""),
+              password: body.password,
+            };
+
         return {
           url: "/auth/user-login",
-          method: "post",
-          body: {
-            phoneNumber: body.phoneNumber,
-            dialCode: body.prefix.replace("+", ""),
-          },
+          method: "POST",
+          body: requestBody,
         };
       },
     }),

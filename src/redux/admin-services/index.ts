@@ -18,7 +18,7 @@ export const adminApi = createApi({
     TAG_GET_REPORTS,
   ],
   baseQuery: fetchBaseQuery({
-    baseUrl: `${process.env.NEXT_PUBLIC_API_SERVER}/api/v1`,
+    baseUrl: `${process.env.NEXT_PUBLIC_API_SERVER}/v1`,
     prepareHeaders: (headers, { getState }) => {
       // console.log("getSate", getState());
       const token = (getState() as RootState).adminAuth.token;
