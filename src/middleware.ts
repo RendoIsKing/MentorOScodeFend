@@ -8,7 +8,7 @@ import { notFound } from "next/navigation";
 
 async function getUserProgress(userAuthToken: string) {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_SERVER}/api/v1/auth/me`,
+    `${process.env.NEXT_PUBLIC_API_SERVER}/v1/auth/me`,
     {
       method: "GET",
       headers: {

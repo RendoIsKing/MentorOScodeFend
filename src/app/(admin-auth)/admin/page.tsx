@@ -127,7 +127,7 @@ function AdminLogin() {
           </form>
         </Form>
       </div>
-      <h1 className="fixed bottom-8">© 2024 HaveMe</h1>
+      {/* <h1 className="fixed bottom-8">© 2024 HaveMe</h1> */}
     </div>
   );
 }

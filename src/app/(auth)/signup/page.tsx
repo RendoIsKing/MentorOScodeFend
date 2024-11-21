@@ -14,7 +14,7 @@ import { useRegisterUserMutation } from "@/redux/services/haveme";
 import { useAppDispatch } from "@/redux/store";
 import { setUserPhoneNumber } from "@/redux/slices/user-info";
 import { useRouter } from "next/navigation";
-import { authFormSchema } from "@/schemas/auth";
+import { signupFormSchema } from "@/schemas/auth";
 import { useCountryCodeContext } from "@/context/countryCodeContext";
 import { phoneNumberRefine } from "@/lib/utils";
 
@@ -24,8 +24,8 @@ const Signup = () => {
   const { isMobile } = useClientHardwareInfo();
   const appDispatcher = useAppDispatch();
   const router = useRouter();
-  const form = useForm<z.infer<typeof authFormSchema>>({
-    resolver: zodResolver(authFormSchema),
+  const form = useForm<z.infer<typeof signupFormSchema>>({
+    resolver: zodResolver(signupFormSchema),
     defaultValues: {
       phoneNumber: "",
       prefix: "",
@@ -35,7 +35,7 @@ const Signup = () => {
   const [registerUser, { isLoading, error, isError }] =
     useRegisterUserMutation();
 
-  const onSubmit = async (data: z.infer<typeof authFormSchema>) => {
+  const onSubmit = async (data: z.infer<typeof signupFormSchema>) => {
     if (!countryCode) {
       form.setError("phoneNumber", {
         type: "manual",
@@ -100,10 +100,12 @@ const Signup = () => {
           </form>
         </Form>
       ) : (
-        <div className="mr-auto my-8">
-          <div className="flex justify-center">
-            <img src="/assets/images/Signup/phone1.svg" alt="signup" />
-            <div className="border lg:border-muted-foreground/30 lg:rounded-lg p-12 pl-8 ml-20 lg:w-[41%]">
+        <div className="mx-auto my-8">
+          <div className="flex justify-center items-center gap-12">
+            <div className="flex-1">
+              <img src="/assets/images/Signup/phone1.svg" alt="signup" />
+            </div>
+            <div className="border flex-1 lg:border-muted-foreground/30 lg:rounded-lg p-12 pl-8 lg:w-[41%]">
               <div className="p-0">
                 <Logo />
               </div>

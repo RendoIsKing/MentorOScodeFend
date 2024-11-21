@@ -16,7 +16,7 @@ export default function OnBoardingLayout({
         </div>
       )}
       {children}
-      {!isMobile && <h1 className="fixed bottom-8">© 2024 HaveMe</h1>}
+      {/* {!isMobile && <h1 className="fixed bottom-8">© 2024 HaveMe</h1>} */}
     </div>
   );
 }

@@ -9,8 +9,9 @@ import { FormMessage } from "@/components/ui/form";
 import GoogleButton from "../google-button";
 import CustomHr from "../custom-hr";
 import PasswordInput from "@/components/password-input";
+import { useFormContext } from "react-hook-form";
+import PhoneEmailInput from "@/components/PhoneEmailInput";
 
-// TODO: Make this font definition dynamic
 export const fontItalic = ABeeZee({
   subsets: ["latin"],
   weight: ["400"],
@@ -20,30 +21,55 @@ export const fontItalic = ABeeZee({
 const AuthInputs = ({ type }) => {
   const router = useRouter();
   const pathname = usePathname();
+  const form = useFormContext();
+
+  // Helper function to get error message
+  const getErrorMessage = (fieldName: string) => {
+    const error = form.formState.errors.loginMethod || form.formState.errors;
+    return error?.[fieldName]?.message?.toString();
+  };
+
   return (
     <div>
-      <PhoneInput className="mt-4" />
-      <FormMessage />
-      {type === "signin" && <PasswordInput className="pt-4" />}
+      {type === "signin" ? (
+        <PhoneEmailInput className="mt-4" />
+      ) : (
+        <PhoneInput className="mt-4" />
+      )}
+      {getErrorMessage("loginMethod") && (
+        <div className="text-destructive text-sm mt-1">
+          {getErrorMessage("loginMethod")}
+        </div>
+      )}
+      {type === "signin" && (
+        <PasswordInput className="pt-4" {...form.register("password")} />
+      )}
+      {getErrorMessage("password") && (
+        <div className="text-destructive text-sm mt-1">
+          {getErrorMessage("password")}
+        </div>
+      )}
+
       <div className={`mt-6 lg:${fontItalic.className} font-light`}>
-        <p>
-          We will send a text with a verification code. Message and date rates
-          may apply, By continuing, you agree to our
-        </p>
+        <p>By continuing, you agree to our</p>
         <div className="flex">
           <span className="text-primary">Terms of Services</span>
           <span>&nbsp; & &nbsp;</span>
           <span className="text-primary">Privacy Policy</span>.
         </div>
       </div>
-      <Button className="block w-full my-4 text-base" type="submit">
+      <Button
+        className="block w-full my-4 text-base"
+        type="submit"
+        disabled={!form.formState.isValid}
+      >
         Continue
       </Button>
       <CustomHr />
       <GoogleButton />
       <div className="text-base flex justify-center mt-8">
         {pathname !== "/signup" ? (
-          <p>{`Don’t have an account?`}</p>
+          <p>{`Don't have an account?`}</p>
         ) : (
           <p>{`Already have an account?`}</p>
         )}
