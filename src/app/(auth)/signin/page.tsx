@@ -103,9 +103,11 @@ const Signin = () => {
       ) : (
         <div className="mx-auto my-8">
           <div className="flex justify-center items-center gap-12">
-            <div className="flex-1">
-              <img src="/assets/images/Signup/phone1.svg" alt="Phone_Image" />
-            </div>
+            <img
+              src="/assets/images/Signup/phone1.svg"
+              alt="Phone_Image"
+              className="flex-1"
+            />
             <div className="border flex-1 lg:border-muted-foreground/30 lg:rounded-lg p-12 pl-8 lg:w-[50%] ">
               <div className="p-0">
                 <Logo />

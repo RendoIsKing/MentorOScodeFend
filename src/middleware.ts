@@ -28,6 +28,7 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname !== "/signup" &&
     request.nextUrl.pathname !== "/verify-otp" &&
     request.nextUrl.pathname !== "/signin" &&
+    request.nextUrl.pathname !== "/forgotpassword" &&
     request.nextUrl.pathname !== "/admin"
   ) {
     const signupUrl = new URL("/signup", process.env.NEXT_PUBLIC_DOMAIN);
@@ -105,6 +106,7 @@ export async function middleware(request: NextRequest) {
         currentPath === "/signup" ||
         currentPath === "/signin" ||
         currentPath === "/verify-otp" ||
+        currentPath === "/forgotpassword" ||
         currentPath === "/admin"
       ) {
         return NextResponse.redirect(

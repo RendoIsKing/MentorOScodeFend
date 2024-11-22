@@ -30,7 +30,7 @@ const AuthInputs = ({ type }) => {
   };
 
   return (
-    <div>
+    <div className="min-w-[320px]">
       {type === "signin" ? (
         <PhoneEmailInput className="mt-4" />
       ) : (
@@ -50,23 +50,39 @@ const AuthInputs = ({ type }) => {
         </div>
       )}
 
-      <div className={`mt-6 lg:${fontItalic.className} font-light`}>
-        <p>By continuing, you agree to our</p>
-        <div className="flex">
-          <span className="text-primary">Terms of Services</span>
-          <span>&nbsp; & &nbsp;</span>
-          <span className="text-primary">Privacy Policy</span>.
+      {type !== "forgot" && (
+        <div className={`mt-6 lg:${fontItalic.className} font-light`}>
+          <p>By continuing, you agree to our</p>
+          <div className="flex">
+            <span className="text-primary">Terms of Services</span>
+            <span>&nbsp; & &nbsp;</span>
+            <span className="text-primary">Privacy Policy</span>.
+          </div>
         </div>
-      </div>
+      )}
       <Button
         className="block w-full my-4 text-base"
         type="submit"
         disabled={!form.formState.isValid}
       >
-        Continue
+        {type !== "forgot" ? "Continue" : "Forget"}
       </Button>
-      <CustomHr />
-      <GoogleButton />
+      {type !== "forgot" && (
+        <>
+          <GoogleButton />
+          <CustomHr />
+        </>
+      )}
+      {type === "signin" && (
+        <div className="w-full text-center mt-2">
+          <Link
+            className="text-primary text-base hover:underline"
+            href="/forgotpassword"
+          >
+            Forgot Password
+          </Link>
+        </div>
+      )}
       <div className="text-base flex justify-center mt-8">
         {pathname !== "/signup" ? (
           <p>{`Don't have an account?`}</p>

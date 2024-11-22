@@ -10,7 +10,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
-import { useRegisterUserMutation } from "@/redux/services/haveme";
+import { useForgotPasswordMutation } from "@/redux/services/haveme";
 import { useAppDispatch } from "@/redux/store";
 import { setUserPhoneNumber } from "@/redux/slices/user-info";
 import { useRouter } from "next/navigation";
@@ -32,8 +32,8 @@ const Signup = () => {
     },
   });
 
-  const [registerUser, { isLoading, error, isError }] =
-    useRegisterUserMutation();
+  const [forgotPassword, { isLoading, error, isError }] =
+    useForgotPasswordMutation();
 
   const onSubmit = async (data: z.infer<typeof signupFormSchema>) => {
     if (!countryCode) {
@@ -52,7 +52,7 @@ const Signup = () => {
       return;
     }
 
-    await registerUser(data)
+    await forgotPassword(data)
       .unwrap()
       .then((res) => {
         appDispatcher(
@@ -81,7 +81,10 @@ const Signup = () => {
   return (
     <div>
       {isMobile && (
-        <PageHeader title="Sign Up" description="Enter Your Phone Number" />
+        <PageHeader
+          title="Forgot Password"
+          description="Enter Your Phone Number"
+        />
       )}
       {isMobile ? (
         <Form {...form}>
@@ -92,7 +95,7 @@ const Signup = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <AuthInputs type="signup" />
+                    <AuthInputs type="forgot" />
                   </FormControl>
                 </FormItem>
               )}
@@ -101,19 +104,14 @@ const Signup = () => {
         </Form>
       ) : (
         <div className="mx-auto my-8">
-          <div className="flex justify-center items-center gap-12">
-            <img
-              src="/assets/images/Signup/phone1.svg"
-              alt="Phone_Image"
-              className="flex-1"
-            />
-            <div className="border flex-1 lg:border-muted-foreground/30 lg:rounded-lg p-12 pl-8 lg:w-[41%]">
+          <div className="flex w-full justify-center items-center gap-12">
+            <div className="border flex-1 lg:border-muted-foreground/30 lg:rounded-lg p-12 pl-8">
               <div className="p-0">
                 <Logo />
               </div>
               <div className="p-2">
                 <PageHeader
-                  title="Sign Up"
+                  title="Forgot Password"
                   description="Enter Your Phone Number"
                 />
                 <Form {...form}>
@@ -124,7 +122,7 @@ const Signup = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <AuthInputs type="signup" />
+                            <AuthInputs type="forgot" />
                           </FormControl>
                         </FormItem>
                       )}
