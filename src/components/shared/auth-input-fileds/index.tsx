@@ -63,7 +63,7 @@ const AuthInputs = ({ type }) => {
       <Button
         className="block w-full my-4 text-base"
         type="submit"
-        disabled={!form.formState.isValid}
+        // disabled={!form.formState.isValid}
       >
         {type !== "forgot" ? "Continue" : "Forget"}
       </Button>
