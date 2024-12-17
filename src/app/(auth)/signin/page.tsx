@@ -113,10 +113,6 @@ const Signin = () => {
                 <Logo />
               </div>
               <div className="lg:p-2">
-                <PageHeader
-                  title="Sign In"
-                  description="Enter Your Phone Number or Email"
-                />
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="">
                     <FormField
