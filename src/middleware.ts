@@ -1,10 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { notFound } from "next/navigation";
-
-// authenticated user means he has token
-// logged in user means user is on boarded and completed all the steps
-// verified means user's docs are verified and can view other contents on the site
 
 async function getUserProgress(userAuthToken: string) {
   const response = await fetch(
@@ -23,20 +18,33 @@ async function getUserProgress(userAuthToken: string) {
 export async function middleware(request: NextRequest) {
   const userAuthToken = request.cookies.get("auth_token");
 
-  if (
-    !userAuthToken &&
-    request.nextUrl.pathname !== "/signup" &&
-    request.nextUrl.pathname !== "/verify-otp" &&
-    request.nextUrl.pathname !== "/signin" &&
-    request.nextUrl.pathname !== "/forgotpassword" &&
-    request.nextUrl.pathname !== "/admin"
-  ) {
+  // Public paths that don't require authentication
+  const publicPaths = [
+    "/signup",
+    "/verify-otp",
+    "/signin",
+    "/forgotpassword",
+    "/admin",
+  ];
+
+  // Check if current path is public
+  const isPublicPath = publicPaths.includes(request.nextUrl.pathname);
+
+  // If no token and trying to access protected route
+  if (!userAuthToken && !isPublicPath) {
     const signupUrl = new URL("/signup", process.env.NEXT_PUBLIC_DOMAIN);
     return NextResponse.redirect(signupUrl);
-  } else if (userAuthToken?.value) {
+  }
+
+  if (userAuthToken?.value) {
     const userProgress = await getUserProgress(userAuthToken.value);
     const currentPath = request.nextUrl.pathname;
     const isAdmin = userProgress?.data?.role === "admin" ? true : false;
+
+    const hasActiveSubscription =
+      userProgress?.data?.platformSubscription?.status === "active";
+
+    // Admin route handling
     if (isAdmin) {
       if (!currentPath.startsWith("/admin/")) {
         return NextResponse.redirect(
@@ -44,27 +52,53 @@ export async function middleware(request: NextRequest) {
         );
       }
     } else {
+      // Prevent non-admins from accessing admin routes
       if (currentPath.startsWith("/admin/")) {
         return NextResponse.redirect(
           new URL("/home", process.env.NEXT_PUBLIC_DOMAIN)
         );
       }
+
+      // Onboarding steps check
       const pathsAndChecks = [
         { path: "/user-info", check: userProgress.data.hasPersonalInfo },
         { path: "/user-photo", check: userProgress.data.hasPhotoInfo },
         { path: "/user-tags", check: userProgress.data.hasSelectedInterest },
         { path: "/age-confirmation", check: userProgress.data.hasConfirmedAge },
-        {
-          path: "/age-confirmation",
-          check: userProgress.data.hasDocumentUploaded,
-        },
       ];
 
       const allStepsCompleted = pathsAndChecks.every(
         (element) => element.check
       );
 
-      // If all steps are completed, redirect the user
+      // Routes that require subscription
+      const subscriptionRequiredPaths = [
+        "/chat",
+        "/creator-center",
+        "/search",
+        "/wallet",
+      ];
+
+      // Check if current path requires subscription
+      const requiresSubscription = subscriptionRequiredPaths.some((path) =>
+        currentPath.startsWith(path)
+      );
+
+      // If path requires subscription and user doesn't have active subscription
+      if (requiresSubscription && !hasActiveSubscription) {
+        const response = NextResponse.redirect(
+          `${process.env.NEXT_PUBLIC_DOMAIN}/home`
+        );
+
+        response.cookies.set("showSubscriptionModal", "true", {
+          path: "/",
+          maxAge: 60 * 5,
+        });
+
+        return response;
+      }
+
+      // If user has subscription but tries to access onboarding steps
       if (
         allStepsCompleted &&
         pathsAndChecks.some((pathCheck) => pathCheck.path === currentPath)
@@ -74,41 +108,19 @@ export async function middleware(request: NextRequest) {
         );
       }
 
+      // Check and redirect for incomplete steps
       for (const element of pathsAndChecks) {
         if (element.path === currentPath && !element.check) {
-          // User is on the correct page but hasn't completed it
           break;
         } else if (!element.check) {
-          // Find the first incomplete step
           return NextResponse.redirect(
             new URL(element.path, process.env.NEXT_PUBLIC_DOMAIN)
           );
         }
       }
 
-      const verifiedOnlyPaths = [
-        "/chat",
-        "/creator-center",
-        "/search",
-        "/wallet",
-      ];
-
-      if (
-        !userProgress?.data?.hasDocumentVerified &&
-        verifiedOnlyPaths.some((path) => currentPath.startsWith(path))
-      ) {
-        return NextResponse.redirect(
-          new URL("/home", process.env.NEXT_PUBLIC_DOMAIN)
-        );
-      }
-
-      if (
-        currentPath === "/signup" ||
-        currentPath === "/signin" ||
-        currentPath === "/verify-otp" ||
-        currentPath === "/forgotpassword" ||
-        currentPath === "/admin"
-      ) {
+      // Redirect authenticated users away from auth pages
+      if (publicPaths.includes(currentPath)) {
         return NextResponse.redirect(
           new URL("/home", process.env.NEXT_PUBLIC_DOMAIN)
         );
@@ -128,6 +140,7 @@ export const config = {
     "/user-photo",
     "/user-tags",
     "/age-confirmation",
+    "/billing",
     "/home/:id*",
     "/chat/:id*",
     "/search/:id*",

@@ -34,7 +34,9 @@ export const authSlice = createSlice({
     setAccessToken: (state, { payload }) => {
       state.token = payload;
     },
-    logout: async (state) => {
+    logout: (state) => {
+      state.authenticated = null;
+      state.token = null;
       sessionStorage.removeItem(AUTH_KEY);
       sessionStorage.removeItem(AUTH_TOKEN);
       localStorage.removeItem(AUTH_KEY);
@@ -42,44 +44,38 @@ export const authSlice = createSlice({
       removeAuthCookies();
     },
   },
-
   extraReducers: (builder) => {
     builder
       .addMatcher(
-        havemeApi.endpoints.verifyOtp.matchFulfilled,
+        havemeApi.endpoints.loginUser.matchFulfilled,
         (state, { payload }) => {
-          if (payload?.data.token) {
-            state.authenticated = payload;
-            setAuthCookie(payload.data.token);
-            state.token = payload.data.token;
-            sessionStorage.setItem(
-              AUTH_TOKEN,
-              JSON.stringify({ token: payload.data.token })
-            );
-            localStorage.setItem(
-              AUTH_TOKEN,
-              JSON.stringify({ token: payload.data.token })
-            );
-            sessionStorage.setItem(AUTH_KEY, JSON.stringify(payload));
-            localStorage.setItem(AUTH_KEY, JSON.stringify(payload));
+          if (payload?.token) {
+            state.authenticated = { ...payload }; // Spread to avoid mutations
+            state.token = payload.token;
+            setAuthCookie(payload.token);
+
+            const authData = JSON.stringify(payload);
+            sessionStorage.setItem(AUTH_KEY, authData);
+            localStorage.setItem(AUTH_KEY, authData);
+
+            const tokenData = JSON.stringify({ token: payload.token });
+            sessionStorage.setItem(AUTH_TOKEN, tokenData);
+            localStorage.setItem(AUTH_TOKEN, tokenData);
           } else {
-            state = null;
+            state.authenticated = null;
+            state.token = null;
             sessionStorage.removeItem(AUTH_KEY);
-            localStorage.removeItem(AUTH_TOKEN);
-            sessionStorage.removeItem(AUTH_TOKEN);
             localStorage.removeItem(AUTH_KEY);
+            sessionStorage.removeItem(AUTH_TOKEN);
+            localStorage.removeItem(AUTH_TOKEN);
             removeAuthCookies();
           }
         }
       )
       .addMatcher(
-        havemeApi.endpoints.verifyOtp.matchRejected,
+        havemeApi.endpoints.loginUser.matchRejected,
         (state, { payload }) => {
-          if (payload.data) {
-          } else {
-            console.error(`something went wrong`);
-          }
-          console.error(payload, "error");
+          console.error(payload?.data || "Something went wrong", payload);
         }
       );
   },

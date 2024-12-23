@@ -10,7 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/components/ui/use-toast";
 import FileUploadForm from "@/components/file-upload";
 import PageHeader from "@/components/shared/page-header";
 import WebcamCapture from "@/components/capture-photo";
@@ -56,7 +56,7 @@ const ProfilePhoto: React.FC<IProfilePhotoProps> = ({ isUpdating }) => {
   const [savePhotoMethod] = useUpdateMeMutation();
   const [skipProfilePhoto] = useSkipUserPhotoMutation();
   const [deleteProfilePhoto] = useDeleteFileMutation();
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   // Function to convert the captured image to a base64 string
   const convertToBase64 = (file: Blob) => {
@@ -76,6 +76,7 @@ const ProfilePhoto: React.FC<IProfilePhotoProps> = ({ isUpdating }) => {
   };
 
   const updateProfilePhotoInfo = (photoInfo) => {
+    console.log("photoinfo:: ", photoInfo);
     const newPhotoPath = `${baseServerUrl}/${
       photoInfo.file.data.path
     }?t=${new Date().getTime()}`;

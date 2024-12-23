@@ -43,6 +43,7 @@
     "embla-carousel-react": "^8.0.0",
     "firebase": "^10.12.2",
     "input-otp": "^1.2.2",
+    "libphonenumber-js": "^1.11.16",
     "lucide-react": "^0.360.0",
     "millify": "^6.1.0",
     "next": "^14.2.3",

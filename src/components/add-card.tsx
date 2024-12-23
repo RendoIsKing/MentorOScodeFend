@@ -1,5 +1,6 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { cookies } from "next/headers";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -23,50 +24,36 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import { StripeCardNumberElement } from "@stripe/stripe-js";
-import CountryDropdown from "./dropdown/countries";
-import StateDropdown from "./dropdown/states";
 import { useTheme } from "next-themes";
 import { useAddCardFromTokenMutation } from "@/redux/services/haveme/card";
-import states from "@/data/states.json";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import CountryDropdown from "./dropdown/countries";
+import StateDropdown from "./dropdown/states";
+import {
+  useCreateSubscriptionMutation,
+  useGetOnePlanForAllQuery,
+} from "@/redux/services/haveme/subscription";
 
-const SD = states;
-const countryStateMap = SD.reduce((acc, state) => {
-  if (!acc[state.country_name]) {
-    acc[state.country_name] = [];
-  }
-  acc[state.country_name].push(state.name.toLowerCase());
-  return acc;
-}, {});
-
-const FormSchema = z
-  .object({
-    country: z.string({
-      required_error: "Please select Country.",
+// Validation schema remains the same
+const FormSchema = z.object({
+  country: z.string({ required_error: "Please select Country." }),
+  state: z.string().optional(),
+  street: z.string().min(5, "Address should be minimum 4 characters."),
+  username: z.string().min(5, "Name should be minimum 5 characters."),
+  age: z.literal(true, {
+    errorMap: () => ({
+      message: "You must confirm that you are at least 18 years old.",
     }),
-    state: z.string().optional(),
-    street: z.string().min(5, "Address should be minimum 4 characters."),
-    username: z.string().min(5, "Name should be minimum 5 characters."),
-    age: z.literal(true, {
-      errorMap: () => ({
-        message: "You must confirm that you are at least 18 years old.",
-      }),
-    }),
-  })
-  .refine(
-    (data) => {
-      const countryStates = countryStateMap[data.country];
-      if (countryStates && countryStates.length > 0) {
-        return countryStates.includes(data.state?.toLowerCase());
-      }
-      return true; // If the country doesn't have states,
-    },
-    {
-      message: "Please select state/province.",
-      path: ["state"],
-    }
-  );
+  }),
+});
 
 const BillingDetails = () => {
   const { resolvedTheme } = useTheme();
@@ -74,6 +61,52 @@ const BillingDetails = () => {
   const stripe = useStripe();
   const elements = useElements();
   const [addCardFromToken, { isLoading }] = useAddCardFromTokenMutation();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [hasSubscription, setHasSubscription] = useState(false);
+  const { data: planData, isFetching: isPlanLoading } =
+    useGetOnePlanForAllQuery();
+  const [createSubscription, { isLoading: isSubscribing }] =
+    useCreateSubscriptionMutation();
+
+  useEffect(() => {
+    if (planData?.data?.platformSubscription?.status === "active") {
+      setHasSubscription(true);
+    }
+
+    const checkModalState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const showModal =
+        params.get("showModal") === "true" ||
+        localStorage.getItem("showSubscriptionModal") === "true";
+
+      if (showModal) {
+        setIsModalOpen(true);
+        // Clear the modal state from storage after showing
+        localStorage.removeItem("showSubscriptionModal");
+        // Remove the URL parameter
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, "", newUrl);
+      }
+    };
+
+    checkModalState();
+  }, [planData]);
+
+  // Handle modal close attempt
+  const handleModalClose = (open: boolean) => {
+    if (!hasSubscription) {
+      toast({
+        variant: "destructive",
+        title: "Subscription Required",
+        description: "Please select a subscription plan to continue.",
+      });
+      return;
+    }
+    setIsModalOpen(open);
+    if (!open) {
+      localStorage.removeItem("showSubscriptionModal");
+    }
+  };
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -86,12 +119,7 @@ const BillingDetails = () => {
   const baseOptions = {
     style: {
       base: {
-        color:
-          resolvedTheme === "dark"
-            ? "#e5e7eb"
-            : resolvedTheme === "light"
-            ? "#000"
-            : "#e5e7eb",
+        color: resolvedTheme === "dark" ? "#e5e7eb" : "#000",
       },
     },
   };
@@ -131,7 +159,7 @@ const BillingDetails = () => {
             variant: "success",
             title: res?.message || "Card added successfully.",
           });
-          router.push("/wallet");
+          setIsModalOpen(true);
         })
         .catch((err) => {
           console.log("err:", err);
@@ -149,10 +177,44 @@ const BillingDetails = () => {
     }
   };
 
+  const handleSubscribe = async (planId: string) => {
+    try {
+      await createSubscription(planId).unwrap();
+      setHasSubscription(true);
+      // Store subscription status
+      localStorage.setItem("hasSubscription", "true");
+      toast({
+        variant: "success",
+        title: "Subscribed successfully!",
+      });
+      router.push("/home");
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        description: err?.data?.error || "Failed to subscribe.",
+      });
+    }
+  };
+
+  useEffect(() => {
+    const showModal =
+      document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("showSubscriptionModal="))
+        ?.split("=")[1] === "true";
+
+    if (showModal) {
+      setIsModalOpen(true);
+      localStorage.setItem("showSubscriptionModal", "true");
+      document.cookie =
+        "showSubscriptionModal=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    }
+  }, []);
+
   return (
     <div className="p-5">
       <div className="md:flex sm:items-center flex-col">
-        <p className="w-full mt-5  md:max-w-md md:w-1/2 text-left lg:text-center font-extralight text-base lg:text-xl">
+        <p className="w-full mt-5 md:max-w-md md:w-1/2 text-left lg:text-center font-extralight text-base lg:text-xl">
           We are fully compliant with payment card industry data security
           standards
         </p>
@@ -340,7 +402,97 @@ const BillingDetails = () => {
           </Form>
         </div>
       </div>
+
+      {/* Updated Dialog with forced subscription */}
+      <Dialog open={isModalOpen} onOpenChange={handleModalClose}>
+        <DialogContent
+          className="sm:max-w-[500px]"
+          onInteractOutside={(e) => {
+            if (!hasSubscription) {
+              e.preventDefault();
+            }
+          }}
+          onEscapeKeyDown={(e) => {
+            if (!hasSubscription) {
+              e.preventDefault();
+            }
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle>Subscription Required</DialogTitle>
+            <DialogDescription>
+              Please select a subscription plan to continue using our services.
+            </DialogDescription>
+          </DialogHeader>
+
+          {isPlanLoading ? (
+            <div className="flex justify-center py-4">
+              <Loader2 className="h-6 w-6 animate-spin" />
+            </div>
+          ) : planData && planData.data ? (
+            <div className="space-y-4">
+              {Array.isArray(planData.data) && planData.data.length > 0 ? (
+                planData.data.map((plan) => (
+                  <div
+                    key={plan._id}
+                    className="p-4 border rounded-md flex flex-col items-center shadow-md"
+                  >
+                    <h3 className="text-xl font-bold">{plan.title}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {plan.description}
+                    </p>
+                    <p className="text-sm font-medium mt-2">
+                      Price: ${plan.price}
+                    </p>
+                    <p className="text-sm font-medium">
+                      Duration: {plan.duration} days
+                    </p>
+                    <Button
+                      onClick={() => handleSubscribe(plan._id)}
+                      className="mt-4 w-full"
+                      disabled={isSubscribing}
+                    >
+                      {isSubscribing && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      Subscribe
+                    </Button>
+                  </div>
+                ))
+              ) : (
+                <div className="p-4 border rounded-md shadow-md">
+                  <h3 className="text-lg font-bold">{planData.data.title}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {planData.data.description}
+                  </p>
+                  <p className="text-sm font-medium mt-2">
+                    Price: ${planData.data.price}
+                  </p>
+                  <p className="text-sm font-medium">
+                    Duration: {planData.data.duration} days
+                  </p>
+                  <Button
+                    onClick={() => handleSubscribe(planData.data._id)}
+                    className="mt-4 w-full"
+                    disabled={isSubscribing}
+                  >
+                    {isSubscribing && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Subscribe
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-center text-muted-foreground">
+              No subscription plans available.
+            </p>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
+
 export default BillingDetails;

@@ -1,12 +1,12 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   parsePhoneNumber,
   getCountryCallingCode,
+  isValidPhoneNumber,
 } from "react-phone-number-input";
 import { useFormContext } from "react-hook-form";
-import { cn } from "@/lib/utils";
-import { Phone, Mail, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { Input } from "./ui/input";
 
 const PhoneEmailInput = ({ className, ...props }) => {
@@ -18,7 +18,6 @@ const PhoneEmailInput = ({ className, ...props }) => {
 
   const determineInputType = (value: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     const phoneRegex = /^(\+?\d{1,3}[-\s.]?)?(\d{1,4}[-\s.]?){1,3}\d{1,4}$/;
 
     if (emailRegex.test(value)) {
@@ -36,18 +35,19 @@ const PhoneEmailInput = ({ className, ...props }) => {
     const trimmedValue = value.trim();
     setInputValue(trimmedValue);
 
-    try {
-      const currentInputType = determineInputType(trimmedValue);
-      setInputType(currentInputType);
+    const currentInputType = determineInputType(trimmedValue);
+    setInputType(currentInputType);
 
-      if (currentInputType === "email") {
-        form.setValue("loginMethod", {
-          type: "email",
-          email: trimmedValue,
-        });
-      } else {
-        const cleanedValue = trimmedValue.replace(/[^\d+]/g, "");
+    if (currentInputType === "email") {
+      form.setValue("loginMethod", {
+        type: "email",
+        email: trimmedValue,
+      });
+      form.clearErrors("loginMethod");
+    } else {
+      const cleanedValue = trimmedValue.replace(/[^\d+]/g, "");
 
+      if (cleanedValue && isValidPhoneNumber(cleanedValue)) {
         try {
           const phoneNumber = parsePhoneNumber(cleanedValue);
 
@@ -66,19 +66,29 @@ const PhoneEmailInput = ({ className, ...props }) => {
               phoneNumber: cleanedValue.replace(/^\+/, ""),
             });
           }
+
+          form.clearErrors("loginMethod");
         } catch {
-          form.setValue("loginMethod", {
-            type: "phone",
-            prefix: "",
-            phoneNumber: cleanedValue.replace(/^\+/, ""),
+          form.setError("loginMethod", {
+            type: "manual",
+            message: "Invalid phone number format",
           });
         }
-      }
+      } else {
+        form.setError("loginMethod", {
+          type: "manual",
+          message: "Invalid phone number",
+        });
 
-      form.trigger("loginMethod");
-    } catch (error) {
-      console.error("Input processing error:", error);
+        form.setValue("loginMethod", {
+          type: "phone",
+          prefix: "",
+          phoneNumber: "",
+        });
+      }
     }
+
+    form.trigger("loginMethod");
   };
 
   const getErrorMessage = () => {

@@ -48,6 +48,17 @@ const Signin = () => {
 
       const res = await loginUser(payload).unwrap();
 
+      if (res?.status === false && res?.isPassword === "false") {
+        toast({
+          variant: "destructive",
+          title: "Action Required",
+          description: "Please set your password first",
+        });
+
+        router.push("/user-info");
+        return;
+      }
+
       // Handle successful login
       appDispatcher(
         setUserPhoneNumber({
@@ -66,7 +77,7 @@ const Signin = () => {
         title: `Please verify using it within 10 minutes ${res?.data?.otp}`,
       });
 
-      router.push("/verify-otp");
+      router.push("/home");
     } catch (err) {
       console.error(err);
       toast({
