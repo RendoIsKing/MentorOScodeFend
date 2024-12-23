@@ -59,12 +59,14 @@ const ProfileInfo = () => {
       message: "Full Name must be at least 4 characters.",
     }),
 
-    username: z.string().min(3, {
-      message: "Name must be at least 3 characters and unique.",
-     }).regex(/^[a-zA-Z0-9]+$/, {
+    username: z
+      .string()
+      .min(3, {
+        message: "Name must be at least 3 characters and unique.",
+      })
+      .regex(/^[a-zA-Z0-9]+$/, {
         message: "UserName must contain only alphanumeric characters.",
       }),
-  
 
     emailAddress: z
       .string()
@@ -72,6 +74,10 @@ const ProfileInfo = () => {
         message: "Full Name must be at least 4 characters.",
       })
       .email({ message: "Invalid email address" }),
+
+    password: z.string().min(4, {
+      message: "Password must be at least 4 characters.",
+    }),
 
     genderType: z.string({
       required_error: "Please select your gender.",
@@ -98,12 +104,13 @@ const ProfileInfo = () => {
       fullName: "",
       username: "",
       emailAddress: "",
+      password: "",
       genderType: "",
       otherGender: "",
     },
   });
-  
-  const fieldError = Object.keys(form.formState.errors).length === 0
+
+  const fieldError = Object.keys(form.formState.errors).length === 0;
   const debouncedValue = useDebounce(usernameText, 500);
   useEffect(() => {
     if (debouncedValue) {
@@ -134,6 +141,7 @@ const ProfileInfo = () => {
         fullName: formatFullName(data.fullName),
         userName: data.username,
         email: data.emailAddress.toLowerCase(),
+        password: data.password,
         gender:
           data.genderType.toLowerCase() === "other"
             ? data.otherGender
@@ -142,7 +150,7 @@ const ProfileInfo = () => {
       createUserMethod(createUserObject)
         .unwrap()
         .then((res) => {
-         // console.log(res);
+          // console.log(res);
           router.replace("/user-photo");
 
           toast({
@@ -235,8 +243,12 @@ const ProfileInfo = () => {
                         }}
                       />
                     </FormControl>
-                    {usernameAvailability &&(
-                      <FormMessage className={!fieldError ? "text-red-600" : "text-green-600"}>
+                    {usernameAvailability && (
+                      <FormMessage
+                        className={
+                          !fieldError ? "text-red-600" : "text-green-600"
+                        }
+                      >
                         {usernameAvailability}
                       </FormMessage>
                     )}
@@ -259,6 +271,29 @@ const ProfileInfo = () => {
                         className="h-12"
                         type="email"
                         placeholder="Enter your email address"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel
+                      className={` font-normal ${fontItalic.className}`}
+                    >
+                      Password{" "}
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-12"
+                        type="password"
+                        placeholder="Enter your Password"
                         {...field}
                       />
                     </FormControl>

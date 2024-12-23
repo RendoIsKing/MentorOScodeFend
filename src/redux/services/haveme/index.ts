@@ -125,6 +125,18 @@ export const havemeApi = createApi({
         };
       },
     }),
+    forgotPassword: builder.mutation<IAuthResponse, IAuthRequest>({
+      query: (body) => {
+        return {
+          url: "/auth/forgot-password",
+          method: "post",
+          body: {
+            phoneNumber: body.phoneNumber,
+            dialCode: body.prefix.replace("+", ""),
+          },
+        };
+      },
+    }),
     verifyOtp: builder.mutation<VerifyOtpResponseObject, IVerifyOtpRequest>({
       invalidatesTags: [TAG_GET_USER_INFO],
       query: (body) => {
@@ -243,6 +255,7 @@ export const havemeApi = createApi({
 export const {
   useRegisterUserMutation,
   useLoginUserMutation,
+  useForgotPasswordMutation,
   useVerifyOtpMutation,
   useLazyCheckUsernameQuery,
   useCreateUserMutation,

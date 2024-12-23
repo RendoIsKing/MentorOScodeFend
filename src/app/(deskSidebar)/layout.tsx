@@ -16,12 +16,6 @@ export default function SideBarPageLayout({
   const { isMobile } = useClientHardwareInfo();
   const isLoggedIn = useTypedSelector(selectIsAuthenticated);
 
-  const [isMounted, setIsMounted] = useState(null);
-
-  useEffect(() => {
-    setIsMounted(isLoggedIn);
-  }, []);
-
   return (
     <>
       {isMobile ? (
@@ -30,7 +24,7 @@ export default function SideBarPageLayout({
         <>
           <div className="flex">
             <div className="flex flex-col">
-              {isMounted ? <Sidebar /> : <></>}
+              <Sidebar />
             </div>
             <ScrollArea className="flex flex-col flex-grow h-screen">
               {children}

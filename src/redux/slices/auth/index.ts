@@ -34,7 +34,26 @@ export const authSlice = createSlice({
     setAccessToken: (state, { payload }) => {
       state.token = payload;
     },
-    logout: async (state) => {
+    setAuthData: (state, { payload }) => {
+      state.authenticated = payload;
+      if (payload?.token) {
+        state.token = payload.token;
+        setAuthCookie(payload.token);
+        sessionStorage.setItem(
+          AUTH_TOKEN,
+          JSON.stringify({ token: payload.token })
+        );
+        localStorage.setItem(
+          AUTH_TOKEN,
+          JSON.stringify({ token: payload.token })
+        );
+        sessionStorage.setItem(AUTH_KEY, JSON.stringify(payload));
+        localStorage.setItem(AUTH_KEY, JSON.stringify(payload));
+      }
+    },
+    logout: (state) => {
+      state.authenticated = {};
+      state.token = "";
       sessionStorage.removeItem(AUTH_KEY);
       sessionStorage.removeItem(AUTH_TOKEN);
       localStorage.removeItem(AUTH_KEY);
@@ -44,49 +63,38 @@ export const authSlice = createSlice({
   },
 
   extraReducers: (builder) => {
-    builder
-      .addMatcher(
-        havemeApi.endpoints.verifyOtp.matchFulfilled,
-        (state, { payload }) => {
-          if (payload?.data.token) {
-            state.authenticated = payload;
-            setAuthCookie(payload.data.token);
-            state.token = payload.data.token;
-            sessionStorage.setItem(
-              AUTH_TOKEN,
-              JSON.stringify({ token: payload.data.token })
-            );
-            localStorage.setItem(
-              AUTH_TOKEN,
-              JSON.stringify({ token: payload.data.token })
-            );
-            sessionStorage.setItem(AUTH_KEY, JSON.stringify(payload));
-            localStorage.setItem(AUTH_KEY, JSON.stringify(payload));
-          } else {
-            state = null;
-            sessionStorage.removeItem(AUTH_KEY);
-            localStorage.removeItem(AUTH_TOKEN);
-            sessionStorage.removeItem(AUTH_TOKEN);
-            localStorage.removeItem(AUTH_KEY);
-            removeAuthCookies();
-          }
+    builder.addMatcher(
+      havemeApi.endpoints.verifyOtp.matchFulfilled,
+      (state, { payload }) => {
+        if (payload?.data.token) {
+          state.authenticated = payload;
+          setAuthCookie(payload.data.token);
+          state.token = payload.data.token;
+          sessionStorage.setItem(
+            AUTH_TOKEN,
+            JSON.stringify({ token: payload.data.token })
+          );
+          localStorage.setItem(
+            AUTH_TOKEN,
+            JSON.stringify({ token: payload.data.token })
+          );
+          sessionStorage.setItem(AUTH_KEY, JSON.stringify(payload));
+          localStorage.setItem(AUTH_KEY, JSON.stringify(payload));
+        } else {
+          state.authenticated = {};
+          state.token = "";
+          sessionStorage.removeItem(AUTH_KEY);
+          localStorage.removeItem(AUTH_TOKEN);
+          sessionStorage.removeItem(AUTH_TOKEN);
+          localStorage.removeItem(AUTH_KEY);
+          removeAuthCookies();
         }
-      )
-      .addMatcher(
-        havemeApi.endpoints.verifyOtp.matchRejected,
-        (state, { payload }) => {
-          if (payload.data) {
-          } else {
-            console.error(`something went wrong`);
-          }
-          console.error(payload, "error");
-        }
-      );
+      }
+    );
   },
 });
 
-export default authSlice.reducer;
-export const { logout, setAccessToken } = authSlice.actions;
+export const { setAccessToken, setAuthData, logout } = authSlice.actions;
 export const selectCurrentUser = (state: RootState) => state.auth.authenticated;
-
 export const selectIsAuthenticated = (state: RootState) => !!state.auth.token;
+export default authSlice.reducer;

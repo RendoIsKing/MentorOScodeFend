@@ -18,6 +18,7 @@ export interface ILoginResponseObject {
   otpInvalidAt: string;
   _id: string;
   location: any[];
+  token?: string;
   createdAt: string;
   updatedAt: string;
   completePhoneNumber: string;
@@ -28,4 +29,6 @@ export interface IUserLoginResponse {
   data?: ILoginResponseObject;
   token?: string;
   message?: string;
+  status?: boolean;
+  isPassword?: string;
 }

@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation";
 import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
 
 import Logo from "@/components/shared/Logo";
-import SharedPopupsComponent from "@/components/shared/popup/doc-age-popup";
+// import SharedPopupsComponent from "@/components/shared/popup/doc-age-popup";
 import BackArrow from "@/assets/images/Signup/back.svg";
 import { differenceInYears } from "date-fns";
 
@@ -151,7 +151,7 @@ const AgeConfirmation = () => {
           description: "Something went wrong",
         });
       });
-    //router.push("/home");
+    router.push("/home");
   };
 
   return (
@@ -163,7 +163,7 @@ const AgeConfirmation = () => {
         />
       )}
 
-      <SharedPopupsComponent
+      {/* <SharedPopupsComponent
         openPopup={openPopup}
         titleText="Upload your ID proof"
         btnText="Upload Your ID"
@@ -184,7 +184,7 @@ const AgeConfirmation = () => {
         imageUrl="\assets\images\pending-verification\pending-verification.svg"
         handleSubmit={submitReview}
         exitText="Logout"
-      />
+      /> */}
       <div className="lg:flex">
         {/* {!isMobile && (
           <div className="mt-4">

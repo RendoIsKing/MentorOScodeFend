@@ -5,7 +5,10 @@ import {
   TAG_GET_USER_ENTITLEMENTS,
   TAG_GET_USER_PLANS,
 } from "@/contracts/haveme/haveMeApiTags";
-import { IGetAllEntitlementsResponse } from "@/contracts/responses/IGetAllEntitlementsResponse";
+import {
+  IGetAllEntitlementsResponse,
+  IGetOnePlanForAllResponse,
+} from "@/contracts/responses/IGetAllEntitlementsResponse";
 
 export const subscriptionApi = havemeApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -24,6 +27,17 @@ export const subscriptionApi = havemeApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    getOnePlanForAll: builder.query<IGetOnePlanForAllResponse, void>({
+      providesTags: [TAG_GET_USER_ENTITLEMENTS],
+      query: () => {
+        console.log("Fetching subscription plans");
+        return {
+          url: `/plans/subscription`,
+          method: "GET",
+        };
+      },
+    }),
+
     getAllEntitlements: builder.query<IGetAllEntitlementsResponse, void>({
       providesTags: [TAG_GET_USER_ENTITLEMENTS],
       query: () => ({
@@ -65,6 +79,7 @@ export const {
   useCreateProductPlanMutation,
   useGetPlanDetailsQuery,
   useDeletePlanMutation,
+  useGetOnePlanForAllQuery,
   useGetAllEntitlementsQuery,
   useCreateSubscriptionMutation,
   useGiveTipMutation,

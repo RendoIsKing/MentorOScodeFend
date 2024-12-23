@@ -22,7 +22,7 @@ export const signinFormSchema = z.object({
       email: z.string().email("Invalid email address"),
     }),
   ]),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(5, "Password must be at least 5 characters"),
 });
 // .refine((data) => phoneNumberRefine(data.phoneNumber, data.prefix), {
 //   message: "Please Enter valid number",

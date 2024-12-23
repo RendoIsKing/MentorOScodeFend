@@ -8,6 +8,7 @@ export interface IAuthResponseObject {
   verifiedAt: string | null;
   verifiedBy: string | null;
   isVerified: boolean;
+  isPassword: boolean;
   otp: string;
   otpInvalidAt: string;
   _id: string;
@@ -20,6 +21,8 @@ export interface IAuthResponseObject {
 }
 
 export interface IAuthResponse {
+  status: boolean;
+  isPassword: string;
   data?: IAuthResponseObject;
   token?: string;
   message?: string;

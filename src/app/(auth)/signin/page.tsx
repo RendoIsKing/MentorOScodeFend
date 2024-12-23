@@ -14,6 +14,7 @@ import { useLoginUserMutation } from "@/redux/services/haveme";
 import { setUserPhoneNumber } from "@/redux/slices/user-info";
 import { useAppDispatch } from "@/redux/store";
 import { signinFormSchema } from "@/schemas/auth";
+import { setAuthData } from "@/redux/slices/auth";
 
 const Signin = () => {
   const { isMobile } = useClientHardwareInfo();
@@ -31,6 +32,7 @@ const Signin = () => {
   });
 
   const [loginUser, { isLoading, error, isError }] = useLoginUserMutation();
+  const appDispatch = useAppDispatch();
 
   const onSubmit = async (data: z.infer<typeof signinFormSchema>) => {
     try {
@@ -48,25 +50,36 @@ const Signin = () => {
 
       const res = await loginUser(payload).unwrap();
 
+      if (res?.status === false && res?.isPassword === "false") {
+        toast({
+          variant: "destructive",
+          title: "Action Required",
+          description: "Please set your password first",
+        });
+
+        router.push("/user-info");
+        return;
+      }
+
       // Handle successful login
-      appDispatcher(
-        setUserPhoneNumber({
-          phoneNumber:
-            data.loginMethod.type === "phone"
-              ? data.loginMethod.phoneNumber
-              : "",
-          prefix:
-            data.loginMethod.type === "phone" ? data.loginMethod.prefix : "",
-          id: res?.data?._id,
-        })
-      );
+      appDispatch(setAuthData(res));
+
+      // Store phone number if using phone login
+      if (data.loginMethod.type === "phone") {
+        appDispatch(
+          setUserPhoneNumber({
+            phoneNumber: data.loginMethod.phoneNumber,
+            prefix: data.loginMethod.prefix,
+            id: res?.data?._id,
+          })
+        );
+      }
+      router.push("/home");
 
       toast({
         variant: "success",
         title: `Please verify using it within 10 minutes ${res?.data?.otp}`,
       });
-
-      router.push("/verify-otp");
     } catch (err) {
       console.error(err);
       toast({
@@ -103,18 +116,16 @@ const Signin = () => {
       ) : (
         <div className="mx-auto my-8">
           <div className="flex justify-center items-center gap-12">
-            <div className="flex-1">
-              <img src="/assets/images/Signup/phone1.svg" alt="Phone_Image" />
-            </div>
+            <img
+              src="/assets/images/Signup/phone1.svg"
+              alt="Phone_Image"
+              className="flex-1"
+            />
             <div className="border flex-1 lg:border-muted-foreground/30 lg:rounded-lg p-12 pl-8 lg:w-[50%] ">
               <div className="p-0">
                 <Logo />
               </div>
               <div className="lg:p-2">
-                <PageHeader
-                  title="Sign In"
-                  description="Enter Your Phone Number or Email"
-                />
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="">
                     <FormField
