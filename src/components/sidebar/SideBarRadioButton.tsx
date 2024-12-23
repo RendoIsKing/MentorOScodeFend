@@ -79,7 +79,7 @@ const SideBarRadioButton = () => {
       url: "/search",
       icon: <Search />,
       segment: "(search)",
-      hasDocumentVerified: !user?.platformSubscription.status,
+      hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
     },
     {
       id: 3,
@@ -87,7 +87,7 @@ const SideBarRadioButton = () => {
       url: "/chat",
       icon: <Sms />,
       segment: "(inbox)",
-      hasDocumentVerified: !user?.platformSubscription.status,
+      hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
     },
     {
       id: 4,
@@ -102,7 +102,7 @@ const SideBarRadioButton = () => {
       url: "/wallet",
       icon: <Wallet />,
       segment: "wallet",
-      // hasDocumentVerified: !user?.hasDocumentVerified,
+      // hasDocumentVerified: true,
     },
     {
       id: 6,
@@ -110,7 +110,7 @@ const SideBarRadioButton = () => {
       url: "/creator-center",
       icon: <CreatorCenter />,
       segment: "creator-center",
-      hasDocumentVerified: !user?.platformSubscription.status,
+      hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
     },
     {
       id: 7,
@@ -118,7 +118,7 @@ const SideBarRadioButton = () => {
       url: "",
       icon: <Upload />,
       segment: "(none)",
-      hasDocumentVerified: !user?.platformSubscription.status,
+      hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
     },
     {
       id: 8,

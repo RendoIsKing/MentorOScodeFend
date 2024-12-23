@@ -2,21 +2,27 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 async function getUserProgress(userAuthToken: string) {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_SERVER}/v1/auth/me`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${userAuthToken}`,
-      },
-    }
-  );
-  const data = await response.json();
-  return data;
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_SERVER}/v1/auth/me`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${userAuthToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching user progress:", error);
+    return null;
+  }
 }
 
 export async function middleware(request: NextRequest) {
   const userAuthToken = request.cookies.get("auth_token");
+  const currentPath = request.nextUrl.pathname;
 
   // Public paths that don't require authentication
   const publicPaths = [
@@ -28,7 +34,15 @@ export async function middleware(request: NextRequest) {
   ];
 
   // Check if current path is public
-  const isPublicPath = publicPaths.includes(request.nextUrl.pathname);
+  const isPublicPath = publicPaths.includes(currentPath);
+
+  // Initial onboarding path that should be accessible after signup
+  const isInitialOnboardingPath = currentPath === "/user-info";
+
+  // Allow access to initial onboarding path if auth token exists
+  if (isInitialOnboardingPath && userAuthToken) {
+    return NextResponse.next();
+  }
 
   // If no token and trying to access protected route
   if (!userAuthToken && !isPublicPath) {
@@ -36,11 +50,17 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(signupUrl);
   }
 
+  // Handle authenticated routes
   if (userAuthToken?.value) {
     const userProgress = await getUserProgress(userAuthToken.value);
-    const currentPath = request.nextUrl.pathname;
-    const isAdmin = userProgress?.data?.role === "admin" ? true : false;
 
+    // If failed to fetch user progress, redirect to signup
+    if (!userProgress?.data) {
+      const signupUrl = new URL("/signup", process.env.NEXT_PUBLIC_DOMAIN);
+      return NextResponse.redirect(signupUrl);
+    }
+
+    const isAdmin = userProgress?.data?.role === "admin" ? true : false;
     const hasActiveSubscription =
       userProgress?.data?.platformSubscription?.status === "active";
 
@@ -67,6 +87,17 @@ export async function middleware(request: NextRequest) {
         { path: "/age-confirmation", check: userProgress.data.hasConfirmedAge },
       ];
 
+      // Don't redirect away from current onboarding step
+      for (const element of pathsAndChecks) {
+        if (element.path === currentPath) {
+          return NextResponse.next();
+        } else if (!element.check) {
+          return NextResponse.redirect(
+            new URL(element.path, process.env.NEXT_PUBLIC_DOMAIN)
+          );
+        }
+      }
+
       const allStepsCompleted = pathsAndChecks.every(
         (element) => element.check
       );
@@ -76,7 +107,7 @@ export async function middleware(request: NextRequest) {
         "/chat",
         "/creator-center",
         "/search",
-        "/wallet",
+        // "/wallet",
       ];
 
       // Check if current path requires subscription
@@ -84,7 +115,7 @@ export async function middleware(request: NextRequest) {
         currentPath.startsWith(path)
       );
 
-      // If path requires subscription and user doesn't have active subscription
+      // Handle subscription required paths
       if (requiresSubscription && !hasActiveSubscription) {
         const response = NextResponse.redirect(
           `${process.env.NEXT_PUBLIC_DOMAIN}/home`
@@ -98,29 +129,8 @@ export async function middleware(request: NextRequest) {
         return response;
       }
 
-      // If user has subscription but tries to access onboarding steps
-      if (
-        allStepsCompleted &&
-        pathsAndChecks.some((pathCheck) => pathCheck.path === currentPath)
-      ) {
-        return NextResponse.redirect(
-          new URL("/home", process.env.NEXT_PUBLIC_DOMAIN)
-        );
-      }
-
-      // Check and redirect for incomplete steps
-      for (const element of pathsAndChecks) {
-        if (element.path === currentPath && !element.check) {
-          break;
-        } else if (!element.check) {
-          return NextResponse.redirect(
-            new URL(element.path, process.env.NEXT_PUBLIC_DOMAIN)
-          );
-        }
-      }
-
       // Redirect authenticated users away from auth pages
-      if (publicPaths.includes(currentPath)) {
+      if (isPublicPath && allStepsCompleted) {
         return NextResponse.redirect(
           new URL("/home", process.env.NEXT_PUBLIC_DOMAIN)
         );

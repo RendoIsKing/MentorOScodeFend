@@ -187,6 +187,7 @@ const BillingDetails = () => {
         variant: "success",
         title: "Subscribed successfully!",
       });
+      window.location.reload();
       router.push("/home");
     } catch (err) {
       toast({

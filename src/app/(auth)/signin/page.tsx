@@ -14,6 +14,7 @@ import { useLoginUserMutation } from "@/redux/services/haveme";
 import { setUserPhoneNumber } from "@/redux/slices/user-info";
 import { useAppDispatch } from "@/redux/store";
 import { signinFormSchema } from "@/schemas/auth";
+import { setAuthData } from "@/redux/slices/auth";
 
 const Signin = () => {
   const { isMobile } = useClientHardwareInfo();
@@ -31,6 +32,7 @@ const Signin = () => {
   });
 
   const [loginUser, { isLoading, error, isError }] = useLoginUserMutation();
+  const appDispatch = useAppDispatch();
 
   const onSubmit = async (data: z.infer<typeof signinFormSchema>) => {
     try {
@@ -60,24 +62,24 @@ const Signin = () => {
       }
 
       // Handle successful login
-      appDispatcher(
-        setUserPhoneNumber({
-          phoneNumber:
-            data.loginMethod.type === "phone"
-              ? data.loginMethod.phoneNumber
-              : "",
-          prefix:
-            data.loginMethod.type === "phone" ? data.loginMethod.prefix : "",
-          id: res?.data?._id,
-        })
-      );
+      appDispatch(setAuthData(res));
+
+      // Store phone number if using phone login
+      if (data.loginMethod.type === "phone") {
+        appDispatch(
+          setUserPhoneNumber({
+            phoneNumber: data.loginMethod.phoneNumber,
+            prefix: data.loginMethod.prefix,
+            id: res?.data?._id,
+          })
+        );
+      }
+      router.push("/home");
 
       toast({
         variant: "success",
         title: `Please verify using it within 10 minutes ${res?.data?.otp}`,
       });
-
-      router.push("/home");
     } catch (err) {
       console.error(err);
       toast({
