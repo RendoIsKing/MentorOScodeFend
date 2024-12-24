@@ -41,6 +41,7 @@ import {
   useCreateSubscriptionMutation,
   useGetOnePlanForAllQuery,
 } from "@/redux/services/haveme/subscription";
+import { IGetOnePlanForAllObject } from "@/contracts/responses/IGetAllEntitlementsResponse";
 
 // Validation schema remains the same
 const FormSchema = z.object({
@@ -67,30 +68,6 @@ const BillingDetails = () => {
     useGetOnePlanForAllQuery();
   const [createSubscription, { isLoading: isSubscribing }] =
     useCreateSubscriptionMutation();
-
-  useEffect(() => {
-    if (planData?.data?.platformSubscription?.status === "active") {
-      setHasSubscription(true);
-    }
-
-    const checkModalState = () => {
-      const params = new URLSearchParams(window.location.search);
-      const showModal =
-        params.get("showModal") === "true" ||
-        localStorage.getItem("showSubscriptionModal") === "true";
-
-      if (showModal) {
-        setIsModalOpen(true);
-        // Clear the modal state from storage after showing
-        localStorage.removeItem("showSubscriptionModal");
-        // Remove the URL parameter
-        const newUrl = window.location.pathname;
-        window.history.replaceState({}, "", newUrl);
-      }
-    };
-
-    checkModalState();
-  }, [planData]);
 
   // Handle modal close attempt
   const handleModalClose = (open: boolean) => {
@@ -181,14 +158,13 @@ const BillingDetails = () => {
     try {
       await createSubscription(planId).unwrap();
       setHasSubscription(true);
-      // Store subscription status
       localStorage.setItem("hasSubscription", "true");
       toast({
         variant: "success",
         title: "Subscribed successfully!",
       });
-      window.location.reload();
       router.push("/home");
+      window.location.reload();
     } catch (err) {
       toast({
         variant: "destructive",
@@ -430,60 +406,63 @@ const BillingDetails = () => {
             <div className="flex justify-center py-4">
               <Loader2 className="h-6 w-6 animate-spin" />
             </div>
-          ) : planData && planData.data ? (
+          ) : planData?.data ? (
             <div className="space-y-4">
-              {Array.isArray(planData.data) && planData.data.length > 0 ? (
-                planData.data.map((plan) => (
-                  <div
-                    key={plan._id}
-                    className="p-4 border rounded-md flex flex-col items-center shadow-md"
-                  >
-                    <h3 className="text-xl font-bold">{plan.title}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {plan.description}
-                    </p>
-                    <p className="text-sm font-medium mt-2">
-                      Price: ${plan.price}
-                    </p>
-                    <p className="text-sm font-medium">
-                      Duration: {plan.duration} days
-                    </p>
-                    <Button
-                      onClick={() => handleSubscribe(plan._id)}
-                      className="mt-4 w-full"
-                      disabled={isSubscribing}
+              {Array.isArray(planData.data)
+                ? planData.data.map((plan: IGetOnePlanForAllObject) => (
+                    <div
+                      key={plan._id}
+                      className="p-4 border rounded-md flex flex-col items-center shadow-md"
                     >
-                      {isSubscribing && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      )}
-                      Subscribe
-                    </Button>
-                  </div>
-                ))
-              ) : (
-                <div className="p-4 border rounded-md shadow-md">
-                  <h3 className="text-lg font-bold">{planData.data.title}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {planData.data.description}
-                  </p>
-                  <p className="text-sm font-medium mt-2">
-                    Price: ${planData.data.price}
-                  </p>
-                  <p className="text-sm font-medium">
-                    Duration: {planData.data.duration} days
-                  </p>
-                  <Button
-                    onClick={() => handleSubscribe(planData.data._id)}
-                    className="mt-4 w-full"
-                    disabled={isSubscribing}
-                  >
-                    {isSubscribing && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Subscribe
-                  </Button>
-                </div>
-              )}
+                      <h3 className="text-xl font-bold">{plan.title}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {plan.description}
+                      </p>
+                      <p className="text-sm font-medium mt-2">
+                        Price: ${plan.price}
+                      </p>
+                      <p className="text-sm font-medium">
+                        Duration: {plan.duration} days
+                      </p>
+                      <Button
+                        onClick={() => handleSubscribe(plan._id)}
+                        className="mt-4 w-full"
+                        disabled={isSubscribing}
+                      >
+                        {isSubscribing && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Subscribe
+                      </Button>
+                    </div>
+                  ))
+                : (() => {
+                    const plan = planData.data as IGetOnePlanForAllObject;
+                    return (
+                      <div className="p-4 border rounded-md shadow-md">
+                        <h3 className="text-lg font-bold">{plan.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {plan.description}
+                        </p>
+                        <p className="text-sm font-medium mt-2">
+                          Price: ${plan.price}
+                        </p>
+                        <p className="text-sm font-medium">
+                          Duration: {plan.duration} days
+                        </p>
+                        <Button
+                          onClick={() => handleSubscribe(plan._id)}
+                          className="mt-4 w-full"
+                          disabled={isSubscribing}
+                        >
+                          {isSubscribing && (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          )}
+                          Subscribe
+                        </Button>
+                      </div>
+                    );
+                  })()}
             </div>
           ) : (
             <p className="text-center text-muted-foreground">

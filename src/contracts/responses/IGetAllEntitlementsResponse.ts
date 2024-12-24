@@ -13,12 +13,27 @@ export interface IPlatformSubscriptionObject {
 }
 
 export interface IGetOnePlanForAllObject {
-  platformSubscription: IPlatformSubscriptionObject[];
+  _id: string;
   title: string;
   description: string;
   price: number;
   duration: number;
-  _id: string;
+  stripeProductId: string;
+  stripeProductFeatureIds: string[];
+  featureIds: string[];
+  stripeProductObject: {
+    id: string;
+    object: string;
+    active: boolean;
+  };
+  planType: string;
+  userId: string;
+  isDeleted: boolean;
+  deletedAt: string | null;
+  permissions: any[];
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
 }
 
 export interface IGetAllEntitlementsObject {
@@ -35,8 +50,9 @@ export interface IGetAllEntitlementsMetaObject {
   pageCount: number;
 }
 export interface IGetOnePlanForAllResponse {
-  data: IGetOnePlanForAllObject[];
-  meta: IGetAllEntitlementsMetaObject;
+  success: boolean;
+  data: IGetOnePlanForAllObject | IGetOnePlanForAllObject[];
+  meta?: IGetAllEntitlementsMetaObject;
 }
 
 export interface IGetAllEntitlementsResponse {
