@@ -139,6 +139,7 @@ const AgeConfirmation = () => {
       .then((res) => {
         //console.log(res);
         setOpenPopup(true);
+        router.push("/wallet/add-payment-method");
         toast({
           variant: "success",
           description: "User on boarded successfully",
@@ -151,7 +152,6 @@ const AgeConfirmation = () => {
           description: "Something went wrong",
         });
       });
-    router.push("/home");
   };
 
   return (

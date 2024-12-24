@@ -4,6 +4,18 @@ import {
   ISubscriptionPlanObject,
 } from "../responses/IGetSubscriptionPlanResponse";
 
+export interface IPlatformSubscription {
+  _id: string;
+  userId: string;
+  planId: string;
+  StripeSubscriptionId: string;
+  StripePriceId: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
 export type UserBase = {
   isFollowing: boolean;
   userPhoto: any;
@@ -59,6 +71,7 @@ export type UserBase = {
   hasPlan?: boolean;
   subscriberCount: number;
   fcm_token?: string;
+  platformSubscription: IPlatformSubscription | null;
 };
 
 export class User implements UserBase {
@@ -98,6 +111,7 @@ export class User implements UserBase {
     public updatedAt: string,
     public deletedAt: string,
     public userName: string,
+    public platformSubscription: IPlatformSubscription | null,
     public hasPersonalInfo?: boolean,
     public hasPhotoInfo?: boolean,
     public hasSelectedInterest?: boolean,
