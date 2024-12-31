@@ -25,6 +25,7 @@ WORKDIR /app
 # Install production dependencies only
 COPY package*.json ./
 RUN npm install --production
+COPY .env .
 
 # Copy built files from the build stage
 COPY --from=build /app/.next /app/.next
