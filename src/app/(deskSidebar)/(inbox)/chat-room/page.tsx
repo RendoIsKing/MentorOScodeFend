@@ -11,7 +11,9 @@ export default function InboxPageResponsive() {
   return (
     <>
       <div className="h-screen">
-        <InboxBody />
+        <InboxBody
+    
+        />
       </div>
     </>
   );

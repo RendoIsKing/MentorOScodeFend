@@ -116,18 +116,18 @@ export async function middleware(request: NextRequest) {
       );
 
       // Handle subscription required paths
-      if (requiresSubscription && !hasActiveSubscription) {
-        const response = NextResponse.redirect(
-          `${process.env.NEXT_PUBLIC_DOMAIN}/home`
-        );
+      // if (requiresSubscription && !hasActiveSubscription) {
+      //   const response = NextResponse.redirect(
+      //     `${process.env.NEXT_PUBLIC_DOMAIN}/home`
+      //   );
 
-        response.cookies.set("showSubscriptionModal", "true", {
-          path: "/",
-          maxAge: 60 * 5,
-        });
+      //   response.cookies.set("showSubscriptionModal", "true", {
+      //     path: "/",
+      //     maxAge: 60 * 5,
+      //   });
 
-        return response;
-      }
+      //   return response;
+      // }
 
       // Redirect authenticated users away from auth pages
       if (isPublicPath && allStepsCompleted) {

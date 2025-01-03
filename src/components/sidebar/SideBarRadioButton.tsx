@@ -127,6 +127,13 @@ const SideBarRadioButton = () => {
       icon: <CircleUserRound size={30} strokeWidth={1.5} absoluteStrokeWidth />,
       segment: user?.userName,
     },
+    {
+      id: 9,
+      name: "Avatar Generator",
+      url: "/avatar-generator",
+      icon: <CircleUserRound size={30} strokeWidth={1.5} absoluteStrokeWidth />,
+      segment: "myprofile",
+    },
   ];
 
   return (

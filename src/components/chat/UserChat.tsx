@@ -21,9 +21,7 @@ function UserChat({ name, message, profilePhoto }: UserChatProps) {
   const messageCount = 1;
 
   return (
-    <div
-      className="flex justify-between p-2 cursor-pointer rounded-lg hover:bg-muted transition delay-150 duration-300 ease-in-out lg:p-3 group/item"
-    >
+    <div className="flex justify-between p-2 cursor-pointer rounded-lg hover:bg-muted transition delay-150 duration-300 ease-in-out lg:p-3 group/item">
       <div className="flex lg:gap-4">
         <Avatar className="size-12 ">
           <Image
