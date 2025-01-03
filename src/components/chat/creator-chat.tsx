@@ -1,28 +1,28 @@
 import React from "react";
-import { Message } from "@/components/chat/avatar-chat";
+// import { Message } from "@/components/chat/avatar-chat";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
 const CreatorChatHistory: React.FC = () => {
   // Dummy data for demonstration
-  const messages: Message[] = [
+  const messages: any = [
     {
       sender: "other",
       text: "Hi there. How can I help you today?",
-      name: "Bob Marley",
       time: "10:30 AM",
       date: "Friday, 19 January",
     },
     {
       sender: "user",
       text: "Hi there. How can I help you today?",
+
       time: "10:30 AM",
       date: "Friday, 19 January",
     },
     {
       sender: "other",
       text: "Can you please send me the link of the project?",
-      name: "Bob Marley",
+
       time: "10:30 AM",
       date: "Saturday, 20 January",
     },
@@ -35,7 +35,7 @@ const CreatorChatHistory: React.FC = () => {
     {
       sender: "other",
       text: "Hi there. How can I help you today?",
-      name: "Bob Marley",
+
       time: "10:30 AM",
       date: "Saturday, 20 January",
     },
@@ -48,7 +48,7 @@ const CreatorChatHistory: React.FC = () => {
     {
       sender: "other",
       text: "Hi there. How can I help you today?",
-      name: "Bob Marley",
+
       time: "10:30 AM",
       date: "Saturday, 20 January",
     },
