@@ -70,11 +70,34 @@ const Signup = () => {
         router.push("/verify-otp");
       })
       .catch((err) => {
-        console.log(err);
-        toast({
-          variant: "destructive",
-          description: "Something went wrong",
-        });
+        if (err?.status === 400 && err?.data?.data?._id) {
+          const { data } = err.data;
+          appDispatcher(
+            setUserPhoneNumber({
+              phoneNumber: data.phoneNumber,
+              prefix: data.dialCode,
+              id: data._id,
+            })
+          );
+          toast({
+            variant: "success",
+            title: `Please verify using it with in 10 minutes ${data?.otp}`,
+            // FIX ME: REMOVE THIS LINE BEFORE DEPLOY
+          });
+          router.push("/verify-otp");
+        } else if (err?.status === 400 && err?.data?.message) {
+          toast({
+            variant: "destructive",
+            title: err?.data?.message,
+            // FIX ME: REMOVE THIS LINE BEFORE DEPLOY
+          });
+        } else {
+          console.log(err);
+          toast({
+            variant: "destructive",
+            description: "Something went wrong",
+          });
+        }
       });
   };
 
