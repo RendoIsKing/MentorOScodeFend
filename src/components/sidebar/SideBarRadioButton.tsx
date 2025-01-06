@@ -84,10 +84,11 @@ const SideBarRadioButton = () => {
     {
       id: 3,
       name: "Inbox",
-      url: "/chat",
+      url: "/room",
       icon: <Sms />,
       segment: "(inbox)",
-      hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
+      // hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
+      hasDocumentVerified: false,
     },
     {
       id: 4,
