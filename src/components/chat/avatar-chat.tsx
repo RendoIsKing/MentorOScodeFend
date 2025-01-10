@@ -125,6 +125,17 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import CloseIcon from "@/assets/images/my-Profile/closeIcon";
 
+function formatAnswer(answer) {
+  if (!answer || typeof answer !== "string") {
+    return "";
+  }
+  return answer
+    .replace(/###\s(.*?)\n/g, "<h3>$1</h3>")
+    .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
+    .replace(/^- /gm, "<br/>- ")
+    .replace(/\n/g, "<br/>");
+}
+
 export interface Message {
   sender: "user" | "other";
   text: string;
@@ -211,7 +222,11 @@ const AvatarChatHistory: React.FC<AvatarChatHistoryProps> = ({
                     }}
                   />
                 ) : (
-                  message.text
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: formatAnswer(message.text),
+                    }}
+                  />
                 )}
               </div>
             </div>
