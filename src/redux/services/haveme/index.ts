@@ -128,7 +128,7 @@ export const havemeApi = createApi({
     forgotPassword: builder.mutation<IAuthResponse, IAuthRequest>({
       query: (body) => {
         return {
-          url: "/auth/forgot-password",
+          url: "/auth/forget-password",
           method: "post",
           body: {
             phoneNumber: body.phoneNumber,
