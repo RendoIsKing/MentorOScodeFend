@@ -26,10 +26,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useTypedSelector } from "@/redux/store";
-import {
-  useValidateOtpMutation,
-  useVerifyOtpMutation,
-} from "@/redux/services/haveme";
+import { useValidateOtpMutation } from "@/redux/services/haveme";
 import { useRouter } from "next/navigation";
 
 const fontItalic = ABeeZee({
@@ -53,7 +50,6 @@ export default function VerifyOtpPage() {
   );
   const userId = useTypedSelector((state) => state.userInfo.id);
   const prefix = useTypedSelector((state) => state.userInfo.prefix);
-  const [verifyMobileOtp] = useVerifyOtpMutation();
   const [validateOtp] = useValidateOtpMutation();
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -64,52 +60,28 @@ export default function VerifyOtpPage() {
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    if (userId) {
-      await verifyMobileOtp({
-        id: userId,
-        otp: data.pin,
-      })
-        .unwrap()
-        .then((res) => {
-          //console.log("res", res);
-          router.replace("/user-info");
+    await validateOtp({
+      dialCode: "92",
+      phoneNumber: userMobileNumber,
+      otp: data.pin,
+    })
+      .unwrap()
+      .then((res) => {
+        //console.log("res", res);
+        router.replace("/user-info");
 
-          toast({
-            variant: "success",
-            description: "OTP verified successfully.",
-          });
-        })
-        .catch((err) => {
-          console.log("err", err);
-          toast({
-            variant: "destructive",
-            description: "Otp is invalid",
-          });
+        toast({
+          variant: "success",
+          description: "OTP verified successfully.",
         });
-    } else {
-      await validateOtp({
-        dialCode: "92",
-        phoneNumber: userMobileNumber,
-        otp: data.pin,
       })
-        .unwrap()
-        .then((res) => {
-          //console.log("res", res);
-          router.replace("/user-info");
-
-          toast({
-            variant: "success",
-            description: "OTP verified successfully.",
-          });
-        })
-        .catch((err) => {
-          console.log("err", err);
-          toast({
-            variant: "destructive",
-            description: "Otp is invalid",
-          });
+      .catch((err) => {
+        console.log("err", err);
+        toast({
+          variant: "destructive",
+          description: "Otp is invalid",
         });
-    }
+      });
   }
 
   return (

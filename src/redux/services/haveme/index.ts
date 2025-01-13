@@ -51,6 +51,8 @@ import {
 } from "@/contracts/haveme/haveMeApiTags";
 import { IGetFileRequest } from "@/contracts/requests/IGetFileRequest";
 import { IGetFileResponse } from "@/contracts/requests/IGetFileResponse";
+import { IValidateOtpResponse } from "@/contracts/requests/IValidateOtpResponse";
+import { IValidateOtpRequest } from "@/contracts/requests/IValidateOtpRequest";
 
 export const havemeApi = createApi({
   reducerPath: HAVE_ME_API_REDUCER_KEY,
@@ -128,7 +130,7 @@ export const havemeApi = createApi({
     forgotPassword: builder.mutation<IAuthResponse, IAuthRequest>({
       query: (body) => {
         return {
-          url: "/auth/forgot-password",
+          url: "/auth/forget-password",
           method: "post",
           body: {
             phoneNumber: body.phoneNumber,
@@ -249,6 +251,19 @@ export const havemeApi = createApi({
         };
       },
     }),
+    validateOtp: builder.mutation<IValidateOtpResponse, IValidateOtpRequest>({
+      query: (body) => {
+        return {
+          url: "/auth/validate-otp",
+          method: "POST",
+          body: {
+            dialCode: body.dialCode.replace("+", ""), // Remove "+" if needed
+            phoneNumber: body.phoneNumber,
+            otp: body.otp,
+          },
+        };
+      },
+    }),
   }),
 });
 
@@ -266,4 +281,5 @@ export const {
   useSkipUserPhotoMutation,
   useDeleteFileMutation,
   useGetUserDetailsQuery,
+  useValidateOtpMutation,
 } = havemeApi;

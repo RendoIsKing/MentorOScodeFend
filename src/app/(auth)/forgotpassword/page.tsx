@@ -59,7 +59,7 @@ const Signup = () => {
           setUserPhoneNumber({
             phoneNumber: data.phoneNumber,
             prefix: data.prefix,
-            id: res.data._id,
+            // id: res?.data?._id,
           })
         );
         toast({
@@ -67,7 +67,7 @@ const Signup = () => {
           title: `Please verify using it with in 10 minutes ${res?.data?.otp}`,
           // FIX ME: REMOVE THIS LINE BEFORE DEPLOY
         });
-        router.push("/verify-otp");
+        router.push("/validate-otp");
       })
       .catch((err) => {
         console.log(err);
