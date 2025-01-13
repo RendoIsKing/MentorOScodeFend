@@ -377,7 +377,7 @@ function InboxBody({ loggedInUser, fullName, image }: InboxBodyProps) {
             Unread messages ({totalUnreadCount})
           </h1>
           {userChats.map((chat, index) => (
-            <Link key={index} href={`/chat/${chat.name}`}>
+            <Link key={index} href={`/room/${chat.name}`}>
               <UserChat
                 name={chat.name}
                 message={chat.message}

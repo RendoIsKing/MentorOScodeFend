@@ -79,15 +79,17 @@ const SideBarRadioButton = () => {
       url: "/search",
       icon: <Search />,
       segment: "(search)",
-      hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
+      // hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
+      hasDocumentVerified: !false,
     },
     {
       id: 3,
       name: "Inbox",
-      url: "/chat",
+      url: "/room",
       icon: <Sms />,
       segment: "(inbox)",
       hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
+      // hasDocumentVerified: false,
     },
     {
       id: 4,
@@ -95,6 +97,8 @@ const SideBarRadioButton = () => {
       url: "/notification",
       icon: <Bell size={30} strokeWidth={1.5} absoluteStrokeWidth />,
       segment: "notification",
+      // hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
+      hasDocumentVerified: !false,
     },
     {
       id: 5,
@@ -110,7 +114,8 @@ const SideBarRadioButton = () => {
       url: "/creator-center",
       icon: <CreatorCenter />,
       segment: "creator-center",
-      hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
+      // hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
+      hasDocumentVerified: !false,
     },
     {
       id: 7,
@@ -118,7 +123,8 @@ const SideBarRadioButton = () => {
       url: "",
       icon: <Upload />,
       segment: "(none)",
-      hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
+      hasDocumentVerified: !false,
+      // hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
     },
     {
       id: 8,
@@ -133,6 +139,8 @@ const SideBarRadioButton = () => {
       url: "/avatar-generator",
       icon: <CircleUserRound size={30} strokeWidth={1.5} absoluteStrokeWidth />,
       segment: "myprofile",
+      // hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
+      hasDocumentVerified: !false,
     },
   ];
 
