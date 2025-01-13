@@ -68,7 +68,7 @@ export default function VerifyOtpPage() {
       .unwrap()
       .then((res) => {
         //console.log("res", res);
-        router.replace("/user-info");
+        router.replace("/new-password");
 
         toast({
           variant: "success",

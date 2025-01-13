@@ -31,16 +31,19 @@ const AuthInputs = ({ type }) => {
 
   return (
     <div className="min-w-[320px]">
-      {type === "signin" ? (
-        <PhoneEmailInput className="mt-4" />
-      ) : (
-        <PhoneInput className="mt-4" />
-      )}
+      {type !== "reset" ? (
+        type === "signin" ? (
+          <PhoneEmailInput className="mt-4" />
+        ) : (
+          <PhoneInput className="mt-4" />
+        )
+      ) : null}
       {getErrorMessage("loginMethod") && (
         <div className="text-destructive text-sm mt-1">
           {getErrorMessage("loginMethod")}
         </div>
       )}
+
       {type === "signin" && (
         <PasswordInput className="pt-4" {...form.register("password")} />
       )}
@@ -50,7 +53,32 @@ const AuthInputs = ({ type }) => {
         </div>
       )}
 
-      {type !== "forgot" && (
+      {type === "reset" && (
+        <>
+          <PasswordInput
+            className="pt-4"
+            {...form.register("newPassword")}
+            placeholder="New Password"
+          />
+          {getErrorMessage("newPassword") && (
+            <div className="text-destructive text-sm mt-1">
+              {getErrorMessage("newPassword")}
+            </div>
+          )}
+          <PasswordInput
+            className="pt-4"
+            placeholder="Confirm Password"
+            {...form.register("confirmPassword")}
+          />
+          {getErrorMessage("confirmPassword") && (
+            <div className="text-destructive text-sm mt-1">
+              {getErrorMessage("confirmPassword")}
+            </div>
+          )}
+        </>
+      )}
+
+      {(type !== "forgot" || type !== "reset") && (
         <div className={`mt-6 lg:${fontItalic.className} font-light`}>
           <p>By continuing, you agree to our</p>
           <div className="flex">
@@ -65,9 +93,13 @@ const AuthInputs = ({ type }) => {
         type="submit"
         // disabled={!form.formState.isValid}
       >
-        {type !== "forgot" ? "Continue" : "Forget"}
+        {type === "reset"
+          ? "Reset Password"
+          : type !== "forgot"
+          ? "Continue"
+          : "Forget"}
       </Button>
-      {type !== "forgot" && (
+      {(type !== "forgot" || type !== "reset") && (
         <>
           <GoogleButton />
           <CustomHr />

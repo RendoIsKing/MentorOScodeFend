@@ -264,6 +264,26 @@ export const havemeApi = createApi({
         };
       },
     }),
+    resetPassword: builder.mutation<
+      void,
+      {
+        countryCode: string;
+        mobileNumber: string;
+        newPassword: string;
+        confirmPassword: string;
+      }
+    >({
+      query: (body) => ({
+        url: "/auth/reset-password",
+        method: "PUT",
+        body: {
+          dialCode: body.countryCode.replace("+", ""), // Ensure dial code does not include "+"
+          phoneNumber: body.mobileNumber,
+          newPassword: body.newPassword,
+          confirmPassword: body.confirmPassword,
+        },
+      }),
+    }),
   }),
 });
 
@@ -282,4 +302,5 @@ export const {
   useDeleteFileMutation,
   useGetUserDetailsQuery,
   useValidateOtpMutation,
+  useResetPasswordMutation,
 } = havemeApi;
