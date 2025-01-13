@@ -80,7 +80,8 @@ const SideBarRadioButton = () => {
       icon: <Search />,
       segment: "(search)",
       // hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
-      hasDocumentVerified: !false,
+      // hasDocumentVerified: !false,
+      hasDocumentVerified: user?.platformSubscription?.status !== "active",
     },
     {
       id: 3,
@@ -88,8 +89,9 @@ const SideBarRadioButton = () => {
       url: "/room",
       icon: <Sms />,
       segment: "(inbox)",
-      hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
+      // hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
       // hasDocumentVerified: false,
+      hasDocumentVerified: user?.platformSubscription?.status !== "active",
     },
     {
       id: 4,
@@ -98,7 +100,8 @@ const SideBarRadioButton = () => {
       icon: <Bell size={30} strokeWidth={1.5} absoluteStrokeWidth />,
       segment: "notification",
       // hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
-      hasDocumentVerified: !false,
+      // hasDocumentVerified: !false,
+      hasDocumentVerified: user?.platformSubscription?.status !== "active",
     },
     {
       id: 5,
@@ -115,7 +118,8 @@ const SideBarRadioButton = () => {
       icon: <CreatorCenter />,
       segment: "creator-center",
       // hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
-      hasDocumentVerified: !false,
+      // hasDocumentVerified: !false,
+      hasDocumentVerified: user?.platformSubscription?.status !== "active",
     },
     {
       id: 7,
@@ -123,7 +127,9 @@ const SideBarRadioButton = () => {
       url: "",
       icon: <Upload />,
       segment: "(none)",
-      hasDocumentVerified: !false,
+      hasDocumentVerified: user?.platformSubscription?.status !== "active",
+
+      // hasDocumentVerified: !false,
       // hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
     },
     {
@@ -140,7 +146,8 @@ const SideBarRadioButton = () => {
       icon: <CircleUserRound size={30} strokeWidth={1.5} absoluteStrokeWidth />,
       segment: "myprofile",
       // hasDocumentVerified: !(user?.platformSubscription?.status ?? false),
-      hasDocumentVerified: !false,
+      // hasDocumentVerified: !false,
+      hasDocumentVerified: user?.platformSubscription?.status !== "active",
     },
   ];
 
