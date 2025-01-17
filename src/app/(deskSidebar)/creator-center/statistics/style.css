@@ -1,0 +1,9 @@
+.demo > canvas {
+    height: 400px !important;
+    width: 100% !important;
+}
+@media screen and (max-width: 767px) {
+    .demo > canvas {
+        height: auto !important;
+    }
+}
