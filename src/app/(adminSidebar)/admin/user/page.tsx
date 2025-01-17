@@ -13,6 +13,7 @@ import { userColumns } from "@/components/data-table/columns/users/userColumns";
 import { Input } from "@/components/ui/input";
 import { DataTableViewOptions } from "@/components/data-table/DataTableViewOptions";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useToast } from "@/components/ui/use-toast";
 
 export interface ISearchQuery {
   searchTerm?: string;
@@ -27,6 +28,7 @@ function AdminUserPage() {
   const page_number = searchParams.get("page") ?? "1";
   const [searchTerm, setSearchTerm] = useState<string>("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const { toast } = useToast();
   const [updateUserStatus, { isLoading: isLoadingStatus }] =
     useUpdateUserStatusMutation();
   const query: ISearchQuery = {
@@ -40,6 +42,12 @@ function AdminUserPage() {
     const newStatus = isActive ? "active" : "inactive";
     try {
       await updateUserStatus({ newStatus, id: userId });
+      toast({
+        variant: "success",
+        title: isActive
+          ? "User status has been updated to Active"
+          : "User status has been set to Inactive.",
+      });
     } catch (error) {
       console.error("Error updating user status", error);
     }

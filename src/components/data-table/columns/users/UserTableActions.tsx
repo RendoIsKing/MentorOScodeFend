@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { DeleteAlertDialog } from "@/components/data-table/columns/users/DeleteAlertDialog";
 import { useGrantUserFullPermissionMutation } from "@/redux/admin-services/admin/admin";
+import { useToast } from "@/components/ui/use-toast";
 
 interface SubscriptionType {
   status: String;
@@ -25,6 +26,7 @@ interface Props {
 
 const UserActionsCell: React.FC<Props> = ({ user }) => {
   const router = useRouter();
+  const {toast} = useToast();
   const [open, setOpen] = useState(false);
   const [grantUserFullPermission, { isLoading }] =
     useGrantUserFullPermissionMutation();
@@ -46,6 +48,10 @@ const UserActionsCell: React.FC<Props> = ({ user }) => {
     try {
       const response = await grantUserFullPermission(user?._id);
       console.log("response...", response);
+      toast({
+        variant: "destructive",
+        title: "User's permissions updated successfully",
+      });
     } catch (error) {
       console.log("Error....", error);
     }
