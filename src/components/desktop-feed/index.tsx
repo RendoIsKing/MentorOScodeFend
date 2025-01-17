@@ -86,8 +86,8 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
     <div className="flex flex-col gap-y-4">
       <TipDialogComponent
         showText={true}
-        creatorId={feedData.userInfo[0]._id}
-        tipOn={feedData._id}
+        creatorId={feedData?.userInfo[0]?._id}
+        tipOn={feedData?._id}
       />
 
       <div className="flex justify-center ">
@@ -95,7 +95,7 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
           className={cn(
             "flex flex-col items-center gap-2 justify-center cursor-pointer"
           )}
-          onClick={() => handleSelectHeart(feedData._id)}
+          onClick={() => handleSelectHeart(feedData?._id)}
         >
           {heartStates ? (
             <HeartActive className="fill-foreground cursor-pointer" />

@@ -130,7 +130,24 @@ export const adminUserApi = adminApi.injectEndpoints({
         };
       },
     }),
-
+    updateUserStatus: builder.mutation({
+      invalidatesTags: [TAG_GET_USERS],
+      query: (body) => {
+        return {
+          url: `user/${body.id}/status?status=${body.newStatus}`,
+          method: "PUT",
+        };
+      },
+    }),
+    grantUserFullPermission: builder.mutation({
+      invalidatesTags: [TAG_GET_USERS],
+      query: (id) => {
+        return {
+          url: `user/${id}/make-it-free`,
+          method: "PATCH",
+        };
+      },
+    }),
     deleteUserInterest: builder.mutation({
       invalidatesTags: [TAG_GET_INTERESTS],
       query: (id) => ({
@@ -202,6 +219,8 @@ export const {
   useGetUsersDocumentsQuery,
   useGetIndividualUserQuery,
   useUpdateUserMutation,
+  useUpdateUserStatusMutation,
+  useGrantUserFullPermissionMutation,
   useCreateUserInterestMutation,
   useVerifyDocumentMutation,
   useUpdateUserInterestMutation,

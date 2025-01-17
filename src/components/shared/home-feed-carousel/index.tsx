@@ -28,7 +28,7 @@ interface IMyCarouselProps {
 }
 
 const ADD_POSTS = "ADD_POSTS";
-const RESET_POSTS = "RESET_POSTS"
+const RESET_POSTS = "RESET_POSTS";
 
 // TODO: Make this font definition dynamic
 const fontItalic = ABeeZee({
@@ -99,7 +99,7 @@ const HomeFeedCarousel: React.FC<IMyCarouselProps> = ({ isMobile }) => {
   useEffect(() => {
     if (postDetails?.data) {
       updatepostsData({ type: RESET_POSTS });
-      setPage(1)
+      setPage(1);
     }
   }, [homeHeaderFilter]);
 
@@ -118,50 +118,57 @@ const HomeFeedCarousel: React.FC<IMyCarouselProps> = ({ isMobile }) => {
             "h-[88vh] w-[28vw]": !isMobile,
           })}
         >
-          {
-            isLoadingDetails ? <div className="flex h-full w-full justify-center items-center text-gray-500 text-2xl">
+          {isLoadingDetails ? (
+            <div className="flex h-full w-full justify-center items-center text-gray-500 text-2xl">
               Loading...
-            </div> :
-              postsData?.posts?.length === 0 ? (
-                <div className="flex h-full w-full justify-center items-center text-gray-500 text-2xl">
-                  {homeHeaderFilter === "following" ? "Please follow some accounts to see posts." : homeHeaderFilter === "subscribed" ? "Please subscribe some accounts to see posts." : "No posts found."}
-                </div>
-              ) :
-                <AutoSizer disableWidth>
-                  {({ height }) => (
-                    <List
-                      className="snap-y snap-mandatory"
-                      height={height}
-                      itemCount={postsData?.posts?.length}
-                      itemSize={getRowHeight}
-                      ref={listRef}
-                      onItemsRendered={({ visibleStartIndex, visibleStopIndex }) => {
-                        if (
-                          visibleStopIndex >= postsData?.posts.length - 1 &&
-                          !isLoadingDetails &&
-                          postsData?.posts.length !== postDetails?.meta?.total
-                        ) {
-                          setPage((prevPage) => prevPage + 1);
-                        }
-                      }}
-                    >
-                      {({ index, style }) => {
-                        const post = postsData?.posts[index];
+            </div>
+          ) : postsData?.posts?.length === 0 ? (
+            <div className="flex h-full w-full justify-center items-center text-gray-500 text-2xl">
+              {homeHeaderFilter === "following"
+                ? "Please follow some accounts to see posts."
+                : homeHeaderFilter === "subscribed"
+                ? "Please subscribe some accounts to see posts."
+                : "No posts found."}
+            </div>
+          ) : (
+            <AutoSizer disableWidth>
+              {({ height }) => (
+                <List
+                  className="snap-y snap-mandatory"
+                  height={height}
+                  itemCount={postsData?.posts?.length}
+                  itemSize={getRowHeight}
+                  ref={listRef}
+                  onItemsRendered={({
+                    visibleStartIndex,
+                    visibleStopIndex,
+                  }) => {
+                    if (
+                      visibleStopIndex >= postsData?.posts.length - 1 &&
+                      !isLoadingDetails &&
+                      postsData?.posts.length !== postDetails?.meta?.total
+                    ) {
+                      setPage((prevPage) => prevPage + 1);
+                    }
+                  }}
+                >
+                  {({ index, style }) => {
+                    const post = postsData?.posts[index];
 
-                        return (
-                          <PostItem
-                            style={style}
-                            post={post}
-                            isMobile={isMobile}
-                            index={index}
-                            setRowHeight={setRowHeight}
-                          />
-                        );
-                      }}
-                    </List>
-                  )}
-                </AutoSizer>
-          }
+                    return (
+                      <PostItem
+                        style={style}
+                        post={post}
+                        isMobile={isMobile}
+                        index={index}
+                        setRowHeight={setRowHeight}
+                      />
+                    );
+                  }}
+                </List>
+              )}
+            </AutoSizer>
+          )}
         </div>
       </div>
     </div>
@@ -283,10 +290,11 @@ export function PostItem({
           {fileType === "image" ? (
             <img
               onLoad={() => createImpression()}
-              src={`${process.env.NEXT_PUBLIC_API_SERVER +
+              src={`${
+                process.env.NEXT_PUBLIC_API_SERVER +
                 "/" +
                 post?.mediaFiles[0].path
-                }`}
+              }`}
               alt="post details"
               className={cn("rounded-md object-contain", {
                 "h-full": isMobile,
@@ -299,10 +307,11 @@ export function PostItem({
             />
           ) : (
             <VideoPlayer
-              videoSrc={`${process.env.NEXT_PUBLIC_API_SERVER +
+              videoSrc={`${
+                process.env.NEXT_PUBLIC_API_SERVER +
                 "/" +
                 post?.mediaFiles[0].path
-                }`}
+              }`}
               className={cn("rounded-md", {
                 "h-full": isMobile,
                 "w-full h-full flex": !isPortraitHardware,
@@ -325,7 +334,7 @@ export function PostItem({
               </div>
               <div className="flex flex-col p-4 absolute bottom-20 text-white">
                 <div>
-                  <Label>{post?.userInfo[0].fullName}</Label>
+                  <Label>{post?.userInfo[0]?.fullName || "Guest"}</Label>
                 </div>
                 <div className="">
                   <Label>{textFormatter(post?.content)}</Label>
@@ -340,7 +349,7 @@ export function PostItem({
                 className={`flex flex-col absolute items-start left-8 font-thin text-white py-4 ${fontItalic.className}`}
               >
                 <div className="dark:text-white text-muted-foreground">
-                  <Label>{post?.userInfo[0].fullName}</Label>
+                  <Label>{post?.userInfo[0]?.fullName || "Guest"}</Label>
                 </div>
                 <div className="dark:text-white text-muted-foreground">
                   <Label>{textFormatter(post?.content)}</Label>

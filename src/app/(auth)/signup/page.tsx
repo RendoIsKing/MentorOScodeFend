@@ -85,7 +85,10 @@ const Signup = () => {
             // FIX ME: REMOVE THIS LINE BEFORE DEPLOY
           });
           router.push("/verify-otp");
-        } else if (err?.status === 400 && err?.data?.message) {
+        } else if (
+          (err?.status === 400 || err?.status === 403) &&
+          err?.data?.message
+        ) {
           toast({
             variant: "destructive",
             title: err?.data?.message,
