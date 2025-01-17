@@ -1,6 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import { useGetUsersQuery } from "@/redux/admin-services/admin/admin";
+import {
+  useGetUsersQuery,
+  useUpdateUserStatusMutation,
+} from "@/redux/admin-services/admin/admin";
 import { useDataTable } from "@/hooks/use-data-table";
 import { DataTable } from "@/components/data-table/DataTable";
 import { DataTableSkeleton } from "@/components/data-table/data-table-skelton";
@@ -24,15 +27,29 @@ function AdminUserPage() {
   const page_number = searchParams.get("page") ?? "1";
   const [searchTerm, setSearchTerm] = useState<string>("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
-
+  const [updateUserStatus, { isLoading: isLoadingStatus }] =
+    useUpdateUserStatusMutation();
   const query: ISearchQuery = {
     searchTerm: debouncedSearchTerm,
     page: page_number,
     per_page: per_page,
   };
 
+  // Define a handler function that uses the API hook
+  const handleToggleUserStatus = async (isActive: Boolean, userId: String) => {
+    const newStatus = isActive ? "active" : "inactive";
+    try {
+      await updateUserStatus({ newStatus, id: userId });
+    } catch (error) {
+      console.error("Error updating user status", error);
+    }
+  };
+
   const { data, isLoading, isError } = useGetUsersQuery(query);
-  const tablecolumns = React.useMemo(() => userColumns(), []);
+  const tablecolumns = React.useMemo(
+    () => userColumns(handleToggleUserStatus),
+    []
+  );
 
   const tableData = data?.data ?? [];
   const totalCount = data?.meta?.total ?? 0;

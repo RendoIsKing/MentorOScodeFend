@@ -48,19 +48,14 @@ type User = {
   __v: number;
 };
 
-export function userColumns(): ColumnDef<User>[] {
-  const handleToggle = () => {
-    // const newStatus = userStatus === 'active' ? 'inactive' : 'active';
-    // dispatch(updateUserStatusAsync(row.original.userId, newStatus));
-  };
-
+export function userColumns(handleToggleUserStatus): ColumnDef<User>[] {
   return [
     {
       id: "select",
       header: ({ table }) => (
         <Checkbox
           checked={
-            table.getIsAllPageRowsSelected() 
+            table.getIsAllPageRowsSelected()
             // ||
             // (table.getIsSomePageRowsSelected() && "indeterminate")
           }
@@ -99,7 +94,10 @@ export function userColumns(): ColumnDef<User>[] {
             <Switch
               id="status"
               checked={row.original.isActive === true}
-              onChange={handleToggle}
+              // onChange={handleToggle}
+              onCheckedChange={(checked: boolean) =>
+                handleToggleUserStatus(checked, row?.original?._id)
+              }
             />
           </div>
         </div>

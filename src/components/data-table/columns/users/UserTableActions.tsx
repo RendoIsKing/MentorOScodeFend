@@ -11,16 +11,23 @@ import { Ellipsis } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { DeleteAlertDialog } from "@/components/data-table/columns/users/DeleteAlertDialog";
+import { useGrantUserFullPermissionMutation } from "@/redux/admin-services/admin/admin";
 
+interface SubscriptionType {
+  status: String;
+}
 interface Props {
   user: {
     _id: string;
+    subscriptions?: SubscriptionType[];
   };
 }
 
 const UserActionsCell: React.FC<Props> = ({ user }) => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [grantUserFullPermission, { isLoading }] =
+    useGrantUserFullPermissionMutation();
 
   const handleCopyUserID = () => {
     navigator.clipboard.writeText(user._id);
@@ -32,6 +39,16 @@ const UserActionsCell: React.FC<Props> = ({ user }) => {
 
   const handleDeleteUser = () => {
     setOpen(true);
+  };
+
+  const handleSubscription = async () => {
+    // console.log("handle subscription...");
+    try {
+      const response = await grantUserFullPermission(user?._id);
+      console.log("response...", response);
+    } catch (error) {
+      console.log("Error....", error);
+    }
   };
 
   return (
@@ -52,6 +69,11 @@ const UserActionsCell: React.FC<Props> = ({ user }) => {
           <DropdownMenuItem onClick={handleViewUserDetails}>
             View user details
           </DropdownMenuItem>
+          {user?.subscriptions?.length === 0 && (
+            <DropdownMenuItem onClick={handleSubscription}>
+              Allow All Priviledges
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem onClick={handleDeleteUser}>
             Delete user
           </DropdownMenuItem>
