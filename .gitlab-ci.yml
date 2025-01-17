@@ -47,6 +47,6 @@ deploy-job:      # This job runs in the deploy stage.
     - ssh -o StrictHostKeyChecking=no ubuntu@$PUBLIC_KEY sudo docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
     - ssh -o StrictHostKeyChecking=no ubuntu@$PUBLIC_KEY sudo docker image rm -f codistan/haveme:$DOCKER_IMAGE_TAG
     - ssh -o StrictHostKeyChecking=no ubuntu@$PUBLIC_KEY sudo docker pull codistan/haveme:$DOCKER_IMAGE_TAG
-    - ssh -o StrictHostKeyChecking=no ubuntu@$PUBLIC_KEY sudo docker rm -f haveme-frontend-container
-    - ssh -o StrictHostKeyChecking=no ubuntu@$PUBLIC_KEY sudo docker run -d --name haveme-frontend-container -p 3002:3002 codistan/haveme:$DOCKER_IMAGE_TAG
+    - ssh -o StrictHostKeyChecking=no ubuntu@$PUBLIC_KEY sudo docker rm -f haveme-frontend-production
+    - ssh -o StrictHostKeyChecking=no ubuntu@$PUBLIC_KEY sudo docker run -d --name haveme-frontend-production -p 3002:3002 codistan/haveme:$DOCKER_IMAGE_TAG
     - ssh -o StrictHostKeyChecking=no ubuntu@$PUBLIC_KEY sudo docker image prune -f
