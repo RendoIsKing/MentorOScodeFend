@@ -65,14 +65,14 @@ export const NotificationBannerContextProvider = (props: any) => {
 
   const hasDocumentVerified = "verifying-users";
   useEffect(() => {
-    if (!user?.hasDocumentVerified) {
+    // Remove the condition that adds the banner
+    if (false) {
       addBanner({
         id: hasDocumentVerified,
         title: `We're reviewing your ID`,
         type: "muted",
         imgSrc: "/assets/images/pending-verification/pending-verification.svg",
-        description: `This process may take up to 2 days. You will be notified once the
-                review is completed. After that, you can post your posts`,
+        description: `This process may take up to 2 days. You will be notified once the review is completed. After that, you can post your posts`,
       });
     } else {
       removeBanner(hasDocumentVerified);

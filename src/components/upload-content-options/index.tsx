@@ -38,7 +38,7 @@ function ContentUploadOptions() {
               storyId: story._id,
               isLiked: story.isLiked,
               otherProfileFullName: story?.userInfo?.fullName,
-              otherUserProfileImage: story?.userInfo?.photo[0].path,
+              otherUserProfileImage: story?.userInfo?.photo?.[0]?.path || "defaultImagePath",
               id: story?.userInfo?._id,
             };
           }),

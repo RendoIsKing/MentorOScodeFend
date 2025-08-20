@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { baseServerUrl } from '@/lib/utils';
 
 function InboxReport() {
   const { isMobile } = useClientHardwareInfo();
@@ -43,6 +44,23 @@ function InboxReport() {
               >
                 <Info />
                 Report User
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <div
+                className="flex gap-2 cursor-pointer"
+                onClick={async()=>{
+                  try{
+                    const apiBase = baseServerUrl || '/api/backend';
+                    // Attach userId for clear
+                    let userId: string | undefined;
+                    try{ const me = await fetch(`${apiBase}/v1/auth/me`, { credentials:'include' }).then(r=>r.json()); userId = me?.data?._id || me?.data?.id; }catch{}
+                    await fetch(`${apiBase}/v1/interaction/chat/engh/clear`, { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ userId }) });
+                    if (typeof window !== 'undefined') window.location.reload();
+                  }catch{}
+                }}
+              >
+                Clear conversation
               </div>
             </DropdownMenuItem>
           </DropdownMenuContent>

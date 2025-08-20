@@ -58,7 +58,7 @@ const SendMessagePopup = ({
         <AlertDialogHeader>
           <div className="border-b flex justify-between py-2 px-4 items-center border-muted-foreground/40">
             <AlertDialogTitle className={`${fontItalic.className}`}>
-              Send Message to @Alice
+              Send Message to @Coach Engh
             </AlertDialogTitle>
             <div onClick={() => setOpenPopup(false)} className="cursor-pointer">
               <X className="text-muted-foreground/40" />
@@ -76,7 +76,7 @@ const SendMessagePopup = ({
             <Button
               variant={"outline"}
               className="text-[#01b9ae] w-3/12 border border-[#01b9ae]"
-              onClick={() => router.push("/chat/Alice")}
+              onClick={() => router.push("/chat/Coach%20Engh")}
             >
               Chat
             </Button>

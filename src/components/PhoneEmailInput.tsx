@@ -12,7 +12,7 @@ import { Input } from "./ui/input";
 const PhoneEmailInput = ({ className, ...props }) => {
   const form = useFormContext();
   const [inputValue, setInputValue] = useState("");
-  const [inputType, setInputType] = useState<"phone" | "email">("phone");
+  const [inputType, setInputType] = useState<"phone" | "email" | "username">("phone");
 
   const error = form.formState.errors.loginMethod;
 
@@ -20,15 +20,9 @@ const PhoneEmailInput = ({ className, ...props }) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^(\+?\d{1,3}[-\s.]?)?(\d{1,4}[-\s.]?){1,3}\d{1,4}$/;
 
-    if (emailRegex.test(value)) {
-      return "email";
-    }
-
-    if (phoneRegex.test(value.replace(/\s+/g, ""))) {
-      return "phone";
-    }
-
-    return "phone";
+    if (emailRegex.test(value)) return "email";
+    if (phoneRegex.test(value.replace(/\s+/g, ""))) return "phone";
+    return "username";
   };
 
   const handleInputChange = (value: string) => {
@@ -42,6 +36,12 @@ const PhoneEmailInput = ({ className, ...props }) => {
       form.setValue("loginMethod", {
         type: "email",
         email: trimmedValue,
+      });
+      form.clearErrors("loginMethod");
+    } else if (currentInputType === "username") {
+      form.setValue("loginMethod", {
+        type: "username",
+        username: trimmedValue,
       });
       form.clearErrors("loginMethod");
     } else {
@@ -102,6 +102,7 @@ const PhoneEmailInput = ({ className, ...props }) => {
         return loginError.phoneNumber.message;
 
       if (loginError?.email?.message) return loginError.email.message;
+      if (loginError?.username?.message) return loginError.username.message;
     }
 
     return error.message?.toString() || "Invalid input";
@@ -117,7 +118,7 @@ const PhoneEmailInput = ({ className, ...props }) => {
           type="text"
           value={inputValue}
           onChange={(e) => handleInputChange(e.target.value)}
-          placeholder="Enter phone number or email"
+          placeholder="Enter phone number, email or username"
           className="h-12 pl-6 border-muted-foreground/30"
         />
       </div>

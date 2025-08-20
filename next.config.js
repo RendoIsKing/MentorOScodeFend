@@ -29,7 +29,25 @@ const nextConfig = {
   },
   reactStrictMode: false, // Add reactStrictMode option here
   images: {
-    domains: ["192.168.1.210", process.env.NEXT_PUBLIC_API_SERVER], // Add the allowed image domains here
+    remotePatterns: process.env.NEXT_PUBLIC_API_SERVER
+      ? [
+          {
+            protocol: new URL(process.env.NEXT_PUBLIC_API_SERVER).protocol.replace(':',''),
+            hostname: new URL(process.env.NEXT_PUBLIC_API_SERVER).hostname,
+            port: new URL(process.env.NEXT_PUBLIC_API_SERVER).port || '',
+          },
+        ]
+      : [],
+  },
+  async rewrites() {
+    const backend = process.env.NEXT_PUBLIC_API_SERVER || "http://localhost:3006/api/backend";
+    const url = new URL(backend);
+    return [
+      {
+        source: "/api/backend/:path*",
+        destination: `${url.origin}${url.pathname}/:path*`,
+      },
+    ];
   },
 };
 

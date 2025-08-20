@@ -123,14 +123,18 @@ export function postsColumns(): ColumnDef<Post>[] {
       header: "Media",
 
       cell: ({ row }) => {
-        return (
+        const path = row.original?.mediaFiles?.[0]?.path;
+        return path ? (
           <a
-            href={`${process.env.NEXT_PUBLIC_API_SERVER}/${row.original.mediaFiles[0].path}`}
+            href={`${process.env.NEXT_PUBLIC_API_SERVER}/${path}`}
             className="capitalize text-blue-600"
             target="_blank"
+            rel="noreferrer"
           >
             {"MediaUrl"}
           </a>
+        ) : (
+          <span className="text-muted-foreground">No media</span>
         );
       },
     },

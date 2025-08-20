@@ -26,13 +26,13 @@ export default function InboxLayout({
           <div>
             <ResizablePanelGroup direction="horizontal">
               <ResizablePanel
-                className="min-w-96 max-w-[45vw]"
-                defaultSize={40}
+                className="min-w-72 max-w-[35vw]"
+                defaultSize={30}
               >
                 <div>{children}</div>
               </ResizablePanel>
               <ResizableHandle />
-              <ResizablePanel defaultSize={60}>
+              <ResizablePanel defaultSize={70}>
                 <ChatHistory />
               </ResizablePanel>
             </ResizablePanelGroup>

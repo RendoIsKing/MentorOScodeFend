@@ -90,11 +90,7 @@ const PostModalMobile: React.FC<IPostModalMobileProps> = ({ postId }) => {
         // <div className="flex justify-center h-full items-center">
         <div className="flex justify-center h-full items-center">
           <img
-            src={`${
-              process.env.NEXT_PUBLIC_API_SERVER +
-              "/" +
-              postDetails?.mediaFiles[0].path
-            }`}
+            src={postDetails?.mediaFiles?.[0]?.path ? `${process.env.NEXT_PUBLIC_API_SERVER}/${postDetails.mediaFiles[0].path}` : undefined}
             className={cn("h-screen w-screen rounded-md", {
               "h-3/4": isMobile,
               "w-full h-full flex": !isPortraitHardware,
@@ -127,11 +123,7 @@ const PostModalMobile: React.FC<IPostModalMobileProps> = ({ postId }) => {
       ) : (
         // </div>
         <VideoPlayer
-          videoSrc={`${
-            process.env.NEXT_PUBLIC_API_SERVER +
-            "/" +
-            postDetails?.mediaFiles[0].path
-          }`}
+          videoSrc={postDetails?.mediaFiles?.[0]?.path ? `${process.env.NEXT_PUBLIC_API_SERVER}/${postDetails.mediaFiles[0].path}` : undefined}
           // className="h-screen w-screen"
           className={cn("h-screen w-screen rounded-md", {
             "h-full": isMobile,

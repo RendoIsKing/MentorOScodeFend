@@ -3,7 +3,7 @@ import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
 
 import { Search } from "lucide-react";
 import Link from "next/link";
-import { ABeeZee, Inter_Tight } from "next/font/google";
+import { ABeeZee, Inter_Tight, Orbitron } from "next/font/google";
 import { useHomeHeaderFilter } from "@/context/HomeFeedHeader";
 
 // TODO: Make this font definition dynamic
@@ -12,11 +12,7 @@ const fontItalic = ABeeZee({
   weight: ["400"],
   style: "italic",
 });
-const fontHelvetica = Inter_Tight({
-  subsets: ["latin"],
-  weight: ["400"],
-  style: ["normal", "italic"],
-});
+const fontLogo = Orbitron({ subsets: ["latin"], weight: ["700", "800"] });
 
 const FeedHeader = () => {
   const { isMobile } = useClientHardwareInfo();
@@ -36,44 +32,34 @@ const FeedHeader = () => {
       >
         <button
           className={`cursor-pointer  text-lg lg:text-2xl  ${
-            fontHelvetica.className
+            fontLogo.className
           } ${
             homeHeaderFilter === "subscribed"
-              ? "lg:text-foreground italic"
+              ? "lg:text-primary italic"
               : "lg:text-gray-500"
           }`}
           onClick={() => handleItemClick("subscribed")}
         >
-          {/* <button
-          className={`cursor-pointer  ${
-            fontItalic.className
-          } text-lg lg:text-2xl ${
-            homeHeaderFilter === "subscribed"
-              ? "lg:text-foreground"
-              : "lg:text-gray-500"
-          }`}
-          onClick={() => handleItemClick("subscribed")}
-        > */}
           Subscribed
         </button>
         <button
           className={`cursor-pointer text-lg lg:text-2xl  ${
-            fontHelvetica.className
+            fontLogo.className
           } ${
             homeHeaderFilter === "foryou"
-              ? "lg:text-foreground italic"
+              ? "lg:text-primary italic"
               : "lg:text-gray-500"
           }`}
           onClick={() => handleItemClick("foryou")}
         >
-          For Me
+          Feed
         </button>
         <button
           className={`cursor-pointer   text-lg lg:text-2xl  ${
-            fontHelvetica.className
+            fontLogo.className
           } ${
             homeHeaderFilter === "following"
-              ? "lg:text-foreground italic"
+              ? "lg:text-primary italic"
               : "lg:text-gray-500"
           }`}
           onClick={() => handleItemClick("following")}

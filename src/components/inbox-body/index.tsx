@@ -310,9 +310,9 @@ interface InboxBodyProps {
 
 const userChats: UserChatProps[] = [
   {
-    name: "Alice",
+    name: "Coach Engh",
     message: "Hi there!",
-    profilePhoto: "/assets/images/search/image1.svg",
+    profilePhoto: "/assets/images/inbox/image.png",
   },
 ];
 
@@ -338,7 +338,7 @@ function InboxBody({ loggedInUser, fullName, image }: InboxBodyProps) {
             <div className="px-6 pt-4">
               <div className="flex justify-between">
                 <div></div>
-                <h1>Inbox</h1>
+                <h1>Chat</h1>
                 <Link href={"/chat-search"}>
                   <Search className="stroke-foreground" />
                 </Link>
@@ -353,7 +353,7 @@ function InboxBody({ loggedInUser, fullName, image }: InboxBodyProps) {
               onChange={handleChange}
               value={inputValue}
               className="px-12 text-muted-foreground bg-muted border border-muted h-10 w-full rounded-3xl text-sm"
-              placeholder="Search Inbox"
+              placeholder="Search Chat"
             />
             <img
               //assets/images/search/search-normal.svg
@@ -373,7 +373,7 @@ function InboxBody({ loggedInUser, fullName, image }: InboxBodyProps) {
         )}
         <Separator />
         <ScrollArea className="h-[75vh] p-2">
-          <h1 className="text-muted-foreground">
+           <h1 className="text-muted-foreground">
             Unread messages ({totalUnreadCount})
           </h1>
           {userChats.map((chat, index) => (

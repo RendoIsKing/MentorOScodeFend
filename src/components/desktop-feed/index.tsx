@@ -19,7 +19,7 @@ import {
 import ReportProblemAlert from "@/components/report-problem";
 import { cn } from "@/lib/utils";
 import { ABeeZee } from "next/font/google";
-import TipDialogComponent from "../shared/tip-dialog-component";
+// Removed TipDialogComponent per request
 import {
   useLikePostMutation,
   useSavePostMutation,
@@ -84,11 +84,7 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
 
   return (
     <div className="flex flex-col gap-y-4">
-      <TipDialogComponent
-        showText={true}
-        creatorId={feedData?.userInfo[0]?._id}
-        tipOn={feedData?._id}
-      />
+      {/* Tip removed */}
 
       <div className="flex justify-center ">
         <div

@@ -59,10 +59,6 @@ export const UserOnboardingContextProvider = (props: any) => {
           return USER_PHOTO;
         case !userData.hasSelectedInterest:
           return USER_TAGS;
-        case !userData.hasConfirmedAge:
-          return AGE_CONFIRMATION;
-        // case !userData.hasDocumentUploaded:
-        //   return AGE_CONFIRMATION;
         default:
           return HOME;
       }

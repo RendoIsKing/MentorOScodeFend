@@ -15,20 +15,10 @@ import Link from "next/link";
 import Settings from "@/assets/images/popup/setting-2.svg";
 import Report from "@/assets/images/popup/info-circle.svg";
 import Logout from "@/assets/images/popup/logout.svg";
-import ContentUploadProvider, {
-  useContentUploadContext,
-} from "@/context/open-content-modal";
+import ContentUploadProvider, { useContentUploadContext } from "@/context/open-content-modal";
 import SideBarRadioButton from "./SideBarRadioButton";
 import { useAppDispatch } from "@/redux/store";
 import { logout } from "@/redux/slices/auth";
-
-type SidebarTypes = {
-  id: number;
-  url: string;
-  name: string;
-  icon: JSX.Element;
-  segment: string;
-};
 
 function SideBar() {
   const router = useRouter();
@@ -41,59 +31,44 @@ function SideBar() {
 
   return (
     <ContentUploadProvider>
-      <div className="flex flex-col m-2  ">
-        <div
-          className="flex pt-10 pb-6 pl-4 pr-12 cursor-pointer h-[10vh]"
-          onClick={() => router.push("/home")}
-        >
+      <div className="flex flex-col m-2">
+        <div className="flex pt-6 pb-4 pl-2 pr-2 cursor-pointer h-[8vh]" onClick={() => router.push("/home")}>
           <Logo />
         </div>
-        <div className="flex border-r-2 border-secondary flex-col justify-between h-[85vh] pt-10">
+        <div className="flex border-r-0 flex-col justify-between h-[90vh] pt-4">
           <SideBarRadioButton />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="flex gap-6 p-4 cursor-pointer">
-                {/* <img src="/assets/images/SideBar/Vector-more.svg"></img> */}
+              <div className="flex gap-3 p-3 cursor-pointer">
                 <MoreIcon className="stroke-foreground" />
                 More
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="p-2 border-[#0B0F14] light:bg-secondary dark:bg-[#0B0F14]">
               <DropdownMenuItem>
-                <div className="flex items-center">
-                  {/* <img src="/assets/images/popup/setting-2.svg" alt="settings" /> */}
+                <div className="flex items-center gap-2">
                   <Settings className="fill-foreground" />
                   <Link href="/settings">
-                    <Button variant={"link"} className="text-foreground">
+                    <Button variant={"link"} className="text-foreground p-0">
                       Settings
                     </Button>
                   </Link>
                 </div>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <div className="flex items-center">
-                  {/* <img
-                src="/assets/images/popup/info-circle.svg"
-                alt="report-a-problem"
-              /> */}
-
+                <div className="flex items-center gap-2">
                   <Report className="fill-foreground" />
                   <Link href="/settings/report-a-problem">
-                    <Button variant={"link"} className="text-foreground">
+                    <Button variant={"link"} className="text-foreground p-0">
                       Report a problem
                     </Button>
                   </Link>
                 </div>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <div className="flex items-center">
-                  {/* <img src="/assets/images/popup/logout.svg" alt="" /> */}
+                <div className="flex items-center gap-2">
                   <Logout className="stroke-foreground" />
-                  <Button
-                    variant={"link"}
-                    className="text-foreground"
-                    onClick={handleLogout}
-                  >
+                  <Button variant={"link"} className="text-foreground p-0" onClick={handleLogout}>
                     Logout
                   </Button>
                 </div>

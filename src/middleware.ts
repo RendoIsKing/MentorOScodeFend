@@ -1,17 +1,21 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-async function getUserProgress(userAuthToken: string) {
+async function getUserProgress(request: NextRequest, userAuthToken: string) {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_SERVER}/v1/auth/me`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${userAuthToken}`,
-        },
-      }
-    );
+    // Use configured API server if provided; otherwise hit the local proxy
+    const apiBase = process.env.NEXT_PUBLIC_API_SERVER || `${request.nextUrl.origin}/api/backend`;
+
+    const headers: Record<string, string> = {};
+    if (process.env.NEXT_PUBLIC_API_SERVER) {
+      // When talking directly to the backend, prefer Bearer auth
+      headers["Authorization"] = `Bearer ${userAuthToken}`;
+    } else if (userAuthToken) {
+      // When using the Next proxy, forward the cookie for session auth
+      headers["cookie"] = `auth_token=${userAuthToken}`;
+    }
+
+    const response = await fetch(`${apiBase}/v1/auth/me`, { method: "GET", headers });
     const data = await response.json();
     return data;
   } catch (error) {
@@ -23,6 +27,9 @@ async function getUserProgress(userAuthToken: string) {
 export async function middleware(request: NextRequest) {
   const userAuthToken = request.cookies.get("auth_token");
   const currentPath = request.nextUrl.pathname;
+
+  // Prefer env in production, but fall back to current request origin
+  const baseDomain = process.env.NEXT_PUBLIC_DOMAIN || request.nextUrl.origin;
 
   // Public paths that don't require authentication
   const publicPaths = [
@@ -46,95 +53,69 @@ export async function middleware(request: NextRequest) {
 
   // If no token and trying to access protected route
   if (!userAuthToken && !isPublicPath) {
-    const signupUrl = new URL("/signup", process.env.NEXT_PUBLIC_DOMAIN);
-    return NextResponse.redirect(signupUrl);
+    // Check if the user is already on /signin, /signup, /forgotpassword, or /
+    if (currentPath === "/signin" || currentPath === "/signup" || currentPath === "/forgotpassword" || currentPath === "/") {
+      return NextResponse.next();
+    }
+    if (process.env.NODE_ENV === "production") {
+      const signupUrl = new URL("/signin", baseDomain);
+      return NextResponse.redirect(signupUrl);
+    }
   }
+
+  // No special redirect for inbox
 
   // Handle authenticated routes
   if (userAuthToken?.value) {
-    const userProgress = await getUserProgress(userAuthToken.value);
+    const userProgress = await getUserProgress(request, userAuthToken.value);
 
     // If failed to fetch user progress, redirect to signup
-    if (!userProgress?.data) {
-      const signupUrl = new URL("/signup", process.env.NEXT_PUBLIC_DOMAIN);
+    if (!userProgress?.data && process.env.NODE_ENV === "production") {
+      const signupUrl = new URL("/signup", baseDomain);
       return NextResponse.redirect(signupUrl);
     }
 
-    const isAdmin = userProgress?.data?.role === "admin" ? true : false;
-    const hasActiveSubscription =
-      userProgress?.data?.platformSubscription?.status === "active";
+    // Modify onboarding steps to allow access
+    const pathsAndChecks = [
+      { path: "/user-info", check: true },
+      { path: "/user-photo", check: true },
+      { path: "/user-tags", check: true },
+      { path: "/age-confirmation", check: true },
+    ];
 
-    // Admin route handling
-    if (isAdmin) {
-      if (!currentPath.startsWith("/admin/")) {
+    // Don't redirect away from current onboarding step
+    for (const element of pathsAndChecks) {
+      if (element.path === currentPath) {
+        return NextResponse.next();
+      } else if (!element.check && process.env.NODE_ENV === "production") {
         return NextResponse.redirect(
-          new URL("/admin/dashboard", process.env.NEXT_PUBLIC_DOMAIN)
+          new URL(element.path, baseDomain)
         );
       }
-    } else {
-      // Prevent non-admins from accessing admin routes
-      if (currentPath.startsWith("/admin/")) {
-        return NextResponse.redirect(
-          new URL("/home", process.env.NEXT_PUBLIC_DOMAIN)
-        );
-      }
+    }
 
-      // Onboarding steps check
-      const pathsAndChecks = [
-        { path: "/user-info", check: userProgress.data.hasPersonalInfo },
-        { path: "/user-photo", check: userProgress.data.hasPhotoInfo },
-        { path: "/user-tags", check: userProgress.data.hasSelectedInterest },
-        { path: "/age-confirmation", check: userProgress.data.hasConfirmedAge },
-      ];
+    const allStepsCompleted = pathsAndChecks.every(
+      (element) => element.check
+    );
 
-      // Don't redirect away from current onboarding step
-      for (const element of pathsAndChecks) {
-        if (element.path === currentPath) {
-          return NextResponse.next();
-        } else if (!element.check) {
-          return NextResponse.redirect(
-            new URL(element.path, process.env.NEXT_PUBLIC_DOMAIN)
-          );
-        }
-      }
+    // Routes that require subscription
+    const subscriptionRequiredPaths = [
+      "/chat",
+      "/creator-center",
+      "/search",
+      // "/wallet",
+    ];
 
-      const allStepsCompleted = pathsAndChecks.every(
-        (element) => element.check
+    // Check if current path requires subscription
+    const requiresSubscription = subscriptionRequiredPaths.some((path) =>
+      currentPath.startsWith(path)
+    );
+
+    // Redirect authenticated users away from auth pages
+    if (isPublicPath && allStepsCompleted && process.env.NODE_ENV === "production") {
+      return NextResponse.redirect(
+        new URL("/home", baseDomain)
       );
-
-      // Routes that require subscription
-      const subscriptionRequiredPaths = [
-        "/chat",
-        "/creator-center",
-        "/search",
-        // "/wallet",
-      ];
-
-      // Check if current path requires subscription
-      const requiresSubscription = subscriptionRequiredPaths.some((path) =>
-        currentPath.startsWith(path)
-      );
-
-      // Handle subscription required paths
-      // if (requiresSubscription && !hasActiveSubscription) {
-      //   const response = NextResponse.redirect(
-      //     `${process.env.NEXT_PUBLIC_DOMAIN}/home`
-      //   );
-
-      //   response.cookies.set("showSubscriptionModal", "true", {
-      //     path: "/",
-      //     maxAge: 60 * 5,
-      //   });
-
-      //   return response;
-      // }
-
-      // Redirect authenticated users away from auth pages
-      if (isPublicPath && allStepsCompleted) {
-        return NextResponse.redirect(
-          new URL("/home", process.env.NEXT_PUBLIC_DOMAIN)
-        );
-      }
     }
   }
 

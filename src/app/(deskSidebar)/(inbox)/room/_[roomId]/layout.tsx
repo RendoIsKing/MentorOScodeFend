@@ -23,19 +23,9 @@ export default function InboxLayout({
         </div>
       ) : (
         <>
-          <div>
-            <ResizablePanelGroup direction="horizontal">
-              <ResizablePanel
-                className="min-w-96 max-w-[45vw]"
-                defaultSize={40}
-              >
-                <div>{children}</div>
-              </ResizablePanel>
-              <ResizableHandle />
-              <ResizablePanel defaultSize={60}>
-                <ChatHistory />
-              </ResizablePanel>
-            </ResizablePanelGroup>
+          <div className="h-screen">
+            {/* MVP: avatar-only chat – hide conversation picker */}
+            <ChatHistory />
           </div>
         </>
       )}

@@ -95,7 +95,7 @@ function YourStory({ content = [] }: YourStoryProps) {
                 <Avatar className="size-16">
                   <AvatarImage
                     className="relative block"
-                    src={`${baseServerUrl}/${userData?.user?.photo?.path}`}
+                    src={userData?.user?.photo?.path ? `${baseServerUrl}/${userData.user.photo.path}` : undefined}
                   />
                   <AvatarFallback>
                     {getInitials(userData?.user?.fullName)}
@@ -145,7 +145,7 @@ function YourStory({ content = [] }: YourStoryProps) {
                 <Avatar className="size-16">
                   <AvatarImage
                     className="relative block"
-                    src={`${baseServerUrl}/${userData?.user?.photo?.path}`}
+                    src={userData?.user?.photo?.path ? `${baseServerUrl}/${userData.user.photo.path}` : undefined}
                   />
                   <AvatarFallback>
                     {getInitials(userData?.user?.fullName)}
@@ -194,7 +194,7 @@ function YourStory({ content = [] }: YourStoryProps) {
                           <div className="flex justify-center ">
                             <Avatar className="size-14 border-2 border-primary">
                               <AvatarImage
-                                src={`${process.env.NEXT_PUBLIC_API_SERVER}/${userData?.user?.photo?.path}`}
+                                src={userData?.user?.photo?.path ? `${process.env.NEXT_PUBLIC_API_SERVER}/${userData.user.photo.path}` : undefined}
                               />
                               <AvatarFallback>CJ</AvatarFallback>
                             </Avatar>

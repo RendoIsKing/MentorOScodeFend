@@ -81,7 +81,7 @@ function UserStoryMobile({
           <div className="flex justify-center">
             <Avatar className="size-16 border-2 border-primary">
               <AvatarImage
-                src={`${process.env.NEXT_PUBLIC_API_SERVER}/${imagePath}`}
+                src={imagePath ? `${process.env.NEXT_PUBLIC_API_SERVER}/${imagePath}` : undefined}
               />
               <AvatarFallback>{getInitials(fullName)}</AvatarFallback>
             </Avatar>
@@ -114,7 +114,7 @@ function UserStoryMobile({
               <div className="flex justify-center ">
                 <Avatar className="size-14 border-2 border-primary">
                   <AvatarImage
-                    src={`${process.env.NEXT_PUBLIC_API_SERVER}/${imagePath}`}
+                    src={imagePath ? `${process.env.NEXT_PUBLIC_API_SERVER}/${imagePath}` : undefined}
                   />
                   <AvatarFallback>CJ</AvatarFallback>
                 </Avatar>

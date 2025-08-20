@@ -34,89 +34,41 @@ const Signin = () => {
   const [loginUser, { isLoading, error, isError }] = useLoginUserMutation();
   const appDispatch = useAppDispatch();
 
-  const onSubmit = async (data: z.infer<typeof signinFormSchema>) => {
+  const onSubmit = async (formData: z.infer<typeof signinFormSchema>) => {
     try {
-      const payload =
-        data.loginMethod.type === "phone"
-          ? {
-              dialCode: data.loginMethod.prefix.replace("+", ""),
-              phoneNumber: data.loginMethod.phoneNumber,
-              password: data.password,
-            }
-          : {
-              email: data.loginMethod.email,
-              password: data.password,
-            };
+      const payload: any = {
+        password: formData.password,
+      };
 
-      const res = await loginUser(payload).unwrap();
-
-      if (res?.status === false && res?.isPassword === "false") {
-        toast({
-          variant: "destructive",
-          title: "Action Required",
-          description: "Please set your password first",
-        });
-
-        router.push("/user-info");
-        return;
+      if (formData.loginMethod.type === "email") {
+        payload.email = formData.loginMethod.email;
+      } else if (formData.loginMethod.type === "phone") {
+        payload.phoneNumber = `${formData.loginMethod.prefix}--${formData.loginMethod.phoneNumber}`;
+      } else if (formData.loginMethod.type === "username") {
+        payload.username = formData.loginMethod.username;
       }
 
-      // Handle successful login
-      appDispatch(setAuthData(res));
-
-      // Store phone number if using phone login
-      if (data.loginMethod.type === "phone") {
-        appDispatch(
-          setUserPhoneNumber({
-            phoneNumber: data.loginMethod.phoneNumber,
-            prefix: data.loginMethod.prefix,
-            id: res?.data?._id,
-          })
-        );
-      }
-      router.push("/home");
-
-      toast({
-        variant: "success",
-        title: `Please verify using it within 10 minutes ${res?.data?.otp}`,
+      const res = await fetch("http://localhost:3006/api/backend/v1/auth/user-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
-    } catch (err) {
-      // console.error(err);
-      // toast({
-      //   variant: "destructive",
-      //   description: "Something went wrong",
-      // });
-      if (err?.status === 400 && err?.data?.data?._id) {
-        const { data } = err.data;
-        appDispatcher(
-          setUserPhoneNumber({
-            phoneNumber: data.phoneNumber,
-            prefix: data.dialCode,
-            id: data._id,
-          })
-        );
-        toast({
-          variant: "success",
-          title: `Please verify using it with in 10 minutes ${data?.otp}`,
-          // FIX ME: REMOVE THIS LINE BEFORE DEPLOY
-        });
-        router.push("/verify-otp");
-      } else if (
-        (err?.status === 400 || err?.status === 403) &&
-        err?.data?.message
-      ) {
-        toast({
-          variant: "destructive",
-          title: err?.data?.message,
-          // FIX ME: REMOVE THIS LINE BEFORE DEPLOY
-        });
+
+      const body = await res.json();
+
+      if (res.ok && (body.token || body.message === "User login successfully")) {
+        const authPayload = body.token
+          ? body
+          : { token: "session", user: body.user };
+        appDispatch(setAuthData(authPayload));
+        router.push("/home");
+        toast({ variant: "success", title: `Logged in${authPayload.user?.name ? ` as ${authPayload.user.name}` : ""}` });
       } else {
-        console.log(err);
-        toast({
-          variant: "destructive",
-          description: "Something went wrong",
-        });
+        throw new Error(body?.message || "Invalid login credentials");
       }
+    } catch (err) {
+      console.log(err);
+      toast({ variant: "destructive", description: "Something went wrong" });
     }
   };
 

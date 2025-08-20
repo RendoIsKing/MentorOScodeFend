@@ -8,9 +8,8 @@ import React, {
 import PostInteraction from "@/components/postInteraction";
 
 import { cn, textFormatter } from "@/lib/utils";
-import { Label } from "@radix-ui/react-dropdown-menu";
-import { ABeeZee } from "next/font/google";
 import { VideoPlayer, VideoPlayerHandle } from "@/components/video-player";
+import { Maximize2, Minimize2 } from "lucide-react";
 import { IGetPostContentRequest } from "@/contracts/requests/IPostContentRequest";
 import { useGetPostsQuery } from "@/redux/services/haveme/posts";
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -30,12 +29,7 @@ interface IMyCarouselProps {
 const ADD_POSTS = "ADD_POSTS";
 const RESET_POSTS = "RESET_POSTS";
 
-// TODO: Make this font definition dynamic
-const fontItalic = ABeeZee({
-  subsets: ["latin"],
-  weight: ["400"],
-  style: "italic",
-});
+// Typography handled via utility classes; no special font import
 
 const HomeFeedCarousel: React.FC<IMyCarouselProps> = ({ isMobile }) => {
   const listRef = useRef(null);
@@ -50,7 +44,9 @@ const HomeFeedCarousel: React.FC<IMyCarouselProps> = ({ isMobile }) => {
     page: page,
     search: "",
     filter: homeHeaderFilter,
-  };
+    // Include the current user's own posts when viewing the generic Feed
+    includeSelf: homeHeaderFilter === "foryou" ? true : undefined,
+  } as any;
   const { data: postDetails, isLoading: isLoadingDetails } =
     useGetPostsQuery(query);
 
@@ -115,7 +111,7 @@ const HomeFeedCarousel: React.FC<IMyCarouselProps> = ({ isMobile }) => {
         <div
           className={cn(" scrollbar", {
             "h-screen w-screen ": isMobile,
-            "h-[88vh] w-[28vw]": !isMobile,
+            "h-[88vh] w-[40vw] xl:w-[44vw] 2xl:w-[48vw]": !isMobile,
           })}
         >
           {isLoadingDetails ? (
@@ -197,12 +193,111 @@ export function PostItem({
   const videoContainerRef = useRef<HTMLDivElement>(null);
 
   const videoRef = useRef<VideoPlayerHandle>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isPseudoFullscreen, setIsPseudoFullscreen] = useState(false);
+  const isFsActive = () =>
+    !!(
+      document.fullscreenElement ||
+      (document as any).webkitFullscreenElement ||
+      (document as any).mozFullScreenElement ||
+      (document as any).msFullscreenElement
+    );
+
+  const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  const toggleContainerFullscreen = async () => {
+    const container = videoContainerRef.current as any;
+    if (!container) return;
+    const active = isFsActive();
+    try {
+      if (!active) {
+        const req =
+          container.requestFullscreen ||
+          container.webkitRequestFullscreen ||
+          container.mozRequestFullScreen ||
+          container.msRequestFullscreen;
+        if (req) await req.call(container);
+        await wait(150);
+        if (!isFsActive()) {
+          // Try page-level
+          const docReq = (document.documentElement as any).requestFullscreen ||
+            (document.documentElement as any).webkitRequestFullscreen ||
+            (document.documentElement as any).mozRequestFullScreen ||
+            (document.documentElement as any).msRequestFullscreen;
+          if (docReq) await docReq.call(document.documentElement);
+          await wait(150);
+        }
+        if (!isFsActive()) {
+          // Pseudo fullscreen
+          setIsPseudoFullscreen(true);
+          document.body.style.overflow = "hidden";
+        }
+      } else {
+        await (document.exitFullscreen ||
+          (document as any).webkitExitFullscreen ||
+          (document as any).mozCancelFullScreen ||
+          (document as any).msExitFullscreen)?.call(document);
+        await wait(150);
+        setIsPseudoFullscreen(false);
+        document.body.style.overflow = "";
+      }
+    } catch (e) {
+      setIsPseudoFullscreen(true);
+      document.body.style.overflow = "hidden";
+    }
+  };
+
+  useEffect(() => {
+    const handleFsChange = () => {
+      const fsEl = (document.fullscreenElement ||
+        (document as any).webkitFullscreenElement ||
+        (document as any).mozFullScreenElement ||
+        (document as any).msFullscreenElement) as HTMLElement | null;
+      const active = fsEl === videoContainerRef.current;
+      setIsFullscreen(active);
+      if (active) {
+        setIsPseudoFullscreen(false);
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "";
+      }
+    };
+    document.addEventListener("fullscreenchange", handleFsChange);
+    document.addEventListener("webkitfullscreenchange", handleFsChange as any);
+    document.addEventListener("mozfullscreenchange", handleFsChange as any);
+    document.addEventListener("MSFullscreenChange", handleFsChange as any);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFsChange);
+      document.removeEventListener("webkitfullscreenchange", handleFsChange as any);
+      document.removeEventListener("mozfullscreenchange", handleFsChange as any);
+      document.removeEventListener("MSFullscreenChange", handleFsChange as any);
+    };
+  }, []);
+
+  // Keyboard shortcut: press "f" to toggle fullscreen for accessibility and Opera GX reliability
+  useEffect(() => {
+    const keyHandler = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "f") {
+        e.preventDefault();
+        toggleContainerFullscreen();
+      }
+    };
+    document.addEventListener("keydown", keyHandler);
+    return () => document.removeEventListener("keydown", keyHandler);
+  }, []);
 
   const [createImpressionTrigger] = useCreateImpressionMutation();
   const [logViewTrigger] = useLogViewMutation();
 
   const [viewPortTimer, setViewPortTimer] = useState(null);
   const [pointerTimer, setPointerTimer] = useState(null);
+  const [isCaptionExpanded, setIsCaptionExpanded] = useState(false);
+  const clampStyle: React.CSSProperties = {
+    display: "-webkit-box",
+    WebkitBoxOrient: "vertical" as any,
+    WebkitLineClamp: 2 as any,
+    overflow: "hidden",
+  };
 
   useEffect(() => {
     if (rowRef.current) {
@@ -282,80 +377,125 @@ export function PostItem({
       >
         <div
           ref={videoContainerRef}
-          className={cn({
-            "p-0 flex justify-center h-screen ": isMobile,
-            "flex justify-between h-[86vh] w-[86%]": !isMobile,
-          })}
-        >
-          {fileType === "image" ? (
-            <img
-              onLoad={() => createImpression()}
-              src={`${
-                process.env.NEXT_PUBLIC_API_SERVER +
-                "/" +
-                post?.mediaFiles[0].path
-              }`}
-              alt="post details"
-              className={cn("rounded-md object-contain", {
-                "h-full": isMobile,
-                "w-full h-full flex": !isPortraitHardware,
-                "w-screen": !isPortraitHardware && isMobile,
-                "rotate-90": !isPortraitSoftware && isPortraitHardware,
-              })}
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-            />
-          ) : (
-            <VideoPlayer
-              videoSrc={`${
-                process.env.NEXT_PUBLIC_API_SERVER +
-                "/" +
-                post?.mediaFiles[0].path
-              }`}
-              className={cn("rounded-md", {
-                "h-full": isMobile,
-                "w-full h-full flex": !isPortraitHardware,
-                "w-screen": !isPortraitHardware && isMobile,
-                "rotate-90": !isPortraitSoftware && isPortraitHardware,
-              })}
-              ref={videoRef}
-              createImpression={createImpression}
-            />
+          className={cn(
+            "relative",
+            {
+              "p-0 flex justify-center h-screen pr-16 sm:pr-20 md:pr-24":
+                isMobile && !isFullscreen && !isPseudoFullscreen,
+              "flex justify-center h-[86vh] w-full pr-24 xl:pr-28 2xl:pr-32":
+                !isMobile && !isFullscreen && !isPseudoFullscreen,
+              "fixed inset-0 z-50 flex justify-center items-center bg-black pr-0":
+                isPseudoFullscreen,
+              "flex justify-center h-screen w-screen pr-0": isFullscreen,
+            }
           )}
+        >
+          <div
+            className={cn("relative", {
+              "h-full": isMobile,
+              "w-full h-full flex": !isPortraitHardware,
+              "w-screen": !isPortraitHardware && isMobile,
+              "rotate-90": !isPortraitSoftware && isPortraitHardware,
+            })}
+          >
+            {fileType === "image" ? (
+              <img
+                onLoad={() => createImpression()}
+                src={post?.mediaFiles?.[0]?.path ? `${process.env.NEXT_PUBLIC_API_SERVER}/${post.mediaFiles[0].path}` : undefined}
+                alt="post details"
+                className={cn("rounded-md object-contain w-full h-full")}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              />
+            ) : (
+              <VideoPlayer
+                videoSrc={post?.mediaFiles?.[0]?.path ? `${process.env.NEXT_PUBLIC_API_SERVER}/${post.mediaFiles[0].path}` : undefined}
+                className={cn("rounded-md w-full h-full")}
+                ref={videoRef}
+                createImpression={createImpression}
+              />
+            )}
+
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent rounded-md pointer-events-none" />
+            {/* Double-click anywhere on media to toggle fullscreen (safe overlay, not the video element) */}
+            <div
+              className="absolute inset-0 z-30 cursor-zoom-in"
+              onDoubleClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleContainerFullscreen();
+              }}
+            />
+            <button
+              className="absolute top-2 right-2 z-40 bg-black/40 hover:bg-black/60 text-white p-2 rounded-md"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (isFullscreen || isPseudoFullscreen) {
+                  (document.exitFullscreen || (document as any).webkitExitFullscreen || (document as any).mozCancelFullScreen || (document as any).msExitFullscreen)?.call(document);
+                  setIsPseudoFullscreen(false);
+                  document.body.style.overflow = "";
+                } else {
+                  toggleContainerFullscreen();
+                }
+              }}
+              aria-label="Toggle fullscreen"
+            >
+              {isFullscreen || isPseudoFullscreen ? (
+                <Minimize2 size={18} />
+              ) : (
+                <Maximize2 size={18} />
+              )}
+            </button>
+            <div className="absolute left-3 bottom-3 md:left-4 md:bottom-4 text-white space-y-1 text-left pr-24 z-40">
+              <p className="text-base md:text-lg font-semibold leading-tight drop-shadow select-none">
+                {post?.userInfo[0]?.fullName || "Guest"}
+              </p>
+              <p
+                className="text-xs md:text-sm text-white/90 max-w-[60ch] drop-shadow cursor-pointer"
+                style={isCaptionExpanded ? undefined : clampStyle}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsCaptionExpanded((v) => !v);
+                }}
+              >
+                {textFormatter(post?.content)}
+              </p>
+              {post?.content && post?.content.length > 80 && (
+                <button
+                  className="text-xs underline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsCaptionExpanded((v) => !v);
+                  }}
+                  aria-expanded={isCaptionExpanded}
+                >
+                  {isCaptionExpanded ? "See less" : "See more"}
+                </button>
+              )}
+            </div>
+          </div>
 
           {isMobile && (
-            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/10">
-              <div
-                className={cn("absolute right-0 bottom-16 ", {
-                  "absolute right-0 top-0 scale-50 -mt-12": !isPortraitHardware,
-                })}
-              >
-                <PostInteraction postDetails={post} />
-              </div>
-              <div className="flex flex-col p-4 absolute bottom-20 text-white">
-                <div>
-                  <Label>{post?.userInfo[0]?.fullName || "Guest"}</Label>
-                </div>
-                <div className="">
-                  <Label>{textFormatter(post?.content)}</Label>
-                </div>
-              </div>
+            <div
+              className={cn(
+                "absolute right-0 top-1/2 -translate-y-1/2",
+                {
+                  "scale-50": !isPortraitHardware,
+                }
+              )}
+            >
+              <PostInteraction postDetails={post} />
             </div>
           )}
           {!isMobile && (
-            <div className="flex items-end">
-              <PostInteraction postDetails={post} />
-              <div
-                className={`flex flex-col absolute items-start left-8 font-thin text-white py-4 ${fontItalic.className}`}
-              >
-                <div className="dark:text-white text-muted-foreground">
-                  <Label>{post?.userInfo[0]?.fullName || "Guest"}</Label>
-                </div>
-                <div className="dark:text-white text-muted-foreground">
-                  <Label>{textFormatter(post?.content)}</Label>
-                </div>
+            <>
+              <div className={cn("absolute right-0 top-1/2 -translate-y-1/2", { hidden: isFullscreen || isPseudoFullscreen })}>
+                <PostInteraction postDetails={post} />
               </div>
-            </div>
+              {/* remove dblclick overlay; using explicit button for reliability */}
+              {/* overlay now attached to media wrapper above */}
+            </>
           )}
         </div>
       </div>

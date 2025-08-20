@@ -82,7 +82,7 @@ const EditProfile = () => {
         userName: user.userName || "",
         bio: user.bio || "",
         instagramLink: user.instagramLink || "",
-        link: `HaveME.com/@${user.userName}`,
+        link: `MentorOS.com/@${user.userName}`,
         tiktokLink: user.tiktokLink || "",
         youtubeLink: user.youtubeLink || "",
       });

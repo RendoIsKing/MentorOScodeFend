@@ -21,6 +21,10 @@ export const signinFormSchema = z.object({
       type: z.literal("email"),
       email: z.string().email("Invalid email address"),
     }),
+    z.object({
+      type: z.literal("username"),
+      username: z.string().min(3, "Username is too short"),
+    }),
   ]),
   password: z.string().min(5, "Password must be at least 5 characters"),
 });

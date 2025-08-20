@@ -57,10 +57,10 @@ const AgeConfirmation = () => {
   const FormSchema = z.object({
     dob: z.date().refine(
       (dob) =>
-        // comparing difference b/w current date, selectedDate
-        differenceInYears(new Date(), new Date(dob)) >= 18,
+        // Allow users under 18
+        differenceInYears(new Date(), new Date(dob)) >= 0,
       {
-        message: "You must be 18 years older",
+        message: "Please enter your birthdate",
       }
     ),
   });
@@ -139,7 +139,7 @@ const AgeConfirmation = () => {
       .then((res) => {
         //console.log(res);
         setOpenPopup(true);
-        router.push("/wallet/add-payment-method");
+        router.push("/home");
         toast({
           variant: "success",
           description: "User on boarded successfully",
@@ -208,7 +208,7 @@ const AgeConfirmation = () => {
                   When is your Birthday?
                 </h1>
                 <p className="text-muted-foreground mt-2 text-center">
-                  Make sure you are above 18 year old . This App is only for 18+
+                  Your birthdate won’t be shown publicly
                 </p>
               </>
             )}
@@ -236,9 +236,6 @@ const AgeConfirmation = () => {
 
                 <div>
                   <Button className="block w-full">Next</Button>
-                  <p className="text-muted-foreground text-center my-2">
-                    Your birthdate won’t be shown publicly
-                  </p>
                 </div>
               </div>
             </form>

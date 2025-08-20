@@ -120,12 +120,12 @@ const PostInteraction: React.FC<IPostInteractionProps> = ({ postDetails }) => {
   const { isMobile } = useClientHardwareInfo();
   return (
     <div className="flex flex-col gap-y-4">
-      <div className="flex flex-col justify-center w-fit p-2">
+      <div className="flex flex-col items-center justify-center w-fit p-2 mx-auto">
         <div
           onClick={() => router.push(`/${postDetails?.userInfo[0]?.userName}`)}
           className="flex justify-center relative cursor-pointer"
         >
-          <Avatar className="size-16 ">
+          <Avatar className="size-16">
             <AvatarImage className="relative block" src={imageUrl} />
             <AvatarFallback>
               {getInitials(postDetails?.userInfo?.fullName)}
