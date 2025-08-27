@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from "react";
+import { chatCoachEngh, decideAndApply } from "@/lib/api/interaction";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function CoachEnghChat() {
   const [messages, setMessages] = useState([
@@ -12,6 +14,8 @@ export default function CoachEnghChat() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const { toast } = useToast();
+
   const sendMessage = async () => {
     if (!input.trim()) return;
 
@@ -21,27 +25,22 @@ export default function CoachEnghChat() {
     setLoading(true);
 
     try {
-      const res = await fetch(
-        "http://localhost:3006/api/backend/interaction/chat/engh",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message: input,
-            history: newMessages.map((m) => ({
-              role: m.sender === "user" ? "user" : "assistant",
-              content: m.text,
-            })),
-          }),
-        }
-      );
+      const [reply, action] = await Promise.all([
+        chatCoachEngh(input, newMessages.map(m => ({ role: m.sender === 'user' ? 'user' : 'assistant', content: m.text }))),
+        decideAndApply(input).catch(() => ({ noAction: true })),
+      ]);
 
-      const data = await res.json();
-      if (data.reply) {
-        setMessages([
-          ...newMessages,
-          { sender: "coach", text: data.reply },
-        ]);
+      if (reply?.reply) {
+        setMessages([...newMessages, { sender: "coach", text: reply.reply }]);
+      }
+
+      if (action && !action.noAction && action.summary) {
+        toast({ description: `Applied: ${action.summary}` });
+        try {
+          // Notify Student Center (and any listeners) to refresh snapshot
+          window.dispatchEvent(new Event('plansUpdated'));
+          window.dispatchEvent(new Event('student-snapshot-refresh'));
+        } catch {}
       }
     } catch (err) {
       setMessages([

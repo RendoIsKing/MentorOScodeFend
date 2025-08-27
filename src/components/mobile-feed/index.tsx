@@ -76,6 +76,10 @@ const MobileFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
   const [savePost] = useSavePostMutation();
   const { user } = useUserOnboardingContext();
   const [isDeleteModal, setIsDeleteModal] = useState(false);
+  const safeBase = (baseServerUrl as any) || (typeof window !== 'undefined' && (window as any).NEXT_PUBLIC_API_SERVER) || '/api/backend';
+  const path = feedData?.mediaFiles?.[0]?.path;
+  const postUrl = path ? `${safeBase}/${path}` : '';
+  const isVideo = feedData?.media?.[0]?.mediaType === 'video';
 
   const isOwnProfile = feedData?.userInfo[0]?._id === user?._id;
 

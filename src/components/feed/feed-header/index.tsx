@@ -3,6 +3,7 @@ import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
 
 import { Search } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ABeeZee, Inter_Tight, Orbitron } from "next/font/google";
 import { useHomeHeaderFilter } from "@/context/HomeFeedHeader";
 
@@ -16,10 +17,16 @@ const fontLogo = Orbitron({ subsets: ["latin"], weight: ["700", "800"] });
 
 const FeedHeader = () => {
   const { isMobile } = useClientHardwareInfo();
+  const router = useRouter();
   const { homeHeaderFilter, setHomeHeaderFilter } = useHomeHeaderFilter();
 
   const handleItemClick = (item: string) => {
     setHomeHeaderFilter(item);
+    try {
+      router.refresh();
+    } catch {
+      if (typeof window !== 'undefined') window.location.reload();
+    }
   };
   return (
     <div className="sticky top-0 mt-6 mb-2 ">

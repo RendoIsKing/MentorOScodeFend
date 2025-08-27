@@ -9,6 +9,7 @@ import More from "@/assets/images/Home/more.svg";
 import { Info, ThumbsDown } from "lucide-react";
 import CommentsComp from "@/components/comments-comp";
 import Link from "next/link";
+import { baseServerUrl } from "@/lib/utils";
 
 import {
   DropdownMenu,

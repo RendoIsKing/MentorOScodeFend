@@ -1,4 +1,5 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { Volume2, VolumeX } from "lucide-react";
 
 interface VideoPlayerProps {
   videoSrc: string;
@@ -10,11 +11,14 @@ export interface VideoPlayerHandle {
   play: () => void;
   pause: () => void;
   toggleFullscreen: () => void;
+  toggleMuted: () => void;
 }
 
 export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
   ({ videoSrc, className, createImpression }, ref) => {
     const videoRef = useRef<HTMLVideoElement>(null);
+
+    const [isMuted, setIsMuted] = useState(true);
 
     useImperativeHandle(ref, () => ({
       play: () => {
@@ -40,6 +44,9 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
           // ignore
         }
       },
+      toggleMuted: () => {
+        setIsMuted((m) => !m);
+      }
     }));
 
     const [isFullscreen, setIsFullscreen] = useState(false);
@@ -82,25 +89,36 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
     };
 
     return (
-      <video
-        onPlay={() => createImpression()}
-        src={videoSrc}
-        autoPlay
-        loop
-        controls={false}
-        className={className}
-        ref={videoRef}
-        onClick={() => {
-          if (justHandledDoubleClickRef.current) return;
-          if (videoRef.current?.paused) {
-            videoRef.current.play();
-          } else {
-            videoRef.current.pause();
-          }
-        }}
-        // remove double-click handler; fullscreen controlled externally
-        playsInline
-      />
+      <div className={`relative ${className}`}>
+        <video
+          onPlay={() => createImpression()}
+          src={videoSrc}
+          autoPlay
+          loop
+          controls={false}
+          className="w-full h-full"
+          ref={videoRef}
+          muted={isMuted}
+          onClick={() => {
+            if (justHandledDoubleClickRef.current) return;
+            if (videoRef.current?.paused) {
+              videoRef.current.play();
+            } else {
+              videoRef.current.pause();
+            }
+          }}
+          // remove double-click handler; fullscreen controlled externally
+          playsInline
+        />
+        <button
+          type="button"
+          aria-label={isMuted ? 'Unmute' : 'Mute'}
+          onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); setIsMuted(m=>!m); }}
+          className="absolute top-2 left-2 z-40 bg-black/40 hover:bg-black/60 text-white p-2 rounded-md"
+        >
+          {isMuted ? <VolumeX size={16}/> : <Volume2 size={16}/>}
+        </button>
+      </div>
     );
   }
 );

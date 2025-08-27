@@ -17,7 +17,7 @@ export default function ExerciseChart({ series, period }: { series: { date: stri
     labels,
     datasets: [
       {
-        label: 'Progress',
+        label: 'Kg',
         data: points,
         backgroundColor: '#E47DE1',
         borderColor: '#E47DE1',
@@ -25,14 +25,6 @@ export default function ExerciseChart({ series, period }: { series: { date: stri
         pointRadius: 3,
         pointHoverRadius: 5,
       },
-      ...(points.length ? [{
-        label: 'PR',
-        data: points.map(() => Math.max(...points)),
-        borderColor: resolvedTheme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)',
-        borderDash: [6,6],
-        pointRadius: 0,
-        fill: false,
-      } as any] : []),
     ],
   };
 
@@ -49,7 +41,7 @@ export default function ExerciseChart({ series, period }: { series: { date: stri
         if (period === '90d') return raw.slice(5);
         return raw.slice(0,7);
       } } },
-      y: { grid: { color: gridColor }, ticks: { color: axisColor } },
+      y: { grid: { color: gridColor }, ticks: { color: axisColor, callback: (v: any) => `${v} kg` } },
     },
   };
 

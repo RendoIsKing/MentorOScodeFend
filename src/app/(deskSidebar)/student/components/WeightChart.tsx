@@ -16,6 +16,8 @@ export default function WeightChart({ entries, period, onEntriesChange }: { entr
   const [kg, setKg] = useState<string>('');
   const [date, setDate] = useState<string>(() => new Date().toISOString().slice(0,10));
   const [saving, setSaving] = useState(false);
+  const [editingDate, setEditingDate] = useState<string | null>(null);
+  const [editingKg, setEditingKg] = useState<string>('');
   const [localEntries, setLocalEntries] = useState<WeightEntry[]>(entries || []);
 
   useEffect(() => {
@@ -146,6 +148,37 @@ export default function WeightChart({ entries, period, onEntriesChange }: { entr
     }
   }
 
+  async function onStartEdit(d: string, kgValue: number) {
+    setEditingDate(d);
+    setEditingKg(String(kgValue));
+  }
+
+  async function onCancelEdit() {
+    setEditingDate(null);
+    setEditingKg('');
+  }
+
+  async function onSaveEdit(d: string) {
+    const kgNum = Number(editingKg);
+    if (Number.isNaN(kgNum) || kgNum < 30 || kgNum > 400) {
+      alert('Ugyldig vekt. Oppgi mellom 30 og 400 kg.');
+      return;
+    }
+    try {
+      setSaving(true);
+      await updateWeightEntry(user?._id || 'me', { date: d, kg: kgNum });
+      setLocalEntries(prev => {
+        const next = (prev || []).map(e => e.date === d ? { ...e, kg: kgNum } : e);
+        onEntriesChange?.(next);
+        return next;
+      });
+      setEditingDate(null);
+      setEditingKg('');
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <div>
       <div className="h-56 md:h-64">
@@ -179,10 +212,25 @@ export default function WeightChart({ entries, period, onEntriesChange }: { entr
             {([...localEntries].slice().reverse()).slice(0, 10).map(e => (
               <div key={e.date} className="grid grid-cols-5 items-center px-3 py-2 border-b last:border-b-0 text-sm">
                 <div className="col-span-2">{e.date}</div>
-                <div className="col-span-2">{e.kg.toFixed(1)}</div>
+                <div className="col-span-2">
+                  {editingDate === e.date ? (
+                    <input className="w-24 px-2 py-1 border rounded" value={editingKg} onChange={ev=>setEditingKg(ev.target.value)} />
+                  ) : (
+                    e.kg.toFixed(1)
+                  )}
+                </div>
                 <div className="text-right space-x-2">
-                  <button className="px-2 py-0.5 border rounded hover:bg-muted" onClick={()=>{ setDate(e.date); setKg(String(e.kg)); }}>Rediger</button>
-                  <button className="px-2 py-0.5 border rounded hover:bg-muted" onClick={()=>onDelete(e.date)}>Slett</button>
+                  {editingDate === e.date ? (
+                    <>
+                      <button disabled={saving} className="px-2 py-0.5 border rounded hover:bg-muted" onClick={()=>onSaveEdit(e.date)}>Lagre</button>
+                      <button className="px-2 py-0.5 border rounded hover:bg-muted" onClick={onCancelEdit}>Avbryt</button>
+                    </>
+                  ) : (
+                    <>
+                      <button className="px-2 py-0.5 border rounded hover:bg-muted" onClick={()=>onStartEdit(e.date, e.kg)}>Rediger</button>
+                      <button className="px-2 py-0.5 border rounded hover:bg-muted" onClick={()=>onDelete(e.date)}>Slett</button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}

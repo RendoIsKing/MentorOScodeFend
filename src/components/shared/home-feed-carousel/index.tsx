@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import PostInteraction from "@/components/postInteraction";
 
-import { cn, textFormatter } from "@/lib/utils";
+import { cn, textFormatter, baseServerUrl } from "@/lib/utils";
 import { VideoPlayer, VideoPlayerHandle } from "@/components/video-player";
 import { Maximize2, Minimize2 } from "lucide-react";
 import { IGetPostContentRequest } from "@/contracts/requests/IPostContentRequest";
@@ -399,33 +399,53 @@ export function PostItem({
             })}
           >
             {fileType === "image" ? (
-              <img
-                onLoad={() => createImpression()}
-                src={post?.mediaFiles?.[0]?.path ? `${process.env.NEXT_PUBLIC_API_SERVER}/${post.mediaFiles[0].path}` : undefined}
-                alt="post details"
-                className={cn("rounded-md object-contain w-full h-full")}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-              />
+              (() => {
+                const safeBase = (baseServerUrl as any) || (typeof window !== 'undefined' && (window as any).NEXT_PUBLIC_API_SERVER) || '/api/backend';
+                const path = post?.mediaFiles?.[0]?.path;
+                if (path) {
+                  return (
+                    <img
+                      onLoad={(e)=>{ createImpression(); try{ (e.target as HTMLImageElement).classList.remove('blur-sm'); }catch{} }}
+                      src={`${safeBase}/${path}`}
+                      alt="post details"
+                      loading="lazy"
+                      decoding="async"
+                      className={cn("rounded-md object-contain w-full h-full blur-sm transition-all duration-300")}
+                      onMouseEnter={handleMouseEnter}
+                      onMouseLeave={handleMouseLeave}
+                    />
+                  );
+                }
+                return (
+                  <div className="rounded-md object-contain w-full h-full bg-muted flex items-center justify-center text-xs text-muted-foreground">
+                    Media missing
+                  </div>
+                );
+              })()
             ) : (
-              <VideoPlayer
-                videoSrc={post?.mediaFiles?.[0]?.path ? `${process.env.NEXT_PUBLIC_API_SERVER}/${post.mediaFiles[0].path}` : undefined}
-                className={cn("rounded-md w-full h-full")}
-                ref={videoRef}
-                createImpression={createImpression}
-              />
+              (() => {
+                const safeBase = (baseServerUrl as any) || (typeof window !== 'undefined' && (window as any).NEXT_PUBLIC_API_SERVER) || '/api/backend';
+                const path = post?.mediaFiles?.[0]?.path;
+                if (path) {
+                  return (
+                    <VideoPlayer
+                      videoSrc={`${safeBase}/${path}`}
+                      className={cn("rounded-md w-full h-full")}
+                      ref={videoRef}
+                      createImpression={createImpression}
+                    />
+                  );
+                }
+                return (
+                  <div className="rounded-md w-full h-full bg-muted flex items-center justify-center text-xs text-muted-foreground">
+                    Media missing
+                  </div>
+                );
+              })()
             )}
 
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent rounded-md pointer-events-none" />
-            {/* Double-click anywhere on media to toggle fullscreen (safe overlay, not the video element) */}
-            <div
-              className="absolute inset-0 z-30 cursor-zoom-in"
-              onDoubleClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleContainerFullscreen();
-              }}
-            />
+            {/* Remove magnifier overlay so single-click pauses/plays natively */}
             <button
               className="absolute top-2 right-2 z-40 bg-black/40 hover:bg-black/60 text-white p-2 rounded-md"
               onClick={(e) => {

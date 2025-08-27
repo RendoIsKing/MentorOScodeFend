@@ -35,7 +35,7 @@ export default function RootLayout({
 
   useEffect(() => {
     // Set document title and other metadata directly
-    document.title = "HaveMe";
+    document.title = "MentorOS";
     // You can also manipulate other metadata properties here
   }, []);
 

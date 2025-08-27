@@ -45,61 +45,95 @@ export default function NutritionPlanPage(){
 
   // Build client-side day structure as a fallback if backend didn't provide days
   useEffect(()=>{
+    function segmentMealsFromBlock(block: string){
+      const meals: any[] = [];
+      const headerIter = block.matchAll(/(^|\n)\s*(?:[-•]\s*)?\**\s*(Frokost|Lunsj|Middag|Kveldssnack|Kveldsmat|Snack|Breakfast|Lunch|Dinner)\s*\**\s*:?[\t ]*(?=\n|$)/gim);
+      const headers: {name:string; index:number}[] = [];
+      for (const m of headerIter) headers.push({ name: m[2], index: (m as any).index as number });
+      const endIdx = block.length;
+      for (let h=0; h<headers.length; h++){
+        const start = headers[h].index;
+        const stop = h+1 < headers.length ? headers[h+1].index : endIdx;
+        const section = block.slice(start, stop);
+        const body = section.replace(/^.*?:\s*/s, '');
+        const items = body
+          .split(/\n/)
+          .map(l=>l.replace(/^\s*[\-•]\s*/, '').replace(/^\*+|\*+$/g,'').trim())
+          .filter(Boolean)
+          .filter(l=>!/(^|\s)(Frokost|Lunsj|Middag|Kveldssnack|Kveldsmat|Snack|Breakfast|Lunch|Dinner)\s*:?/i.test(l))
+          .filter(l=>!/(^|\s)(Totalt|Total)\s*:?/i.test(l));
+        if (items.length) meals.push({ name: headers[h].name, items });
+      }
+      return meals;
+    }
+
     function parseDaysFromSource(src: string){
-      const text = (src||'').replace(/\r/g,'').replace(/\n\s*---+\s*\n/g,'\n');
-      const parts = text.split(/\n\s*#?\s*(?:Dag|Day)\s*(\d+)\s*:?[\t ]*\n/i);
+      // Normalize markdown separators and solitary '#'
+      let text = (src||'')
+        .replace(/\r/g,'')
+        .replace(/^\s*#\s*$/gim,'')
+        .replace(/\n\s*---+\s*\n/g,'\n');
+
       const result: any[] = [];
-      if (parts.length>1){
-        for (let i=1;i<parts.length;i+=2){
-          const label = `Dag ${parts[i]}`;
-          const block = (parts[i+1]||'');
-          const meals: any[] = [];
 
-          // Detect headers at line starts, optionally preceded by a bullet
-          const headerIter = block.matchAll(/(^|\n)\s*(?:[-•]\s*)?(Frokost|Lunsj|Middag|Snack|Breakfast|Lunch|Dinner)\s*:/gim);
-          const headers: {name:string; index:number}[] = [];
-          for (const m of headerIter) {
-            const full = m[0];
-            const name = m[2];
-            const matchStart = (m as any).index as number; // start of the whole match
-            // compute the start index of the name inside the block
-            const nameOffset = full.toLowerCase().lastIndexOf(name.toLowerCase());
-            const nameIndex = matchStart + (nameOffset >= 0 ? nameOffset : 0);
-            headers.push({ name, index: nameIndex });
-          }
+      // Match lines that represent day headers:
+      // - "Dag 1"
+      // - "Mandag", "Tirsdag", ... (NO) or English weekdays
+      // Allow optional leading '###' and/or '**bold**'
+      const headerRe = /(^|\n)\s*(?:#+\s*)?\**\s*(?:Dag\s*(\d+)|(Mandag|Tirsdag|Onsdag|Torsdag|Fredag|Lørdag|Søndag|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday))\s*\**\s*(?=\n|$)/gim;
+      const matches: { label: string; index: number }[] = [];
+      for (const m of text.matchAll(headerRe)){
+        const idx = (m as any).index as number;
+        const label = m[2] ? `Dag ${m[2]}` : (m[3] || '').replace(/^./, c=>c.toUpperCase());
+        // Advance to next line after the header token
+        const afterHeader = text.slice(idx).match(/^[^\n]*\n/)?.[0]?.length || 0;
+        matches.push({ label, index: idx + afterHeader });
+      }
 
-          const endIdx = block.length;
-          for (let h=0; h<headers.length; h++){
-            const start = headers[h].index;
-            const stop = h+1 < headers.length ? headers[h+1].index : endIdx;
-            const section = block.slice(start, stop);
-            const body = section.replace(/^.*?:\s*/s, '');
-            const items = body
-              .split(/\n/)
-              .map(l=>l.replace(/^\s*[\-•]\s*/, '').trim())
-              .filter(Boolean)
-              // drop any stray lines that start another header pattern within items
-              .filter(l=>!/(^|\s)(Frokost|Lunsj|Middag|Snack|Breakfast|Lunch|Dinner)\s*:/i.test(l));
-            if (items.length) meals.push({ name: headers[h].name, items });
-          }
-
-          if (meals.length) result.push({ label, meals });
+      if (matches.length) {
+        for (let i=0;i<matches.length;i++){
+          const start = matches[i].index;
+          const end = i+1 < matches.length ? matches[i+1].index : text.length;
+          const block = text.slice(start, end);
+          const meals = segmentMealsFromBlock(`\n${block}`);
+          if (meals.length) result.push({ label: matches[i].label, meals });
         }
+      } else if (text.trim()) {
+        const meals = segmentMealsFromBlock(`\n${text}`);
+        if (meals.length) result.push({ label: 'Dag 1', meals });
       }
       return result;
     }
+
+    function splitMealsFromExistingDay(day: any){
+      try{
+        // Use raw items (including any embedded headers) to rebuild a block and re-segment
+        const lines: string[] = [];
+        for (const m of (day.meals || [])){
+          if (m?.name) lines.push(String(m.name));
+          for (const it of (m.items || [])) lines.push(String(it));
+        }
+        const text = `\n${lines.join('\n')}`;
+        const parsed = segmentMealsFromBlock(text);
+        return parsed && parsed.length ? { ...day, meals: parsed } : day;
+      }catch{ return day; }
+    }
     if (plan){
       if (Array.isArray((plan as any).days) && (plan as any).days.length){
-        // sanitize existing days from backend to avoid header bleed-through
-        const sanitize = (days:any[]) => days.map(d=>({
-          ...d,
-          meals: (d.meals||[]).map((m:any)=>({
-            ...m,
-            items: (m.items||[])
-              .map((x:string)=>x.replace(/^\s*[\-•]\s*/, '').trim())
-              .filter((x:string)=>!/(^|\s)(Frokost|Lunsj|Middag|Snack|Breakfast|Lunch|Dinner)\s*:/i.test(x))
-          }))
-        }));
+        // sanitize and, if needed, re-segment meals strictly by headers
+        const sanitize = (days:any[]) => days.map(d=>{
+          const cleaned = {
+            ...d,
+            meals: (d.meals||[]).map((m:any)=>({
+              ...m,
+              items: (m.items||[])
+                .map((x:string)=>x.replace(/^\s*[\-•]\s*/, '').replace(/^\*+|\*+$/g,'').trim())
+                .filter((x:string)=>!/(^|\s)(Frokost|Lunsj|Middag|Kveldssnack|Kveldsmat|Snack|Breakfast|Lunch|Dinner)\s*:?/i.test(x))
+                .filter((x:string)=>!/(^|\s)(Totalt|Total)\s*:?/i.test(x))
+            }))
+          };
+          return splitMealsFromExistingDay(cleaned);
+        });
         setUiDays(sanitize((plan as any).days));
       } else if (plan.sourceText){
         const parsed = parseDaysFromSource(plan.sourceText);

@@ -5,6 +5,8 @@ import WeightChart from './components/WeightChart';
 import ExerciseChart from './components/ExerciseChart';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { fetchStudentSnapshot } from '@/lib/api/student';
+import { baseServerUrl } from '@/lib/utils';
+import { useStudentSnapshot } from '@/hooks/useStudentSnapshot';
 import { useTypedSelector } from '@/redux/store';
 import { selectIsAuthenticated } from '@/redux/slices/auth';
 import { useUserOnboardingContext } from '@/context/UserOnboarding';
@@ -12,15 +14,17 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@
 import { useRouter } from 'next/navigation';
 import { logEvent } from '@/lib/analytics';
 import type { StudentSnapshot } from '@/lib/types/student';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function StudentCenterPage() {
   const [period, setPeriod] = useState<'7d'|'30d'|'90d'|'ytd'>('30d');
-  const [data, setData] = useState<StudentSnapshot | null>(null);
+  const { user } = useUserOnboardingContext();
+  const { data, loading, error, refresh } = useStudentSnapshot(user?._id || 'me', period);
   const [exercise, setExercise] = useState<string>('');
   const [exerciseSeries, setExerciseSeries] = useState<{date:string; value:number}[] | null>(null);
   const isLoggedIn = useTypedSelector(selectIsAuthenticated);
-  const { user } = useUserOnboardingContext();
   const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     // Redirect unauthenticated users (simple guard; final routing can be in middleware)
@@ -30,21 +34,24 @@ export default function StudentCenterPage() {
     }
     // Use cookie-resolved snapshot first for consistency
     (async ()=>{
-      let snapshot: any = null;
       try {
-        const apiBase = process.env.NEXT_PUBLIC_API_SERVER || '/api/backend';
-        const r = await fetch(`${apiBase}/v1/student/me/snapshot?period=${period}`, { credentials:'include' });
-        if (r.ok) snapshot = await r.json();
+        const lsEx = localStorage.getItem('student.ex');
+        const lsP = localStorage.getItem('student.p');
+        if (lsEx) setExercise(lsEx);
+        if (lsP === '7d' || lsP === '30d' || lsP === '90d' || lsP === 'ytd') setPeriod(lsP as any);
       } catch {}
-      if (!snapshot) snapshot = await fetchStudentSnapshot(user?._id || 'me', period);
-      setData(snapshot);
+      const snapshot = (await (async ()=>{
+        try {
+          const apiBase = process.env.NEXT_PUBLIC_API_SERVER || '/api/backend';
+          const r = await fetch(`${apiBase}/v1/student/me/snapshot?period=${period}`, { credentials:'include' });
+          if (r.ok) return await r.json();
+        } catch {}
+        return data ?? await fetchStudentSnapshot(user?._id || 'me', period);
+      })());
       try { sessionStorage.setItem('lastSnapshot', JSON.stringify(snapshot)); } catch {}
-      // default exercise if none selected
       const urlEx = new URLSearchParams(window.location.search).get('ex');
       if (urlEx) {
         setExercise(urlEx);
-      } else if (!exercise && snapshot.topExercises && snapshot.topExercises.length > 0) {
-        setExercise(snapshot.topExercises[0]);
       }
     })();
     logEvent('student_center.viewed', { userId: user?._id });
@@ -52,12 +59,18 @@ export default function StudentCenterPage() {
 
   // Listen for plan updates and refresh snapshot
   useEffect(()=>{
-    const onUpdate = ()=>{
-      fetchStudentSnapshot(user?._id || 'me', period).then((snapshot)=> setData(snapshot));
+    const onUpdate = ()=>{ 
+      Promise.resolve(refresh()).then(()=>{
+        try { toast({ description: 'Student Center oppdatert' }); } catch {}
+      }).catch(()=>{});
     };
     window.addEventListener('plansUpdated', onUpdate);
-    return ()=> window.removeEventListener('plansUpdated', onUpdate);
-  }, [period, user?._id]);
+    window.addEventListener('student-snapshot-refresh', onUpdate);
+    return ()=> { 
+      window.removeEventListener('plansUpdated', onUpdate);
+      window.removeEventListener('student-snapshot-refresh', onUpdate);
+    };
+  }, [period, user?._id, refresh]);
 
   // Load exercise progress whenever period or selected exercise changes
   useEffect(() => {
@@ -65,7 +78,8 @@ export default function StudentCenterPage() {
     async function load() {
       if (!exercise) return;
       const mod = await import('@/lib/api/student');
-      const res: any = await mod.fetchExerciseProgress(user?._id || 'me', exercise, period);
+      const res: any = await mod.fetchExerciseProgress('me', exercise, period);
+      setExerciseSeries(res.series || []);
       if (!didCancel) setExerciseSeries(res.series);
       logEvent('student_center.exercise_graph.viewed', { userId: user?._id, exercise, period });
     }
@@ -77,7 +91,7 @@ export default function StudentCenterPage() {
     <div className="mx-auto max-w-screen-xl px-6 md:px-8 py-6 md:py-8 space-y-6 md:space-y-8">
       <Header
         name={user?.fullName || user?.userName || 'Student'}
-        avatarUrl={user?.photo?.path ? `${process.env.NEXT_PUBLIC_API_SERVER}/${user.photo.path}` : undefined}
+        avatarUrl={(data as any)?.photo?.path ? `${baseServerUrl}/${(data as any).photo.path}` : (user?.photo?.path ? `${baseServerUrl}/${user.photo.path}` : undefined)}
         onPeriodChange={setPeriod}
       />
 
@@ -85,8 +99,17 @@ export default function StudentCenterPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         <Card className="md:col-span-2" aria-label="Vektutvikling">
           <CardHeader>
-            <CardTitle>Vektutvikling</CardTitle>
-            <CardDescription>Siste {period.toUpperCase()}</CardDescription>
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <CardTitle>Vektutvikling</CardTitle>
+                <CardDescription>Siste {period.toUpperCase()}</CardDescription>
+              </div>
+              <div className="inline-flex rounded-md border p-1">
+                {(['7d','30d','90d','ytd'] as const).map(p => (
+                  <button key={p} onClick={()=>setPeriod(p)} className={`px-3 py-1 text-xs rounded ${period===p ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}>{p.toUpperCase()}</button>
+                ))}
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             {data ? (
@@ -94,7 +117,12 @@ export default function StudentCenterPage() {
                 entries={data.weightTrend}
                 period={period}
                 onEntriesChange={(e)=>{
-                  setData(prev => prev ? { ...prev, weightTrend: e } : prev);
+                  // optimistic local update and trigger a refresh fetch
+                  try {
+                    const prev = data as any;
+                    (prev as any).weightTrend = e;
+                  } catch {}
+                  refresh();
                 }}
               />
             ) : (
@@ -103,7 +131,7 @@ export default function StudentCenterPage() {
             {data && (
               <div className="mt-3 grid grid-cols-3 text-sm">
                 <div>Start: {data.weightTrend?.[0]?.kg != null ? data.weightTrend?.[0]?.kg?.toFixed(1) + ' kg' : '—'}</div>
-                <div>Nå: {data.weightTrend?.length ? data.weightTrend?.[data.weightTrend.length-1]?.kg?.toFixed(1) + ' kg' : '—'}</div>
+                <div data-testid="weight-last">Nå: {data.weightTrend?.length ? data.weightTrend?.[data.weightTrend.length-1]?.kg?.toFixed(1) + ' kg' : '—'}</div>
                 <div>Δ: {data.weightTrend?.length ? ((data.weightTrend?.[data.weightTrend.length-1]?.kg - data.weightTrend?.[0]?.kg)).toFixed(1) + ' kg' : '—'}</div>
               </div>
             )}
@@ -131,29 +159,98 @@ export default function StudentCenterPage() {
           <CardDescription>Velg øvelse</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="mb-3 w-full max-w-xs">
-            <Select onValueChange={(v)=>{
-              setExercise(v);
-              const url = new URL(window.location.href);
-              url.searchParams.set('ex', v);
-              window.history.replaceState({}, '', url.toString());
-              logEvent('student_center.exercise.changed', { exercise: v, period });
-            }} value={exercise || (data?.topExercises?.[0] ?? '')}>
-              <SelectTrigger aria-label="Velg øvelse">
-                <SelectValue placeholder="Velg øvelse" />
-              </SelectTrigger>
-              <SelectContent>
-                {(data?.topExercises ?? ['Markløft','Knebøy','Benkpress']).map(ex => (
-                  <SelectItem key={ex} value={ex}>{ex}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="mb-3 w-full flex flex-wrap gap-2 items-center">
+            <div className="w-full max-w-xs">
+              <Select onValueChange={(v)=>{
+                setExercise(v);
+                const url = new URL(window.location.href);
+                url.searchParams.set('ex', v);
+                window.history.replaceState({}, '', url.toString());
+                logEvent('student_center.exercise.changed', { exercise: v, period });
+                try { localStorage.setItem('student.ex', v); } catch {}
+              }} value={exercise || undefined}>
+                <SelectTrigger aria-label="Velg øvelse">
+                  <SelectValue placeholder="Velg øvelse" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(data?.topExercises ?? ['Markløft','Knebøy','Benkpress']).map(ex => (
+                    <SelectItem key={ex} value={ex}>{ex}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="inline-flex rounded-md border p-1 ml-auto">
+              {(['7d','30d','90d','ytd'] as const).map(p => (
+                <button key={p} onClick={()=>{ setPeriod(p); try { localStorage.setItem('student.p', p); } catch {} }} className={`px-3 py-1 text-xs rounded ${period===p ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}>{p.toUpperCase()}</button>
+              ))}
+            </div>
           </div>
-          {exerciseSeries ? (
+          {exercise && exerciseSeries ? (
             <ExerciseChart series={exerciseSeries} period={period} />
           ) : (
-            <div className="h-56 md:h-64 rounded bg-muted animate-pulse" />
+            <div className="h-56 md:h-64 rounded bg-muted flex items-center justify-center text-sm text-muted-foreground">Velg øvelse for å se progresjon</div>
           )}
+          <form className="flex items-center gap-2 mt-3 text-sm" onSubmit={async (e)=>{
+            e.preventDefault();
+            const dateInput = (e.currentTarget.querySelector('[name=ex-date]') as HTMLInputElement);
+            const valInput = (e.currentTarget.querySelector('[name=ex-val]') as HTMLInputElement);
+            const date = dateInput.value.trim();
+            const valStr = valInput.value.trim();
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return toast({ description: 'Dato må være YYYY-MM-DD', variant: 'destructive' });
+            const num = Number(valStr);
+            if (Number.isNaN(num)) return toast({ description: 'Ugyldig verdi', variant: 'destructive' });
+            try {
+              const mod = await import('@/lib/api/student');
+              const exists = (exerciseSeries || []).some(p => p.date === date);
+              if (exists) await (mod as any).updateExerciseProgress('me', exercise || (data?.topExercises?.[0] ?? ''), { date, value: num });
+              else await (mod as any).addExerciseProgress('me', exercise || (data?.topExercises?.[0] ?? ''), { date, value: num });
+              const res: any = await (mod as any).fetchExerciseProgress('me', exercise || (data?.topExercises?.[0] ?? ''), period);
+              setExerciseSeries(res.series);
+              valInput.value = '';
+            } catch (err) {
+              // show basic toast-like feedback via alert for now
+              console.error(err);
+              toast({ description: 'Kunne ikke lagre øvelsesprogresjon', variant: 'destructive' });
+            }
+          }}>
+            <input name="ex-date" type="date" className="px-2 py-1 border rounded" />
+            <input name="ex-val" placeholder="Kg" className="w-24 px-2 py-1 border rounded" />
+            <button type="submit" className="px-3 py-1 rounded border hover:bg-muted">Lagre (kg)</button>
+          </form>
+          {exercise && exerciseSeries?.length ? (
+            <div className="mt-3">
+              <div className="text-sm font-medium mb-1">Historikk</div>
+              <div className="border rounded">
+                <div className="grid grid-cols-5 text-xs font-medium px-3 py-2 border-b bg-muted/50">
+                  <div className="col-span-2">Dato</div>
+                  <div className="col-span-2">Verdi</div>
+                  <div className="text-right">Handling</div>
+                </div>
+                {[...exerciseSeries].slice().reverse().slice(0,10).map((it)=> (
+                  <div key={it.date} className="grid grid-cols-5 items-center px-3 py-2 border-b last:border-b-0 text-sm">
+                    <div className="col-span-2">{it.date}</div>
+                    <div className="col-span-2">{it.value}</div>
+                    <div className="text-right space-x-2">
+                      <button className="px-2 py-0.5 border rounded hover:bg-muted" onClick={async ()=>{
+                        const val = prompt('Ny verdi', String(it.value));
+                        if (!val) return;
+                        const mod = await import('@/lib/api/student');
+                        await (mod as any).updateExerciseProgress('me', exercise || (data?.topExercises?.[0] ?? ''), { date: it.date, value: Number(val) });
+                        const res: any = await (mod as any).fetchExerciseProgress('me', exercise || (data?.topExercises?.[0] ?? ''), period);
+                        setExerciseSeries(res.series);
+                      }}>Rediger</button>
+                      <button className="px-2 py-0.5 border rounded hover:bg-muted" onClick={async ()=>{
+                        const mod = await import('@/lib/api/student');
+                        await (mod as any).deleteExerciseProgress('me', exercise || (data?.topExercises?.[0] ?? ''), it.date);
+                        const res: any = await (mod as any).fetchExerciseProgress('me', exercise || (data?.topExercises?.[0] ?? ''), period);
+                        setExerciseSeries(res.series);
+                      }}>Slett</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </CardContent>
       </Card>
 
@@ -195,10 +292,47 @@ export default function StudentCenterPage() {
           <CardContent>
             {data?.currentNutritionPlan?.[0] ? (
               <>
-                <div className="text-sm mb-2">Mål: {data.currentNutritionPlan[0].dailyTargets?.kcal} kcal</div>
-                <ul className="space-y-2 text-sm">
-                  {data.currentNutritionPlan[0].meals.map((m,i)=>(<li key={i}>{m.name}: {m.items?.join(', ')}</li>))}
-                </ul>
+                <div className="text-sm mb-2">Mål: <span data-testid="nutrition-kcal">{data.currentNutritionPlan[0].dailyTargets?.kcal}</span> kcal</div>
+                {Array.isArray((data.currentNutritionPlan[0] as any).days) && (data.currentNutritionPlan[0] as any).days.length ? (
+                  <div className="space-y-3 text-sm">
+                    {(() => {
+                      const days = (data.currentNutritionPlan[0] as any).days;
+                      const names = ['Søndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag'];
+                      const todayIdx = new Date().getDay();
+                      // try to match a day whose label includes today's name; otherwise pick first
+                      const matchIdx = days.findIndex((d:any)=> (d.label||'').toLowerCase().includes(names[todayIdx].toLowerCase()));
+                      const idx = matchIdx >= 0 ? matchIdx : 0;
+                      const label = days[idx]?.label || `Dag ${idx+1}`;
+                      return <div className="text-xs text-muted-foreground">{label} (i dag)</div>;
+                    })()}
+                    {(() => {
+                      const days = (data.currentNutritionPlan[0] as any).days;
+                      const names = ['Søndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag'];
+                      const todayIdx = new Date().getDay();
+                      const matchIdx = days.findIndex((d:any)=> (d.label||'').toLowerCase().includes(names[todayIdx].toLowerCase()));
+                      const idx = matchIdx >= 0 ? matchIdx : 0;
+                      return days[idx]?.meals?.slice(0,3).map((m:any,i:number)=> (
+                      <div key={i}>
+                        <div className="font-medium">{m.name}</div>
+                        <ul className="list-disc pl-5">
+                          {(m.items||[]).slice(0,3).map((it:string,j:number)=>(<li key={j}>{it}</li>))}
+                        </ul>
+                      </div>
+                      ));
+                    })()}
+                  </div>
+                ) : (
+                  <ul className="space-y-3 text-sm">
+                    {data.currentNutritionPlan[0].meals.slice(0,3).map((m:any,i:number)=> (
+                      <li key={i}>
+                        <div className="font-medium">{m.name}</div>
+                        <ul className="list-disc pl-5">
+                          {(m.items||[]).slice(0,3).map((it:string,j:number)=>(<li key={j}>{it}</li>))}
+                        </ul>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </>
             ) : (
               <div className="text-muted-foreground text-sm">Ingen plan ennå – be om forslag</div>

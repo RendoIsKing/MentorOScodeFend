@@ -162,8 +162,9 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
     setOpen(false);
   };
 
-  const fileType = postDetails?.media[0]?.mediaType;
-  const mediaPath = `${baseServerUrl}/${postDetails?.mediaFiles[0]?.path}`;
+  const fileType = postDetails?.media?.[0]?.mediaType;
+  const safeBase = (baseServerUrl as any) || (typeof window !== 'undefined' && (window as any).NEXT_PUBLIC_API_SERVER) || '/api/backend';
+  const mediaPath = postDetails?.mediaFiles?.[0]?.path ? `${safeBase}/${postDetails.mediaFiles[0].path}` : undefined;
   const profilePhotoPath = `${baseServerUrl}/${userPhotoData?.path}`;
   const postDate = postDetails?.updatedAt
     ? postDetails?.updatedAt
@@ -344,13 +345,19 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
       <div className="relative min-w-96 lg:w-1/2">
         {fileType === "image" ? (
           <div className="relative">
-            <img
-              onLoad={() => logView()}
-              src={mediaPath}
-              alt="post details"
-              className="h-[37.8rem] lg:w-full object-contain"
-              onClick={() => setShowTaggedPeople(!showTaggedPeople)}
-            />
+            {mediaPath ? (
+              <img
+                onLoad={(e)=>{ logView(); try{ (e.target as HTMLImageElement).classList.remove('blur-sm'); }catch{} }}
+                src={mediaPath}
+                alt="post details"
+                loading="lazy"
+                decoding="async"
+                className="h-[37.8rem] lg:w-full object-contain blur-sm transition-all duration-300"
+                onClick={() => setShowTaggedPeople(!showTaggedPeople)}
+              />
+            ) : (
+              <div className="h-[37.8rem] lg:w-full object-contain bg-muted flex items-center justify-center text-xs text-muted-foreground">Media missing</div>
+            )}
             <div>
               {showTaggedPeople &&
                 getPostDetails?.userTags?.map((user, index) => {
@@ -372,13 +379,17 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
           </div>
         ) : (
           <div className="flex flex-col">
-            <video
-              autoPlay
-              controls
-              src={mediaPath}
-              className="h-[37.8rem] lg:w-full"
-              onPlay={createImpression}
-            />
+            {mediaPath ? (
+              <video
+                autoPlay
+                controls
+                src={mediaPath}
+                className="h-[37.8rem] lg:w-full"
+                onPlay={createImpression}
+              />
+            ) : (
+              <div className="h-[37.8rem] lg:w-full bg-muted flex items-center justify-center text-xs text-muted-foreground">Media missing</div>
+            )}
             {/* {showTaggedPeople && (
               <div className="w-[33.8rem] h-auto border-[#0b0f1440]  dark:bg-[#0b0f1440] rounded-lg p-4 absolute top-[240px] text-center">
                 <ScrollArea className="px-3 py-0 h-20">

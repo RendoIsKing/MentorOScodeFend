@@ -33,8 +33,9 @@ const UserPosts: React.FC<IUserPostDataProps> = ({ post, style }) => {
   const stripe = useStripe();
   const [payForPostTrigger, { isLoading }] = usePayForPostMutation();
   const mediaFile = post?.mediaFiles[0];
-  const postUrl = `${baseServerUrl}/${mediaFile.path}`;
-  const isVideo = post?.media[0]?.mediaType === "video";
+  const safeBase = (baseServerUrl as any) || (typeof window !== 'undefined' && (window as any).NEXT_PUBLIC_API_SERVER) || '/api/backend';
+  const postUrl = mediaFile?.path ? `${safeBase}/${mediaFile.path}` : '';
+  const isVideo = post?.media?.[0]?.mediaType === "video";
   const isPayPerView = post?.privacy === "pay-per-view";
   const { user } = useUserOnboardingContext();
   const [isPayPerViewOpen, setIsPayPerViewOpen] = useState(false);
@@ -87,6 +88,34 @@ const UserPosts: React.FC<IUserPostDataProps> = ({ post, style }) => {
     createImpressionTrigger({ postId: post?._id });
   }, []);
 
+  const renderMedia = () => {
+    if (!postUrl) {
+      return (
+        <div className="cursor-pointer object-cover h-full w-full bg-muted flex items-center justify-center text-xs text-muted-foreground">Media missing</div>
+      );
+    }
+    if (isVideo) {
+      return (
+        <video
+          className="cursor-pointer object-cover h-full w-full"
+          src={postUrl}
+          onPlay={() => createImpression()}
+        />
+      );
+    }
+    return (
+      <img
+        className="cursor-pointer object-cover h-full w-full blur-sm transition-all duration-300"
+        src={postUrl}
+        alt="user-post"
+        loading="lazy"
+        decoding="async"
+        onLoad={(e)=>{ try{ (e.target as HTMLImageElement).classList.remove('blur-sm'); }catch{} }}
+        onClick={() => createImpression()}
+      />
+    );
+  };
+
   return (
     <div>
       <div className="grid grid-cols-3 lg:grid-cols-4">
@@ -100,20 +129,7 @@ const UserPosts: React.FC<IUserPostDataProps> = ({ post, style }) => {
               <div className="absolute right-2 top-2">
                 {post?.isPinned && <Pin className="rotate-45" />}
               </div>
-              {isVideo ? (
-                <video
-                  className="cursor-pointer object-cover h-full w-full"
-                  src={postUrl}
-                  onPlay={() => createImpression()}
-                />
-              ) : (
-                <img
-                  className="cursor-pointer object-cover h-full w-full"
-                  src={postUrl}
-                  alt="user-post"
-                  onClick={() => createImpression()}
-                />
-              )}
+              {renderMedia()}
             </Link>
           ) : (
             <>
@@ -126,24 +142,7 @@ const UserPosts: React.FC<IUserPostDataProps> = ({ post, style }) => {
                     {post?.isPinned && <Pin className="rotate-45" />}
                   </div>
                   <DialogTrigger asChild>
-                    {isVideo ? (
-                      <video
-                        className={cn(
-                          "cursor-pointer object-cover h-full w-full blur-sm"
-                        )}
-                        src={postUrl}
-                        onPlay={() => createImpression()}
-                      />
-                    ) : (
-                      <img
-                        className={cn(
-                          "cursor-pointer object-cover h-full w-full blur-sm"
-                        )}
-                        src={postUrl}
-                        alt="user-post"
-                        onClick={() => createImpression()}
-                      />
-                    )}
+                    {renderMedia()}
                   </DialogTrigger>
                   <DialogContent className="max-w-xs sm:max-w-md">
                     <div className="flex justify-center">
@@ -186,20 +185,7 @@ const UserPosts: React.FC<IUserPostDataProps> = ({ post, style }) => {
                   <div className="absolute right-2 top-2">
                     {post?.isPinned && <Pin className="rotate-45" />}
                   </div>
-                  {isVideo ? (
-                    <video
-                      className="cursor-pointer object-cover h-full w-full"
-                      src={postUrl}
-                      onPlay={() => createImpression()}
-                    />
-                  ) : (
-                    <img
-                      className="cursor-pointer object-cover h-full w-full"
-                      src={postUrl}
-                      alt="user-post"
-                      onClick={() => createImpression()}
-                    />
-                  )}
+                  {renderMedia()}
                 </Link>
               )}
             </>
