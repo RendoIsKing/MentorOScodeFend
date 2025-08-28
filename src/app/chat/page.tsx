@@ -8,7 +8,7 @@ export default function CoachEnghChat() {
   const [messages, setMessages] = useState([
     {
       sender: "coach",
-      text: `Hei! Jeg er Coach Engh. Før vi begynner, må jeg forstå deg litt bedre:\n\n1. Hva er målet ditt akkurat nå?\n2. Hva sliter du mest med?\n3. Hvor ofte trener du i uka?\n4. Har du spesielle matpreferanser eller allergier?`,
+      text: `Hei! Jeg er The PT. Før vi begynner, må jeg forstå deg litt bedre:\n\n1. Hva er målet ditt akkurat nå?\n2. Hva sliter du mest med?\n3. Hvor ofte trener du i uka?\n4. Har du spesielle matpreferanser eller allergier?`,
     },
   ]);
   const [input, setInput] = useState("");
@@ -55,7 +55,7 @@ export default function CoachEnghChat() {
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-xl mx-auto bg-white rounded shadow p-6">
-        <h1 className="text-2xl font-bold mb-4">Chat med Coach Engh</h1>
+        <h1 className="text-2xl font-bold mb-4">Chat med The PT</h1>
 
         <div className="space-y-3 mb-4 max-h-[400px] overflow-y-auto">
           {messages.map((msg, i) => (
@@ -77,7 +77,7 @@ export default function CoachEnghChat() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             className="flex-1 border border-gray-300 rounded px-4 py-2"
-            placeholder="Skriv til Coach Engh..."
+            placeholder="Skriv til The PT..."
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
           />
           <button

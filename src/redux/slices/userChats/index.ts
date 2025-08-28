@@ -50,7 +50,7 @@ export const userSliceApi = createApi({
   reducerPath: 'userApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'https://apistaging.haveme.net/api/' }),
   endpoints: (builder) => ({
-    getChat: builder.query<ApiResponse, NewItem>({
+    getChat: builder.query<ApiResponse, string>({
       query: ( userId ) => ({
         url: `chat/show-chat/${userId}`,
         method: 'GET',

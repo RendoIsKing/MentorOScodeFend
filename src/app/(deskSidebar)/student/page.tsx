@@ -266,7 +266,7 @@ export default function StudentCenterPage() {
           <CardContent>
             {data?.currentTrainingPlan?.[0] ? (
               <>
-                <ul className="space-y-2 text-sm">
+                <ul className="space-y-2 text-sm" data-testid="plan-summary">
                   {data.currentTrainingPlan[0].sets.slice(0,3).map((s,i)=>(
                     <li key={i}>{s.exercise} — {s.sets}x{s.reps}{s.weight?` @ ${s.weight}kg`:''}</li>
                   ))}

@@ -403,7 +403,7 @@ const ChatHistory: React.FC = () => {
   const pathName = usePathname();
   const rawUserFromPath = pathName.split("/")[pathName.split("/").length - 1];
   const decodedUserFromPath = decodeURIComponent(rawUserFromPath);
-  const displayName = decodedUserFromPath; // e.g., "Coach Engh"
+  const displayName = decodedUserFromPath; // e.g., "The PT"
   const handleName = decodedUserFromPath.replace(/\s+/g, "_"); // e.g., "Coach_Engh"
   const router = useRouter();
   const { isMobile } = useClientHardwareInfo();
@@ -536,7 +536,7 @@ const ChatHistory: React.FC = () => {
         }
       }
 
-      // Call Coach Engh backend and get reply
+      // Call The PT backend and get reply
       const historyPayload = messages.slice(-10).map((m: any) => ({
         role: m.sender === 'user' ? 'user' : 'assistant',
         content: m.text,
@@ -683,7 +683,7 @@ const ChatHistory: React.FC = () => {
                         : `rounded-full ring ring-white ring-offset-0 cursor-pointer`
                     }
                     alt="profile picture"
-                    src={"/assets/images/inbox/image.png"}
+                    src={"/assets/images/inbox/the-pt.jpg"}
                     height={56}
                     width={56}
                   />
@@ -691,9 +691,8 @@ const ChatHistory: React.FC = () => {
 
                 <div className="ml-4 text-white h-full mt-2">
                   <h2 className="z-10 gap-y-1 overflow-hidden leading-6 ">
-                    Coach Engh (AI)
+                    The PT (AI)
                   </h2>
-                  <p className="text-sm ">@Coach_Engh</p>
                 </div>
               </div>
               {!isMobile && (

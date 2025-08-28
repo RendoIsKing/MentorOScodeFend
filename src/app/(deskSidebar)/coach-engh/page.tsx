@@ -43,10 +43,10 @@ export default function CoachEnghChatPage(){
 
   return (
     <div className="mx-auto max-w-screen-md px-6 md:px-8 py-6 space-y-4">
-      <h1 className="text-xl font-semibold">Coach Engh</h1>
+      <h1 className="text-xl font-semibold">The PT</h1>
       <div className="rounded border p-4 h-[60vh] overflow-y-auto bg-background/50">
         {messages.length === 0 && (
-          <div className="text-sm text-muted-foreground">Start en samtale med Coach Engh.</div>
+          <div className="text-sm text-muted-foreground">Start en samtale med The PT.</div>
         )}
         <div className="space-y-3">
           {messages.map((m, i) => (

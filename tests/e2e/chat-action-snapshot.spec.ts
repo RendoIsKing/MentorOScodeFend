@@ -16,7 +16,7 @@ test.describe("Chat → action → snapshot", () => {
     })));
 
     await page.goto(`${FE}/coach-engh`);
-    await page.getByPlaceholder("Skriv til Coach Engh...").fill("Sett kalorier til 2400");
+    await page.getByPlaceholder("Skriv til The PT...").fill("Sett kalorier til 2400");
     await page.keyboard.press("Enter");
     await page.waitForTimeout(1200);
 

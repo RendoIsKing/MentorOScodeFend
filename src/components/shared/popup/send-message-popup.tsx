@@ -58,7 +58,7 @@ const SendMessagePopup = ({
         <AlertDialogHeader>
           <div className="border-b flex justify-between py-2 px-4 items-center border-muted-foreground/40">
             <AlertDialogTitle className={`${fontItalic.className}`}>
-              Send Message to @Coach Engh
+              Send Message to The PT
             </AlertDialogTitle>
             <div onClick={() => setOpenPopup(false)} className="cursor-pointer">
               <X className="text-muted-foreground/40" />
