@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { logEvent } from '@/lib/analytics';
 import type { StudentSnapshot } from '@/lib/types/student';
 import { useToast } from '@/components/ui/use-toast';
+import WeightInlineLogger from '@/components/student/WeightInlineLogger';
 
 export default function StudentCenterPage() {
   const [period, setPeriod] = useState<'7d'|'30d'|'90d'|'ytd'>('30d');
@@ -104,10 +105,13 @@ export default function StudentCenterPage() {
                 <CardTitle>Vektutvikling</CardTitle>
                 <CardDescription>Siste {period.toUpperCase()}</CardDescription>
               </div>
-              <div className="inline-flex rounded-md border p-1">
-                {(['7d','30d','90d','ytd'] as const).map(p => (
-                  <button key={p} onClick={()=>setPeriod(p)} className={`px-3 py-1 text-xs rounded ${period===p ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}>{p.toUpperCase()}</button>
-                ))}
+              <div className="flex items-center gap-3">
+                <div className="inline-flex rounded-md border p-1">
+                  {(['7d','30d','90d','ytd'] as const).map(p => (
+                    <button key={p} onClick={()=>setPeriod(p)} className={`px-3 py-1 text-xs rounded ${period===p ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}>{p.toUpperCase()}</button>
+                  ))}
+                </div>
+                <WeightInlineLogger userId={user?._id || 'me'} />
               </div>
             </div>
           </CardHeader>

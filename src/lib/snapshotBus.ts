@@ -1,4 +1,4 @@
-export const SNAPSHOT_REFRESH_EVENT = "student:snapshot:refresh";
+export const SNAPSHOT_REFRESH_EVENT = "student-snapshot-refresh";
 
 export function emitSnapshotRefresh() {
   if (typeof window !== "undefined") {
