@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation';
 import { logEvent } from '@/lib/analytics';
 import type { StudentSnapshot } from '@/lib/types/student';
 import { useToast } from '@/components/ui/use-toast';
-import WeightInlineLogger from '@/components/student/WeightInlineLogger';
+import { onSnapshotRefresh } from '@/lib/snapshotBus';
 
 export default function StudentCenterPage() {
   const [period, setPeriod] = useState<'7d'|'30d'|'90d'|'ytd'>('30d');
@@ -23,6 +23,7 @@ export default function StudentCenterPage() {
   const { data, loading, error, refresh } = useStudentSnapshot(user?._id || 'me', period);
   const [exercise, setExercise] = useState<string>('');
   const [exerciseSeries, setExerciseSeries] = useState<{date:string; value:number}[] | null>(null);
+  const todayStr = new Date().toISOString().slice(0,10);
   const isLoggedIn = useTypedSelector(selectIsAuthenticated);
   const router = useRouter();
   const { toast } = useToast();
@@ -57,6 +58,9 @@ export default function StudentCenterPage() {
     })();
     logEvent('student_center.viewed', { userId: user?._id });
   }, [period, user?._id]);
+
+  // Live refresh when other parts of the app emit snapshot updates
+  useEffect(() => onSnapshotRefresh(() => refresh()), [refresh]);
 
   // Listen for plan updates and refresh snapshot
   useEffect(()=>{
@@ -105,13 +109,10 @@ export default function StudentCenterPage() {
                 <CardTitle>Vektutvikling</CardTitle>
                 <CardDescription>Siste {period.toUpperCase()}</CardDescription>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="inline-flex rounded-md border p-1">
-                  {(['7d','30d','90d','ytd'] as const).map(p => (
-                    <button key={p} onClick={()=>setPeriod(p)} className={`px-3 py-1 text-xs rounded ${period===p ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}>{p.toUpperCase()}</button>
-                  ))}
-                </div>
-                <WeightInlineLogger userId={user?._id || 'me'} />
+              <div className="inline-flex rounded-md border p-1">
+                {(['7d','30d','90d','ytd'] as const).map(p => (
+                  <button key={p} onClick={()=>setPeriod(p)} className={`px-3 py-1 text-xs rounded ${period===p ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}>{p.toUpperCase()}</button>
+                ))}
               </div>
             </div>
           </CardHeader>
@@ -217,7 +218,7 @@ export default function StudentCenterPage() {
               toast({ description: 'Kunne ikke lagre øvelsesprogresjon', variant: 'destructive' });
             }
           }}>
-            <input name="ex-date" type="date" className="px-2 py-1 border rounded" />
+            <input name="ex-date" type="date" defaultValue={todayStr} className="px-2 py-1 border rounded" />
             <input name="ex-val" placeholder="Kg" className="w-24 px-2 py-1 border rounded" />
             <button type="submit" className="px-3 py-1 rounded border hover:bg-muted">Lagre (kg)</button>
           </form>
