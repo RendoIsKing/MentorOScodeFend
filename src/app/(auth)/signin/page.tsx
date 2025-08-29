@@ -48,9 +48,11 @@ const Signin = () => {
         payload.username = formData.loginMethod.username;
       }
 
-      const res = await fetch("http://localhost:3006/api/backend/v1/auth/user-login", {
+      const apiBase = process.env.NEXT_PUBLIC_API_SERVER || "/api/backend";
+      const res = await fetch(`${apiBase}/v1/auth/user-login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
 

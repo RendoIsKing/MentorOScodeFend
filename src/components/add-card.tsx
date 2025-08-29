@@ -356,9 +356,9 @@ const BillingDetails = () => {
               <div className=" md:flex md:justify-center ">
                 <div className="md:max-w-md md:w-1/2 border-s-8 border-primary  px-6 bg-muted-foreground/10 ">
                   <p className="text-muted-foreground text-sm leading-6">
-                    HaveMe will make a one-time charge of $0.10 when adding your
+                    MentorOS will make a one-time charge of $0.10 when adding your
                     payment card. The charges on your credit card statement will
-                    appear as HaveMe
+                    appear as MentorOS
                   </p>
                 </div>
               </div>
