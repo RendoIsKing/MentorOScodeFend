@@ -17,6 +17,8 @@ import { HomeHeaderFilterProvider } from "@/context/HomeFeedHeader";
 import PostModalProvider from "@/context/PostModal";
 import UserTagsContextProvider from "@/context/UserTags";
 import CountryCodeProvider from "@/context/countryCodeContext";
+import useFCM from "@/utils/hooks/useFCM";
+import { useUpdateFCMTokenMutation } from "@/redux/services/haveme/notifications";
 
 const fontNormal = ABeeZee({
   subsets: ["latin"],
@@ -32,6 +34,12 @@ export default function RootLayout({
   postslot: React.ReactNode;
 }) {
   const router = useRouter();
+  function PushInit(){
+    const { fcmToken } = useFCM();
+    const [update] = useUpdateFCMTokenMutation();
+    useEffect(()=>{ if (fcmToken) update({ fcm_token: fcmToken }).catch(()=>{}); }, [fcmToken]);
+    return null;
+  }
 
   useEffect(() => {
     // Set document title and other metadata directly
@@ -61,6 +69,7 @@ export default function RootLayout({
                         <PostModalProvider>
                           <UserTagsContextProvider>
                             <CountryCodeProvider>
+                            <PushInit />
                             <div className="absolute top-20 z-50 opacity-50 right-0">
                               <ModeToggle />
                             </div>

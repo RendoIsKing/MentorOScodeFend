@@ -2,33 +2,28 @@ import { useEffect, useState } from "react";
 import useFCMToken from "./useFCMToken";
 import { messaging } from "../firebase";
 import { MessagePayload, onMessage } from "firebase/messaging";
+import { notificationsSupported } from "@/lib/notifySupport";
 
 const useFCM = () => {
   const fcmToken = useFCMToken();
   const [messages, setMessages] = useState<MessagePayload[]>([]);
 
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      const fcmmessaging = messaging();
-      const unsubscribe = onMessage(fcmmessaging, (payload) => {
-        setMessages((messages) => [...messages, payload]);
-      });
+    if (!notificationsSupported) return;
+    if (!("serviceWorker" in navigator)) return;
 
-      // Service worker method
+    const fcmmessaging = messaging();
+    const unsubscribe = onMessage(fcmmessaging, (payload) => {
+      setMessages((messages) => [...messages, payload]);
+    });
 
-      navigator.serviceWorker
-        .register("/firebase-messaging-sw.js")
-        .then(function (registration) {
-          console.log("Service Worker registered");
-        })
-        .catch(function (err) {
-          console.log("Service Worker registration failed:", err);
-        });
+    navigator.serviceWorker
+      .register("/firebase-messaging-sw.js")
+      .catch(function () {});
 
-      return () => {
-        return unsubscribe();
-      };
-    }
+    return () => {
+      try { unsubscribe(); } catch {}
+    };
   }, [fcmToken]);
   return { fcmToken, messages };
 };

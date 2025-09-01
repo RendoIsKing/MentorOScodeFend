@@ -1,7 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: { instrumentationHook: true },
-  webpack(config) {
+  // Alternative approach for older Next.js versions
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
+  },
+  webpack(config, { dev, isServer }) {
+    // Allow cross-origin requests in development
+    if (dev && !isServer) {
+      config.devServer = {
+        ...config.devServer,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+          'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization'
+        }
+      };
+    }
+    
     // Grab the existing rule that handles SVG imports
     const fileLoaderRule = config.module.rules.find((rule) =>
       rule.test?.test?.(".svg")
