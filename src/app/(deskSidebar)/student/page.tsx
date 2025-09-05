@@ -99,6 +99,7 @@ export default function StudentCenterPage() {
         avatarUrl={(data as any)?.photo?.path ? `${baseServerUrl}/${(data as any).photo.path}` : (user?.photo?.path ? `${baseServerUrl}/${user.photo.path}` : undefined)}
         onPeriodChange={setPeriod}
       />
+      {/* Inline weight logger removed as requested */}
 
       {/* Row B: Weight trend and At-a-Glance */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
@@ -352,13 +353,54 @@ export default function StudentCenterPage() {
             <CardTitle>Goals</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-2 text-sm">
-              {data?.goals?.length ? (
-                data.goals.map((g,i)=>(<li key={i}>{g}</li>))
-              ) : (
-                <li className="text-muted-foreground">Ingen mål satt.</li>
-              )}
-            </ul>
+            {data?.currentGoal ? (
+              <div className="space-y-2 text-sm">
+                <div>
+                  <div className="text-muted-foreground">Horisont</div>
+                  <div className="font-medium">{data.currentGoal.horizonWeeks ?? '-'} uker</div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <div className="text-muted-foreground">Målvekt</div>
+                    <div className="font-medium">{data.currentGoal.targetWeightKg ?? '-'} kg</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">Kalori‑defisit</div>
+                    <div className="font-medium">{data.currentGoal.caloriesDailyDeficit ? `${data.currentGoal.caloriesDailyDeficit} kcal/dag` : '—'}</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">Vekt/uke</div>
+                    <div className="font-medium">{data.currentGoal.weeklyWeightLossKg ? `${data.currentGoal.weeklyWeightLossKg} kg` : '—'}</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">Trening</div>
+                    <div className="font-medium">{data.currentGoal.weeklyExerciseMinutes ? `${data.currentGoal.weeklyExerciseMinutes} min/uke` : '—'}</div>
+                  </div>
+                </div>
+                {data.currentGoal.strengthTargets ? (
+                  <div>
+                    <div className="text-muted-foreground">Styrke</div>
+                    <div className="font-medium">{data.currentGoal.strengthTargets}</div>
+                  </div>
+                ) : null}
+                {data.currentGoal.plan?.shortTerm?.length ? (
+                  <div>
+                    <div className="text-muted-foreground mb-1">Fokus (neste 1–3 mnd)</div>
+                    <ul className="list-disc pl-5">
+                      {data.currentGoal.plan.shortTerm.slice(0,3).map((x,i)=>(<li key={i}>{x}</li>))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <ul className="space-y-2 text-sm">
+                {data?.goals?.length ? (
+                  data.goals.map((g,i)=>(<li key={i}>{g}</li>))
+                ) : (
+                  <li className="text-muted-foreground">Ingen mål satt.</li>
+                )}
+              </ul>
+            )}
           </CardContent>
         </Card>
       </div>

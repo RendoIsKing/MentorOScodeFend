@@ -61,4 +61,32 @@
     font-family: "Poppins", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
     font-weight: 600; /* similar weight to logo */
   }
+
+  /* Mobile safe-area helpers and chat polish */
+  :root { --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom); }
+  .pt-safe { padding-top: max(0px, var(--safe-top)); }
+  .pb-safe { padding-bottom: max(12px, var(--safe-bottom)); }
+  input, textarea { font-size: 16px; }
+  .chat-scroll { -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
+}
+
+/* Hide legacy bottom nav ONLY on mobile (belt-and-suspenders) */
+@media (max-width: 767px) {
+  .legacy-mobile-bottom-nav,
+  [data-legacy-bottom-nav],
+  [class*="mobile-bottom-navigation"],
+  [id*="mobile-bottom-navigation"],
+  [class*="MobileBottomNavigation"],
+  [id*="MobileBottomNavigation"],
+  [class*="BottomNavigation"],
+  footer.nav--mobile,
+  nav.nav-mobile,
+  #mobileNav,
+  #bottomNav {
+    display: none !important;
+    pointer-events: none !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    z-index: -1 !important;
+  }
 }

@@ -28,6 +28,7 @@ import FileUploadForm from "@/components/file-upload";
 import { useState } from "react";
 import { CircleX } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast"
+import MobileAvatarCoverPickers from "@/components/profile/MobileAvatarCoverPickers";
 
 export default function EditProfilePage() {
   const { toast } = useToast();
@@ -203,6 +204,7 @@ export default function EditProfilePage() {
               className="absolute inset-0 h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40"></div>
+            <MobileAvatarCoverPickers user={user} />
             <div className="flex items-center px-4 py-2 z-10 justify-between">
               <AvatarWithDescription
                 isTextWhite={true}

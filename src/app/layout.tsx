@@ -19,6 +19,7 @@ import UserTagsContextProvider from "@/context/UserTags";
 import CountryCodeProvider from "@/context/countryCodeContext";
 import useFCM from "@/utils/hooks/useFCM";
 import { useUpdateFCMTokenMutation } from "@/redux/services/haveme/notifications";
+import dynamic from "next/dynamic";
 
 const fontNormal = ABeeZee({
   subsets: ["latin"],
@@ -48,10 +49,13 @@ export default function RootLayout({
   }, []);
 
   const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY);
+  const MobileTabBar = dynamic(() => import("@/components/mobile/MobileTabBar"), { ssr: false });
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <head />
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+      </head>
       <body className="bg-background">
         <main className={`${fontNormal.className}`}>
           <Provider store={store}>
@@ -75,6 +79,7 @@ export default function RootLayout({
                             </div>
                             {postslot}
                             {children}
+                            <MobileTabBar />
                             <Toaster />
                             </CountryCodeProvider>
                           </UserTagsContextProvider>

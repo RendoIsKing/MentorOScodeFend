@@ -45,6 +45,25 @@ export type AtAGlance = {
   activeGoals?: string[];
 };
 
+export type GoalPlan = {
+  shortTerm?: string[];
+  mediumTerm?: string[];
+  longTerm?: string[];
+  tips?: string[];
+};
+
+export type CurrentGoal = {
+  targetWeightKg?: number;
+  strengthTargets?: string;
+  horizonWeeks?: number;
+  sourceText?: string;
+  caloriesDailyDeficit?: number;
+  weeklyWeightLossKg?: number;
+  weeklyExerciseMinutes?: number;
+  hydrationLiters?: number;
+  plan?: GoalPlan;
+};
+
 export type StudentSnapshot = {
   weightTrend: WeightEntry[];
   currentTrainingPlan: TrainingSession[];
@@ -53,6 +72,7 @@ export type StudentSnapshot = {
   glance: AtAGlance;
   topExercises?: string[];
   goals?: string[];
+  currentGoal?: CurrentGoal;
 };
 
 

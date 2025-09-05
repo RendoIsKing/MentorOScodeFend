@@ -134,6 +134,17 @@ export default function GoalsPage(){
               </CardContent>
             </Card>
           ) : null}
+          {!goal.plan?.shortTerm?.length && !goal.plan?.mediumTerm?.length && !goal.plan?.longTerm?.length && goal.sourceText ? (
+            <Card className="md:col-span-3">
+              <CardHeader>
+                <CardTitle className="text-base">Coach‑tekst</CardTitle>
+                <CardDescription>Originalt innhold lagret fra samtalen</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <pre className="whitespace-pre-wrap text-sm leading-6">{goal.sourceText}</pre>
+              </CardContent>
+            </Card>
+          ) : null}
         </div>
       ) : (
         <div className="text-muted-foreground text-sm">Ingen mål satt</div>

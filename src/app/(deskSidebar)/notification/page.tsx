@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import NotificationDescription from "@/components/shared/get-notification-description";
 import { ABeeZee } from "next/font/google";
 import { useGetNotificationQuery } from "@/redux/services/haveme/notifications";
+import { useRouter } from "next/navigation";
 import { useTypedSelector } from "@/redux/store";
 import { selectAllNotifications } from "@/redux/slices/adapters";
 import { useInView } from "react-intersection-observer";
@@ -29,6 +30,7 @@ const Notification = () => {
   });
 
   const { data: userNotificationData } = useGetNotificationQuery(query);
+  const router = useRouter();
 
   const loadMoreNotifications = () => {
     if (query?.page >= userNotificationData?.meta?.pageCount) return;
@@ -44,11 +46,15 @@ const Notification = () => {
     }
   }, [inView]);
 
-  const notificationAction = (notificationInfo) => {
-    // TODO: Implement notification action logic
-    console.log("Notification Action Clicked");
-    const urlToOpen = generateRedirectUrl(notificationInfo);
-    window.open(urlToOpen, "_blank");
+  const notificationAction = (notificationInfo: any) => {
+    const urlToOpen = generateRedirectUrl?.(notificationInfo);
+    if (!urlToOpen) return;
+    try {
+      const u = new URL(urlToOpen);
+      router.push(u.pathname + u.search + u.hash);
+    } catch {
+      window.location.href = urlToOpen;
+    }
   };
 
   return (

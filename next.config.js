@@ -58,13 +58,10 @@ const nextConfig = {
       : [],
   },
   async rewrites() {
-    const backend = process.env.NEXT_PUBLIC_API_SERVER || "http://localhost:3006/api/backend";
-    const url = new URL(backend);
+    const origin = process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:3006";
     return [
-      {
-        source: "/api/backend/:path*",
-        destination: `${url.origin}${url.pathname}/:path*`,
-      },
+      // /api/backend/* -> http://localhost:3006/api/backend/*
+      { source: "/api/backend/:path*", destination: `${origin}/api/backend/:path*` },
     ];
   },
 };
