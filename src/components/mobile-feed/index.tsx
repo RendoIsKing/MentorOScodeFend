@@ -12,7 +12,6 @@ import { ChevronRight, Info, Tags, ThumbsDown } from "lucide-react";
 import { baseServerUrl, cn, getInitials } from "@/lib/utils";
 import CommentsComp from "@/components/comments-comp";
 import { Separator } from "@/components/ui/separator";
-import TipDrawerComponent from "../shared/tip-drawer-component";
 import {
   postsApi,
   useLazyGetTaggedUserListQuery,
@@ -158,11 +157,6 @@ const MobileFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
 
   return (
     <div className="flex flex-col gap-y-4">
-      <TipDrawerComponent
-        showText={true}
-        creatorId={feedData?.userInfo[0]?._id}
-        tipOn={feedData?._id}
-      />
 
       <div className="flex justify-center ">
         <div

@@ -26,75 +26,20 @@ const UserStats: React.FC<IUserStatsProps> = ({
 }) => {
   const router = useRouter();
 
+  const Stat = ({ label, value, onClick }: { label: string; value?: number; onClick?: () => void }) => (
+    <button onClick={onClick} className="text-center">
+      <p className={`text-lg font-semibold ${fontItalic.className}`}>{millify(value || 0)}</p>
+      <p className="text-sm text-muted-foreground">{label}</p>
+    </button>
+  );
+
   return (
     <div>
-      {isOwnProfile ? (
-        <div className="grid grid-cols-5 gap-2 text-center">
-          <div onClick={() => router.push("/followers?tab=following")}>
-            <p className={`text-lg font-semibold  ${fontItalic.className}`}>
-              {millify(followingCount)}
-            </p>
-            <p className="text-sm text-muted-foreground">Following</p>
-          </div>
-          <div onClick={() => router.push("/followers?tab=followers")}>
-            <p className={`text-lg font-semibold  ${fontItalic.className}`}>
-              {millify(followersCount)}
-            </p>
-            <p className="text-sm text-muted-foreground">Followers</p>
-          </div>
-          <div onClick={() => router.push("/followers?tab=subscribers")}>
-            <p className={`text-lg font-semibold  ${fontItalic.className}`}>
-              {millify(subscribersCount)}
-            </p>
-            <p className="text-sm text-muted-foreground">Subscribers</p>
-          </div>
-          <div>
-            <p className={`text-lg font-semibold  ${fontItalic.className}`}>
-              {millify(postsCount)}
-            </p>
-            <p className="text-sm text-muted-foreground">Posts</p>
-          </div>
-          <div>
-            <p className={`text-lg font-semibold  ${fontItalic.className}`}>
-              {millify(likeCount)}
-            </p>
-            <p className="text-sm text-muted-foreground">Likes</p>
-          </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-4 gap-2 text-center">
-          {/* <div onClick={() => router.push("/followers?tab=following")}>
-          <p className={`text-lg font-semibold  ${fontItalic.className}`}>
-            {millify(followingCount)}
-          </p>
-          <p className="text-sm text-muted-foreground">Following</p>
-        </div> */}
-          <div>
-            <p className={`text-lg font-semibold  ${fontItalic.className}`}>
-              {millify(followersCount)}
-            </p>
-            <p className="text-sm text-muted-foreground">Followers</p>
-          </div>
-          <div>
-            <p className={`text-lg font-semibold  ${fontItalic.className}`}>
-              {millify(subscribersCount)}
-            </p>
-            <p className="text-sm text-muted-foreground">Subscribers</p>
-          </div>
-          <div>
-            <p className={`text-lg font-semibold  ${fontItalic.className}`}>
-              {millify(postsCount)}
-            </p>
-            <p className="text-sm text-muted-foreground">Posts</p>
-          </div>
-          <div>
-            <p className={`text-lg font-semibold  ${fontItalic.className}`}>
-              {millify(likeCount)}
-            </p>
-            <p className="text-sm text-muted-foreground">Likes</p>
-          </div>
-        </div>
-      )}
+      <div className="grid grid-cols-3 gap-6 text-center justify-items-center">
+        <Stat label="Following" value={followingCount} onClick={() => router.push("/followers?tab=following")} />
+        <Stat label="Followers" value={followersCount} onClick={() => router.push("/followers?tab=followers")} />
+        <Stat label="Subscribers" value={subscribersCount} onClick={() => router.push("/followers?tab=subscribers")} />
+      </div>
     </div>
   );
 };

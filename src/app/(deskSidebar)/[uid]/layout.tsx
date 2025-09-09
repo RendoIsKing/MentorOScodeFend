@@ -21,7 +21,7 @@ export default function UserPageLayout({
 
   const { userDetailsData, isUserDetailsLoading, isError, isFetching } =
     useGetUserDetailsByUserNameQuery(
-      { userName: userName.uid as string },
+      { userName: String(userName.uid || '').toLowerCase() },
       {
         selectFromResult: ({ data, isLoading, isError, isFetching }) => {
           return {
@@ -34,31 +34,28 @@ export default function UserPageLayout({
       }
     );
 
-  if (isError) {
-    return <Error statusCode={404} title="User not found" />;
-  }
+  // Be resilient to username casing or temporary fetch errors: don't hard 404 the whole page
+  // Let child sections render their own fallbacks while header retries
+  // If you want a 404, we can switch back after stabilizing username matching
   return (
     <>
-      {" "}
-      <>
-        {isMobile ? (
-          <>
-            <ProfileNavbar />
-            <ContentUploadProvider>
-              <ProfileHeaderMobile />
-            </ContentUploadProvider>
-            {children}
-            <FeedFooter />
-          </>
-        ) : (
-          <>
-            <ContentUploadProvider>
-              <ProfileHeaderDesktop />
-            </ContentUploadProvider>
-            {children}
-          </>
-        )}
-      </>
+      {isMobile ? (
+        <>
+          <ProfileNavbar />
+          <ContentUploadProvider>
+            <ProfileHeaderMobile />
+          </ContentUploadProvider>
+          <div className="pb-24">{children}</div>
+          <FeedFooter />
+        </>
+      ) : (
+        <>
+          <ContentUploadProvider>
+            <ProfileHeaderDesktop />
+          </ContentUploadProvider>
+          {children}
+        </>
+      )}
     </>
   );
 }

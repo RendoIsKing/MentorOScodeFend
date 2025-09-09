@@ -5,7 +5,7 @@ import InnerPageHeader from "@/components/shared/inner-page-header";
 import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
 
 import AvatarWithDescription from "@/components/shared/avatar-with-description";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useUserOnboardingContext } from "@/context/UserOnboarding";
 import {
@@ -199,12 +199,15 @@ export default function EditProfilePage() {
         <div>
           <article className="relative isolate flex flex-col justify-end overflow-hidden pt-24 mx-auto">
             <img
-              src="https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-              alt="University of Southern California"
+              src={
+                user?.coverPhoto?._id
+                  ? `${baseServerUrl}/${user?.coverPhoto?.path}`
+                  : "https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+              }
+              alt="Cover"
               className="absolute inset-0 h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40"></div>
-            <MobileAvatarCoverPickers user={user} />
             <div className="flex items-center px-4 py-2 z-10 justify-between">
               <AvatarWithDescription
                 isTextWhite={true}
@@ -218,20 +221,11 @@ export default function EditProfilePage() {
                 userNameTag={`@${user?.userName}`}
               />
 
-              <Button
-                variant={"outline"}
-                size={"icon"}
-                className="opacity-90 bg-muted-foreground"
-              >
-                <img
-                  // onClick={() => setOpenShareModel(true)}
-                  src="/assets/images/my-Profile/camera-icon.svg"
-                  className="cursor-pointer"
-                  alt="camera"
-                />
-              </Button>
+              {/* Removed floating camera icon on mobile header */}
             </div>
           </article>
+          {/* Move mobile avatar/cover pickers below the header */}
+          <MobileAvatarCoverPickers user={user} inline />
         </div>
       )}
       <EditProfile />

@@ -29,58 +29,30 @@ const FeedHeader = () => {
     }
   };
   return (
-    <div className="sticky top-0 mt-6 mb-2 ">
-      <div
-        className={
-          isMobile
-            ? "flex w-full mx-4 justify-between items-center"
-            : "flex w-4/5 justify-between items-center"
-        }
-      >
-        <button
-          className={`cursor-pointer  text-lg lg:text-2xl  ${
-            fontLogo.className
-          } ${
-            homeHeaderFilter === "subscribed"
-              ? "lg:text-primary italic"
-              : "lg:text-gray-500"
-          }`}
-          onClick={() => handleItemClick("subscribed")}
-        >
-          Subscribed
-        </button>
-        <button
-          className={`cursor-pointer text-lg lg:text-2xl  ${
-            fontLogo.className
-          } ${
-            homeHeaderFilter === "foryou"
-              ? "lg:text-primary italic"
-              : "lg:text-gray-500"
-          }`}
-          onClick={() => handleItemClick("foryou")}
-        >
-          Feed
-        </button>
-        <button
-          className={`cursor-pointer   text-lg lg:text-2xl  ${
-            fontLogo.className
-          } ${
-            homeHeaderFilter === "following"
-              ? "lg:text-primary italic"
-              : "lg:text-gray-500"
-          }`}
-          onClick={() => handleItemClick("following")}
-        >
-          Following
-        </button>
-        {isMobile && (
-          <div className="mr-4">
-            <Link href="search">
-              <Search size={20} strokeWidth={1.5} />
-            </Link>
-          </div>
-        )}
-      </div>
+    <div className="sticky top-0 z-30 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+      <nav className="mx-auto max-w-[680px] px-4">
+        <ul className="grid grid-cols-3 text-center">
+          {[
+            { key: "subscribed", label: "Subscribed" },
+            { key: "foryou", label: "Feed" },
+            { key: "following", label: "Following" },
+          ].map((t) => (
+            <li key={t.key}>
+              <button
+                className={
+                  `w-full py-3 text-sm font-medium ` +
+                  (homeHeaderFilter === t.key
+                    ? "text-primary after:block after:h-0.5 after:w-8 after:mx-auto after:mt-1 after:rounded-full after:bg-primary"
+                    : "text-muted-foreground")
+                }
+                onClick={() => handleItemClick(t.key)}
+              >
+                {t.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </div>
   );
 };

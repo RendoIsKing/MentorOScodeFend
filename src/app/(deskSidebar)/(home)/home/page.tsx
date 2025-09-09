@@ -31,8 +31,10 @@ const Home = () => {
   }, [fcmToken]);
 
   return (
-    <div>
-      <HomeFeedCarousel isMobile={isMobile} />
+    <div className="min-h-[100dvh] bg-background">
+      <main className="mx-auto max-w-[680px] px-4 pb-28">
+        <HomeFeedCarousel isMobile={isMobile} />
+      </main>
     </div>
   );
 };

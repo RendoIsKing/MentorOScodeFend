@@ -4,7 +4,7 @@ import InnerPageHeader from "@/components/shared/inner-page-header";
 export default function settingsPage() {
   return (
     <>
-      <InnerPageHeader title="Settings " showBackButton={false} />
+      <InnerPageHeader title="Settings " showBackButton={true} />
       <div className="lg:py-8 h-screen">
       <Settings />
       </div>

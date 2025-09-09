@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useGetUserDetailsQuery } from "@/redux/services/haveme";
 
 function IconHome({ active }: { active: boolean }) {
   return (
@@ -39,10 +40,13 @@ function IconUser({ active }: { active: boolean }) {
 export default function MobileTabBar() {
   const pathname = usePathname();
   const is = (href: string) => pathname === href || pathname?.startsWith(href);
+  const { data } = useGetUserDetailsQuery();
+  const profileHref = data?.data?.userName ? `/${data.data.userName}` : "/profile";
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[9999] border-t bg-background/95 backdrop-blur pb-safe">
-      <div className="relative mx-auto grid max-w-screen-sm grid-cols-3 items-center px-4 py-2">
+    <nav className="md:hidden fixed inset-x-0 bottom-0 z-[9999] pointer-events-auto">
+      <div className="mx-auto max-w-[680px] px-5 pt-1.5 pb-[calc(max(env(safe-area-inset-bottom),10px))] bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <div className="relative grid grid-cols-3 items-end h-[var(--tabbar-height)]">
         <ul className="flex items-center gap-6">
           <li>
             <Link href="/home" className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${is("/home") || pathname === "/" ? "text-primary font-medium" : "text-muted-foreground"}`} aria-label="Home">
@@ -59,8 +63,8 @@ export default function MobileTabBar() {
         </ul>
 
         <div className="relative flex items-center justify-center">
-          <Link href="/upload" aria-label="Post" className="group absolute -top-5 z-10 text-center">
-            <div className="h-12 w-12 rounded-2xl shadow-xl ring-1 ring-black/10 bg-gradient-to-r from-indigo-500 to-fuchsia-500 flex items-center justify-center">
+          <Link href="/upload" aria-label="Post" className="group text-center justify-self-center">
+            <div className="h-11 w-11 rounded-2xl shadow-xl ring-1 ring-black/10 bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white flex items-center justify-center">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
               </svg>
@@ -77,12 +81,13 @@ export default function MobileTabBar() {
             </Link>
           </li>
           <li>
-            <Link href="/profile" className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${is("/profile") ? "text-primary font-medium" : "text-muted-foreground"}`} aria-label="Profile">
-              <div className="h-6 w-6"><IconUser active={Boolean(is("/profile"))} /></div>
+            <Link href={profileHref} className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${is(profileHref) ? "text-primary font-medium" : "text-muted-foreground"}`} aria-label="Profile">
+              <div className="h-6 w-6"><IconUser active={Boolean(is(profileHref))} /></div>
               <span>Profile</span>
             </Link>
           </li>
         </ul>
+        </div>
       </div>
     </nav>
   );

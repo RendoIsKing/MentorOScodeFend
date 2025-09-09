@@ -106,11 +106,11 @@ const HomeFeedCarousel: React.FC<IMyCarouselProps> = ({ isMobile }) => {
   }, [postDetails?.data]);
 
   return (
-    <div className={isMobile ? "absolute top-2 -z-10" : "relative"}>
+    <div className={isMobile ? "relative pb-tabbar" : "relative"}>
       <div>
         <div
           className={cn(" scrollbar", {
-            "h-screen w-screen ": isMobile,
+            "min-h-[100dvh] w-full pb-24": isMobile,
             "h-[88vh] w-[40vw] xl:w-[44vw] 2xl:w-[48vw]": !isMobile,
           })}
         >
@@ -371,7 +371,7 @@ export function PostItem({
       <div
         ref={rowRef}
         className={cn({
-          "p-0 snap-center ": isMobile,
+          "p-0 snap-start min-h-[100dvh]": isMobile,
           "p-1 snap-center": !isMobile,
         })}
       >
@@ -380,7 +380,7 @@ export function PostItem({
           className={cn(
             "relative",
             {
-              "p-0 flex justify-center h-screen pr-16 sm:pr-20 md:pr-24":
+              "p-0 flex justify-center items-center min-h-[100dvh]":
                 isMobile && !isFullscreen && !isPseudoFullscreen,
               "flex justify-center h-[86vh] w-full pr-24 xl:pr-28 2xl:pr-32":
                 !isMobile && !isFullscreen && !isPseudoFullscreen,
@@ -392,9 +392,9 @@ export function PostItem({
         >
           <div
             className={cn("relative", {
-              "h-full": isMobile,
+              "h-full flex items-center justify-center": isMobile,
               "w-full h-full flex": !isPortraitHardware,
-              "w-screen": !isPortraitHardware && isMobile,
+              "w-full": !isPortraitHardware && isMobile,
               "rotate-90": !isPortraitSoftware && isPortraitHardware,
             })}
           >
@@ -496,27 +496,23 @@ export function PostItem({
             </div>
           </div>
 
-          {isMobile && (
+          {isMobile ? (
             <div
               className={cn(
-                "absolute right-0 top-1/2 -translate-y-1/2",
+                "absolute right-2 top-1/2 -translate-y-1/2 z-40",
                 {
-                  "scale-50": !isPortraitHardware,
+                  "scale-90": !isPortraitHardware,
                 }
               )}
             >
               <PostInteraction postDetails={post} />
             </div>
+          ) : (
+            <div className={cn("absolute right-0 top-1/2 -translate-y-1/2", { hidden: isFullscreen || isPseudoFullscreen })}>
+              <PostInteraction postDetails={post} />
+            </div>
           )}
-          {!isMobile && (
-            <>
-              <div className={cn("absolute right-0 top-1/2 -translate-y-1/2", { hidden: isFullscreen || isPseudoFullscreen })}>
-                <PostInteraction postDetails={post} />
-              </div>
-              {/* remove dblclick overlay; using explicit button for reliability */}
-              {/* overlay now attached to media wrapper above */}
-            </>
-          )}
+          {/* remove dblclick overlay; using explicit button for reliability */}
         </div>
       </div>
     </div>

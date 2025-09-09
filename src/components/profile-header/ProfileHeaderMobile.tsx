@@ -11,6 +11,7 @@ import {
   PlusIcon,
   Radio,
   Twitter,
+  Pencil,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
@@ -194,21 +195,42 @@ const ProfileHeaderMobile = () => {
               userNameTag={isOwnerRendered ? data?.data?.userName : userDetailsData?.userName}
             />
             {isOwnerRendered ? (
-              <Drawer>
-                <DrawerTrigger asChild>
-                  <div>
-                    <img src="/assets/images/my-Profile/share.svg" className="cursor-pointer" alt="share" />{" "}
-                  </div>
-                </DrawerTrigger>
-                <DrawerContent>
-                  <div className="w-full">
-                    <div className="flex justify-center">
-                      <DrawerHeader className={`text-xl   ${fontItalic.className}`}>Share Profile</DrawerHeader>
+              <div className="flex items-center gap-2">
+                <Drawer>
+                  <DrawerTrigger asChild>
+                    <Button variant="secondary" size="icon" className="bg-white/10 backdrop-blur border">
+                      <Pencil className="h-4 w-4 text-white" />
+                    </Button>
+                  </DrawerTrigger>
+                  <DrawerContent className="z-[10050] pb-tabbar">
+                    <div className="w-full p-4 pb-tabbar">
+                      <div className="flex justify-center">
+                        <DrawerHeader className={`text-xl ${fontItalic.className}`}>Profile options</DrawerHeader>
+                      </div>
+                      <div className="mx-auto w-full max-w-sm space-y-2">
+                        <Button className="w-full" onClick={() => router.push("/edit-profile")}>Edit Profile</Button>
+                        <Button variant="secondary" className="w-full" onClick={() => router.push("/subscription")}>Edit Subscriptions</Button>
+                        <Button variant="secondary" className="w-full" onClick={() => router.push("/edit-avatar")}>Edit Avatar</Button>
+                      </div>
                     </div>
-                    {/* share buttons left unchanged */}
-                  </div>
-                </DrawerContent>
-              </Drawer>
+                  </DrawerContent>
+                </Drawer>
+                <Drawer>
+                  <DrawerTrigger asChild>
+                    <div className="rounded-full bg-white/10 p-2 backdrop-blur border cursor-pointer">
+                      <img src="/assets/images/my-Profile/share.svg" className="cursor-pointer" alt="share" />
+                    </div>
+                  </DrawerTrigger>
+                  <DrawerContent className="z-[10050] pb-tabbar">
+                    <div className="w-full">
+                      <div className="flex justify-center">
+                        <DrawerHeader className={`text-xl   ${fontItalic.className}`}>Share Profile</DrawerHeader>
+                      </div>
+                      {/* share buttons left unchanged */}
+                    </div>
+                  </DrawerContent>
+                </Drawer>
+              </div>
             ) : (
               <div></div>
             )}
@@ -228,7 +250,7 @@ const ProfileHeaderMobile = () => {
         )}
 
         <div>
-          <div className="text-sm p-2">
+          <div className="text-sm px-4 pt-3 pb-2">
             <p className="text-muted-foreground flex items-center gap-3">
               Bio
               {isOwnerRendered && !isEditingBio && (
@@ -261,7 +283,6 @@ const ProfileHeaderMobile = () => {
                 <h1 className="ml-4 text-base mr-4">{isOwnerRendered ? data?.data?.tiktokLink : userDetailsData?.tiktokLink}</h1>
               </div>
             )}
-            <Separator />
           </div>
           <Separator />
           <UserStats
@@ -274,22 +295,11 @@ const ProfileHeaderMobile = () => {
           />
           <Separator />
           {isOwnerRendered ? (
-            <div className="flex justify-between p-4">
-              <div className="flex gap-4">
-                <div>
-                  <img src="/assets/images/search/serach-profile-icon.svg" alt="edit-subscription" onClick={() => router.push("/subscription")} />
-                </div>
-                <Button variant={"secondary"} size="sleek" className={`py-2 px-4  font-semibold rounded-3xl ${fontItalic.className}`} onClick={() => router.push("/edit-profile")}>
-                  Edit Profile
-                </Button>
-              </div>
+            <div className="flex justify-end px-4 py-3">
               <ContentUploadOptions />
-              <Button variant={"secondary"} size="sleek" className={`py-2 px-4  font-semibold rounded-3xl ${fontItalic.className}`} onClick={() => router.push("/edit-avatar")}>
-                Edit Avatar
-              </Button>
             </div>
           ) : (
-            <div className="flex justify-between p-4">
+            <div className="flex justify-between px-4 py-3">
               <SubscribePlan />
               <Button size={"sleek"} className="w-36" onClick={() => handleFollowClick(userDetailsData?._id)}>
                 {userDetailsData?.isFollowing ? "Unfollow" : "Follow"}
@@ -303,7 +313,6 @@ const ProfileHeaderMobile = () => {
             </div>
           )}
         </div>
-        <Separator />
       </div>
     </div>
   );

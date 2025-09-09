@@ -92,7 +92,7 @@ const HaveMeData: React.FC = () => {
 
   return (
     <>
-      <InnerPageHeader title="Download HaveMe Data" showBackButton={true} />
+      <InnerPageHeader title="Download MentorOS Data" showBackButton={true} />
       <div className="">
         <div className="bg-muted/90 p-2 lg:m-8 lg:rounded-xl">
           <Tabs defaultValue={activeTab}>

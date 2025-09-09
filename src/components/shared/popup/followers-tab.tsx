@@ -236,12 +236,14 @@ const Followers: React.FC<ITabsModalProps> = ({ tabValue }) => {
                   key={user?.owner?._id}
                   className="flex justify-between my-4 mr-4"
                 >
-                  <AvatarWithDescription
-                    imageUrl={`${baseServerUrl}/${user?.owner?.photo?.path}`}
-                    ImageFallBackText={user?.owner?.userName}
-                    userName={user?.owner?.fullName}
-                    userNameTag={user?.owner?.userName}
-                  />
+                  <a href={`/${String(user?.owner?.userName || '').toLowerCase()}`} className="flex-1">
+                    <AvatarWithDescription
+                      imageUrl={`${baseServerUrl}/${user?.owner?.photo?.path}`}
+                      ImageFallBackText={user?.owner?.userName}
+                      userName={user?.owner?.fullName}
+                      userNameTag={user?.owner?.userName}
+                    />
+                  </a>
                   <Button
                     size={"sleek"}
                     className="py-4 bg-primary text-white"
@@ -259,12 +261,14 @@ const Followers: React.FC<ITabsModalProps> = ({ tabValue }) => {
                   key={user?.followingTo?._id}
                   className="flex justify-between my-4 mr-4"
                 >
-                  <AvatarWithDescription
-                    imageUrl={`${baseServerUrl}/${user?.followingTo?.photo?.path}`}
-                    ImageFallBackText={user?.followingTo?.userName}
-                    userName={user?.followingTo?.fullName}
-                    userNameTag={user?.followingTo?.userName}
-                  />
+                  <a href={`/${String(user?.followingTo?.userName || '').toLowerCase()}`} className="flex-1">
+                    <AvatarWithDescription
+                      imageUrl={`${baseServerUrl}/${user?.followingTo?.photo?.path}`}
+                      ImageFallBackText={user?.followingTo?.userName}
+                      userName={user?.followingTo?.fullName}
+                      userNameTag={user?.followingTo?.userName}
+                    />
+                  </a>
                   <Button
                     size={"sleek"}
                     className="py-4 bg-primary text-white"

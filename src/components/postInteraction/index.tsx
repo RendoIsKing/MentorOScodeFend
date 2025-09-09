@@ -139,7 +139,9 @@ const PostInteraction: React.FC<IPostInteractionProps> = ({ postDetails }) => {
       <div className="flex justify-center ">
         <div className="flex flex-col">
           {isMobile ? (
-            <MobileFeed feedData={postDetails} />
+            <div className="md:hidden">
+              <MobileFeed feedData={postDetails} />
+            </div>
           ) : (
             <DesktopFeed feedData={postDetails} />
           )}

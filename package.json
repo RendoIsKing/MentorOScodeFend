@@ -55,6 +55,7 @@
     "react-chartjs-2": "^5.2.0",
     "react-day-picker": "^8.10.0",
     "react-dom": "^18.3.1",
+    "react-easy-crop": "^5.5.0",
     "react-hook-form": "^7.51.1",
     "react-infinite-scroll-component": "^6.1.0",
     "react-insta-stories": "^2.7.0",

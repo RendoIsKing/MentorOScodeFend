@@ -63,11 +63,20 @@
   }
 
   /* Mobile safe-area helpers and chat polish */
-  :root { --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom); }
+  :root { --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom); --tabbar-height: 56px; }
   .pt-safe { padding-top: max(0px, var(--safe-top)); }
   .pb-safe { padding-bottom: max(12px, var(--safe-bottom)); }
+  .pb-tabbar { padding-bottom: calc(var(--tabbar-height) + max(12px, var(--safe-bottom))); }
   input, textarea { font-size: 16px; }
   .chat-scroll { -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
+
+  /* Make mobile browser bars collapse on scroll */
+  html, body { height: 100%; }
+  body { min-height: 100dvh; overflow-y: auto; }
+  @supports not (height: 100dvh) {
+    html, body { height: -webkit-fill-available; }
+    body { min-height: -webkit-fill-available; }
+  }
 }
 
 /* Hide legacy bottom nav ONLY on mobile (belt-and-suspenders) */

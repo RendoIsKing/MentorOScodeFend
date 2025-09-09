@@ -14,6 +14,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { VariableSizeGrid as Grid } from "react-window";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
+import { useGetUserDetailsByUserNameQuery } from "@/redux/services/haveme/user";
 
 const ADD_POSTS = "ADD_POSTS";
 
@@ -29,8 +30,20 @@ export default function ProfileBody() {
     page: 1,
     perPage: 8,
     filter: "posts",
-    userName: userName.uid as string,
+    userName: String(userName.uid || "").toLowerCase(),
   });
+
+  // Resolve canonical username (case-insensitive) so posts query always hits
+  const { userDetailsData: resolvedUser } = useGetUserDetailsByUserNameQuery(
+    { userName: userName.uid as string },
+    { selectFromResult: ({ data }) => ({ userDetailsData: data?.data }) }
+  );
+
+  useEffect(() => {
+    if (resolvedUser?.userName && resolvedUser.userName !== postQuery.userName) {
+      setPostQuery((prev) => ({ ...prev, userName: resolvedUser.userName }));
+    }
+  }, [resolvedUser?.userName]);
 
   useEffect(() => {
     return () => {
@@ -95,7 +108,7 @@ export default function ProfileBody() {
   }
 
   return (
-    <div className="lg:mx-8 h-screen scrollbar " ref={containerRef}>
+    <div className="lg:mx-8 h-[calc(100dvh-110px)] scrollbar pb-tabbar" ref={containerRef}>
       <div className=" grid w-full grid-cols-4 lg:grid-cols-5 bg-transparent border-t rounded-none  border-secondary lg:px-16 lg:h-12">
         <Button
           variant="ghost"
@@ -182,10 +195,12 @@ export default function ProfileBody() {
         )}
       </div>
       {userPosts?.length === 0 && (
-        <div className="w-full justify-center items-center flex h-full">
-          <h3>No Posts to show</h3>
+        <div className="w-full justify-center items-center flex h-full py-10 text-muted-foreground">
+          <h3>No posts yet</h3>
         </div>
       )}
+
+      {/* Grid only */}
 
       <AutoSizer>
         {({ height, width }) => (

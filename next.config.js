@@ -47,15 +47,20 @@ const nextConfig = {
   },
   reactStrictMode: false, // Add reactStrictMode option here
   images: {
-    remotePatterns: process.env.NEXT_PUBLIC_API_SERVER
-      ? [
-          {
-            protocol: new URL(process.env.NEXT_PUBLIC_API_SERVER).protocol.replace(':',''),
-            hostname: new URL(process.env.NEXT_PUBLIC_API_SERVER).hostname,
-            port: new URL(process.env.NEXT_PUBLIC_API_SERVER).port || '',
-          },
-        ]
-      : [],
+    remotePatterns: (() => {
+      const v = process.env.NEXT_PUBLIC_API_SERVER;
+      if (!v || !/^https?:\/\//.test(v)) return [];
+      try {
+        const u = new URL(v);
+        return [{
+          protocol: u.protocol.replace(':',''),
+          hostname: u.hostname,
+          port: u.port || '',
+        }];
+      } catch {
+        return [];
+      }
+    })(),
   },
   async rewrites() {
     const origin = process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:3006";
