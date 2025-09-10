@@ -1,4 +1,5 @@
 import { test, expect, request } from "@playwright/test";
+import { ensureLoggedIn } from './utils';
 
 const FE = process.env.E2E_FRONTEND || "http://localhost:3002";
 const BE = process.env.E2E_BACKEND || "http://localhost:3006/api/backend";
@@ -6,14 +7,7 @@ const BE = process.env.E2E_BACKEND || "http://localhost:3006/api/backend";
 test.describe("Chat → action → snapshot", () => {
   test("sets calories and logs weight; Student Center updates", async ({ page, context }) => {
     const api = await request.newContext();
-    const loginRes = await api.post(`${BE}/v1/dev/login-as`, { data: { email: "demo1@mentoros.app" } });
-    expect(loginRes.ok()).toBeTruthy();
-
-    const cookies = (await api.storageState()).cookies.filter(c => c.domain.includes("localhost"));
-    await context.addCookies(cookies.map(c => ({
-      name: c.name, value: c.value, domain: "localhost", path: c.path, expires: c.expires,
-      httpOnly: c.httpOnly, secure: c.secure, sameSite: "Lax" as const
-    })));
+    await ensureLoggedIn(api as any, context);
 
     await page.goto(`${FE}/coach-engh`);
     await page.getByPlaceholder("Skriv til The PT...").fill("Sett kalorier til 2400");
