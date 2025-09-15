@@ -158,6 +158,14 @@ export default function TrainingPlanPage(){
                       }}>+ Add</button>
                     )}
                   </div>
+                  {Array.isArray(session.notes) && session.notes.length ? (
+                    <div className="mt-3">
+                      <div className="text-xs text-muted-foreground mb-1">Notater</div>
+                      <ul className="list-disc pl-5 text-sm">
+                        {session.notes.map((n:string,i:number)=>(<li key={i}>{n}</li>))}
+                      </ul>
+                    </div>
+                  ) : null}
                 </CardContent>
               </Card>
             ))}

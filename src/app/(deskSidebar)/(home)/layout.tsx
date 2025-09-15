@@ -21,8 +21,6 @@ export default function HomeLayout({
     <>
       {isMobile && (
         <div className="">
-          <FeedHeader />
-
           {children}
           <FeedFooter />
         </div>

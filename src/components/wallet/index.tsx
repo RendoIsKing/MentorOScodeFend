@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import InnerPageHeader from "../shared/inner-page-header";
 import { Button } from "../ui/button";
 import { ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -69,7 +68,6 @@ const Wallet: React.FC = () => {
   const { data: cardsData, isLoading } = useGetUserCardsQuery();
   return (
     <div className="h-screen">
-      <InnerPageHeader title="Wallet" showBackButton={false} />
       <div className="flex flex-col mx-auto w-full border-t  border-b border-muted-foreground/20">
         <div className="flex justify-between align-middle my-3 mx-4 lg:mx-12 lg:mt-6">
           <div className={` text-xl mt-1 ${fontItalic.className}`}>

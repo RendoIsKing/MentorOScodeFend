@@ -59,7 +59,7 @@ export default function UploadPage() {
       )}
       {error && <div className="mb-3 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</div>}
       <div className="md:hidden flex items-center gap-2">
-        <button onClick={onContinue} disabled={!selectedId || busy} className="h-11 rounded-xl bg-primary px-4 text-primary-foreground disabled:opacity-50">{busy?"…":"Publish"}</button>
+        <button onClick={onContinue} disabled={!selectedId || busy} className="h-11 rounded-xl bg-primary px-4 text-primary-foreground disabled:opacity-50" data-test="go-compose">{busy?"…":"Publish"}</button>
         {drafts.length>0 && !busy && <button onClick={()=>{ clearDrafts().then(()=>setDrafts([])); setSelectedId(null); }} className="h-11 rounded-xl border px-4">Clear</button>}
       </div>
       <div className="hidden md:block">{/* <DesktopUploader …/> */}</div>

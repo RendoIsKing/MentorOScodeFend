@@ -3,8 +3,11 @@ import type { NextRequest } from "next/server";
 
 async function getUserProgress(request: NextRequest, userAuthToken: string) {
   try {
-    // Use configured API server if provided; otherwise hit the local proxy
-    const apiBase = process.env.NEXT_PUBLIC_API_SERVER || `${request.nextUrl.origin}/api/backend`;
+    // Always use an absolute URL inside middleware
+    const configured = process.env.NEXT_PUBLIC_API_SERVER;
+    const apiBase = configured && /^https?:\/\//.test(configured)
+      ? configured
+      : `${request.nextUrl.origin}/api/backend`;
 
     const headers: Record<string, string> = {};
     if (process.env.NEXT_PUBLIC_API_SERVER) {

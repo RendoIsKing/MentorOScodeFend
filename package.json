@@ -8,6 +8,7 @@
     "start": "next start -p 3002",
     "lint": "next lint",
     "test:e2e": "playwright test --reporter=list",
+    "test:smoke": "playwright test tests/e2e/fe-be-health.spec.ts tests/e2e/actions-api.spec.ts",
     "test:e2e:headed": "playwright test --headed --project=chromium",
     "test:e2e:update-snapshots": "playwright test --update-snapshots"
   },

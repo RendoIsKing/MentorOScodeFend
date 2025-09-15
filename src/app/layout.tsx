@@ -20,12 +20,20 @@ import CountryCodeProvider from "@/context/countryCodeContext";
 import useFCM from "@/utils/hooks/useFCM";
 import { useUpdateFCMTokenMutation } from "@/redux/services/haveme/notifications";
 import dynamic from "next/dynamic";
+import ErrorBoundary from "@/components/common/ErrorBoundary";
+import type { Viewport } from "next";
 
 const fontNormal = ABeeZee({
   subsets: ["latin"],
   weight: ["400"],
   style: "normal",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export default function RootLayout({
   children,
@@ -83,8 +91,10 @@ export default function RootLayout({
                               <ModeToggle />
                             </div>
                             <div className="pb-tabbar md:pb-0">
-                              {postslot}
-                              {children}
+                              <ErrorBoundary fallback={<div className="p-4 text-muted-foreground text-sm">Kunne ikke laste. Prøv å oppdatere.</div>}>
+                                {postslot}
+                                {children}
+                              </ErrorBoundary>
                             </div>
                             <MobileTabBar />
                             <Toaster />

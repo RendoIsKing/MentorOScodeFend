@@ -367,7 +367,7 @@ export function PostItem({
   };
 
   return (
-    <div style={style}>
+    <div style={style} data-test="post-card" data-post-id={post?._id}>
       <div
         ref={rowRef}
         className={cn({
@@ -391,7 +391,7 @@ export function PostItem({
           )}
         >
           <div
-            className={cn("relative", {
+            className={cn("relative w-full aspect-[9/16] rounded-xl overflow-hidden", {
               "h-full flex items-center justify-center": isMobile,
               "w-full h-full flex": !isPortraitHardware,
               "w-full": !isPortraitHardware && isMobile,
@@ -410,7 +410,7 @@ export function PostItem({
                       alt="post details"
                       loading="lazy"
                       decoding="async"
-                      className={cn("rounded-md object-contain w-full h-full blur-sm transition-all duration-300")}
+                      className={cn("absolute inset-0 w-full h-full object-cover blur-sm transition-all duration-300")}
                       onMouseEnter={handleMouseEnter}
                       onMouseLeave={handleMouseLeave}
                     />
@@ -430,7 +430,7 @@ export function PostItem({
                   return (
                     <VideoPlayer
                       videoSrc={`${safeBase}/${path}`}
-                      className={cn("rounded-md w-full h-full")}
+                      className={cn("absolute inset-0 w-full h-full object-cover rounded-none")}
                       ref={videoRef}
                       createImpression={createImpression}
                     />

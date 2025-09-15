@@ -122,7 +122,7 @@ const UserPosts: React.FC<IUserPostDataProps> = ({ post, style }) => {
         <div style={style} className="p-1 h-72 relative" key={post?._id}>
           {isOwnProfile ? (
             <Link
-              href={`/post/${post?._id}`}
+              href={{ pathname: `/post/${post?._id}`, query: { fromProfile: '1' } }}
               passHref
               onClick={() => togglePostModalOpen(true)}
             >
@@ -178,7 +178,7 @@ const UserPosts: React.FC<IUserPostDataProps> = ({ post, style }) => {
                 </Dialog>
               ) : (
                 <Link
-                  href={`/post/${post?._id}`}
+                  href={{ pathname: `/post/${post?._id}`, query: { fromProfile: '1' } }}
                   passHref
                   onClick={() => togglePostModalOpen(true)}
                 >

@@ -44,7 +44,7 @@ export default function MobileTabBar() {
   const profileHref = data?.data?.userName ? `/${data.data.userName}` : "/profile";
 
   return (
-    <nav className="md:hidden fixed inset-x-0 bottom-0 z-[9999] pointer-events-auto">
+    <nav className="md:hidden fixed inset-x-0 bottom-0 z-[9999] pointer-events-auto" data-test="bottom-nav">
       <div className="mx-auto max-w-[680px] px-5 pt-1.5 pb-[max(env(safe-area-inset-bottom),12px)] bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/80">
         <div className="relative grid grid-cols-3 items-end h-[var(--tabbar-height)]">
         <ul className="flex items-center gap-6">

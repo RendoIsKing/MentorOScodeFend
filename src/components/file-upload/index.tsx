@@ -116,6 +116,7 @@ const FileUploadForm: React.FC<IFileUploadFormProps> = ({
             <Input
               disabled={uploading}
               id="file-input"
+              data-test="file-input"
               style={{ display: "none" }}
               type="file"
               accept="image/jpeg,image/png"
@@ -129,6 +130,7 @@ const FileUploadForm: React.FC<IFileUploadFormProps> = ({
             onClick={handleUpload}
             className="w-3/4"
             disabled={uploading}
+            data-test="post-submit"
           >
             {uploading && (
               <svg

@@ -28,7 +28,7 @@ export default function MobileMediaPicker({ onPick, accept, maxBytes }: Props) {
     <div className="md:hidden grid grid-cols-3 gap-2">
       <input ref={photoRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handle} />
       <input ref={videoRef} type="file" accept="video/*" capture="environment" className="hidden" onChange={handle} />
-      <input ref={libRef}   type="file" accept={accept || "image/*,video/*"} multiple className="hidden" onChange={handle} />
+      <input ref={libRef}   type="file" accept={accept || "image/*,video/*"} multiple className="hidden" onChange={handle} data-test="file-input" />
 
       <button type="button" onClick={() => photoRef.current?.click()}
         className="h-11 rounded-xl border bg-background text-sm">

@@ -15,7 +15,9 @@ const fontItalic = ABeeZee({
 });
 const fontLogo = Orbitron({ subsets: ["latin"], weight: ["700", "800"] });
 
-const FeedHeader = () => {
+type Props = { floating?: boolean; className?: string };
+
+const FeedHeader = ({ floating = false, className = "" }: Props) => {
   const { isMobile } = useClientHardwareInfo();
   const router = useRouter();
   const { homeHeaderFilter, setHomeHeaderFilter } = useHomeHeaderFilter();
@@ -28,12 +30,15 @@ const FeedHeader = () => {
       if (typeof window !== 'undefined') window.location.reload();
     }
   };
+  const wrapperClass = floating
+    ? `z-20 ${className}`
+    : `sticky top-0 z-30 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70 ${className}`;
+
   return (
-    <div className="sticky top-0 z-30 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+    <div className={wrapperClass}>
       <nav className="mx-auto max-w-[680px] px-4">
-        <ul className="grid grid-cols-3 text-center">
+        <ul className="grid grid-cols-2 text-center">
           {[
-            { key: "subscribed", label: "Subscribed" },
             { key: "foryou", label: "Feed" },
             { key: "following", label: "Following" },
           ].map((t) => (

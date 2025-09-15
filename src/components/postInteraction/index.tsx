@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
+import { useGetUserProfilePhotoQuery } from "@/redux/services/haveme/user";
 
 import { baseServerUrl, cn, getInitials } from "@/lib/utils";
 import MobileFeed from "@/components/mobile-feed";
@@ -115,27 +116,16 @@ interface IMyUserDataProps {
 }
 
 const PostInteraction: React.FC<IPostInteractionProps> = ({ postDetails }) => {
-  const imageUrl = `${baseServerUrl}/${postDetails?.userPhoto[0]?.path}`;
+  const directPath = postDetails?.userPhoto?.[0]?.path || postDetails?.userInfo?.[0]?.photo?.path;
+  const photoId = postDetails?.userInfo?.[0]?.photoId;
+  const { data: userPhotoData } = useGetUserProfilePhotoQuery(photoId, { skip: !photoId });
+  const fetchedPath = userPhotoData?.path;
+  const resolvedPath = directPath || fetchedPath;
+  const imageUrl = resolvedPath ? `${baseServerUrl}/${resolvedPath}` : undefined;
   const router = useRouter();
   const { isMobile } = useClientHardwareInfo();
   return (
     <div className="flex flex-col gap-y-4">
-      <div className="flex flex-col items-center justify-center w-fit p-2 mx-auto">
-        <div
-          onClick={() => router.push(`/${postDetails?.userInfo[0]?.userName}`)}
-          className="flex justify-center relative cursor-pointer"
-        >
-          <Avatar className="size-16">
-            <AvatarImage className="relative block" src={imageUrl} />
-            <AvatarFallback>
-              {getInitials(postDetails?.userInfo?.fullName)}
-            </AvatarFallback>
-          </Avatar>
-          <span className="absolute rounded-full -bottom-3 bg-primary">
-            <Plus className="text-white p-1" />
-          </span>
-        </div>
-      </div>
       <div className="flex justify-center ">
         <div className="flex flex-col">
           {isMobile ? (

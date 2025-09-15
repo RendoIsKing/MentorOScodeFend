@@ -5,9 +5,12 @@ import { Label } from "@radix-ui/react-dropdown-menu";
 import { VideoPlayer } from "@/components/video-player";
 import {
   useGetPostByIdQuery,
+  useGetPostsByUserNameQuery,
   useUpdatePostMutation,
 } from "@/redux/services/haveme/posts";
 import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
+import { useParams, useSearchParams } from "next/navigation";
+import FullBleedFeed from "@/components/feed/FullBleedFeed";
 import { cn, textFormatter } from "@/lib/utils";
 import { useCallback, useRef, useState } from "react";
 import {
@@ -16,7 +19,7 @@ import {
 } from "@/redux/services/haveme/interactions";
 import { Pin, PinOff } from "lucide-react";
 import { toast } from "../ui/use-toast";
-import { useAppDispatch } from "@/redux/store";
+import { useAppDispatch, useTypedSelector } from "@/redux/store";
 import { updatePost } from "@/redux/slices/adapters";
 
 interface IPostModalMobileProps {
@@ -24,12 +27,14 @@ interface IPostModalMobileProps {
 }
 
 const PostModalMobile: React.FC<IPostModalMobileProps> = ({ postId }) => {
+  const searchParams = useSearchParams();
+  const fromProfile = searchParams?.get('fromProfile') === '1';
   const { data: postDetails } = useGetPostByIdQuery(postId);
   const [showTaggedPeople, setShowTaggedPeople] = useState(false);
   const [createImpressionTrigger] = useCreateImpressionMutation();
   const appDispatch = useAppDispatch();
 
-  const fileType = postDetails?.media[0]?.mediaType;
+  const fileType = postDetails?.media?.[0]?.mediaType;
   const { isMobile, orientation, softwareOrientation, hardwareOrientation } =
     useClientHardwareInfo();
   // const isSoftwarePortrait =
@@ -84,6 +89,51 @@ const PostModalMobile: React.FC<IPostModalMobileProps> = ({ postId }) => {
       });
   };
 
+  // If opened from a profile grid and we have a username, render a vertical scroller of that user's posts
+  const profileUserName = postDetails?.userInfo?.[0]?.userName as string | undefined;
+  const shouldRenderProfileScroller = fromProfile && typeof profileUserName === 'string' && profileUserName.length > 0;
+
+  // Fetch the user's posts list to build a contiguous feed
+  const { data: userPostsList } = useGetPostsByUserNameQuery(
+    shouldRenderProfileScroller ? { userName: profileUserName, page: 1, perPage: 100, filter: 'posts' } as any : (undefined as any),
+    { skip: !shouldRenderProfileScroller }
+  );
+  const postsArray = (userPostsList as any)?.data ?? [];
+  const normalizedPosts = postsArray.flatMap((p: any) => {
+    const m = p?.mediaFiles?.[0];
+    if (!m?.path) return [] as any[];
+    const isVideo = (m?.mimeType && m.mimeType.startsWith('video/')) || /\.(mp4|webm|mov)$/i.test(m.path);
+    const base = (process.env.NEXT_PUBLIC_API_SERVER as any) || '/api/backend';
+    const src = m.path.startsWith('http') ? m.path : `${base}/${m.path}`;
+    const user = {
+      id: String(p?.userInfo?.[0]?._id || ""),
+      username: String(p?.userInfo?.[0]?.userName || ""),
+      displayName: String(p?.userInfo?.[0]?.fullName || ""),
+      avatarUrl: p?.userPhoto?.[0]?.path ? `${base}/${p.userPhoto[0].path}` : undefined,
+      viewerFollows: Boolean(p?.isFollowing),
+    };
+    return [{ id: String(p._id ?? p.id), type: isVideo ? 'video' : 'image', src, user }];
+  });
+  const initialIndex = Math.max(0, normalizedPosts.findIndex((p: any) => p.id === String(postId)));
+
+  if (shouldRenderProfileScroller && normalizedPosts.length > 0) {
+    const currentUserId = (useTypedSelector as any)?.((s) => s?.auth?.user?._id || null) || null;
+    return (
+      <div className={cn("scrollbar w-screen h-screen")}>        
+        <FullBleedFeed
+          posts={normalizedPosts}
+          initialIndex={initialIndex}
+          currentUserId={currentUserId}
+          RightOverlay={({ post }) => {
+            const original = postsArray.find((p: any) => String(p._id ?? p.id) === post.id);
+            if (!original) return null as any;
+            return <PostInteraction postDetails={original} />;
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={cn("scrollbar w-screen h-screen")}>
       {fileType === "image" ? (
@@ -103,18 +153,20 @@ const PostModalMobile: React.FC<IPostModalMobileProps> = ({ postId }) => {
           />
           <div>
             {showTaggedPeople &&
-              postDetails?.userTags?.map((user, index) => {
+              (postDetails?.userTags || []).map((user, index) => {
+                const y = user?.location?.y ?? 0;
+                const x = user?.location?.x ?? 0;
                 return (
                   <p
                     key={index}
                     style={{
                       position: "absolute",
-                      top: `${user.location.y}%`,
-                      left: `${user.location.x}%`,
+                      top: `${y}%`,
+                      left: `${x}%`,
                       backgroundColor: "black",
                     }}
                   >
-                    {user?.userName}
+                    {user?.userName || ""}
                   </p>
                 );
               })}
@@ -156,10 +208,10 @@ const PostModalMobile: React.FC<IPostModalMobileProps> = ({ postId }) => {
         </div>
         <div className="flex flex-col p-4 absolute bottom-20 text-white">
           <div>
-            <Label>@{postDetails?.userInfo[0].fullName}</Label>
+            <Label>@{postDetails?.userInfo?.[0]?.fullName || ""}</Label>
           </div>
           <div className="">
-            <Label>{textFormatter(postDetails?.content)}</Label>
+            <Label>{textFormatter(postDetails?.content || "")}</Label>
           </div>
         </div>
       </div>

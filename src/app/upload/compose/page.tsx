@@ -113,7 +113,7 @@ export default function ComposePage() {
         </div>
         {err && <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">{err}</div>}
         <div className="flex items-center gap-2">
-          <button disabled={busy || !blob} onClick={postNow} className="h-11 rounded-xl bg-primary px-4 text-primary-foreground disabled:opacity-50">{busy ? "Posting…" : "Post"}</button>
+          <button disabled={busy || !blob} onClick={postNow} className="h-11 rounded-xl bg-primary px-4 text-primary-foreground disabled:opacity-50" data-test="post-submit">{busy ? "Posting…" : "Post"}</button>
           <button onClick={()=>router.back()} className="h-11 rounded-xl border px-4">Back</button>
         </div>
       </div>

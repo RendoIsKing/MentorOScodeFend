@@ -4,7 +4,8 @@ const MAX_UPLOAD_MB = Number(process.env.NEXT_PUBLIC_MAX_UPLOAD_MB || 200);
 const MAX_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
 
 export async function POST(req: NextRequest) {
-  const backend = process.env.NEXT_PUBLIC_BACKEND_ORIGIN || 'http://localhost:3006';
+  const feOrigin = req.nextUrl.origin;
+  const backendOrigin = process.env.NEXT_PUBLIC_BACKEND_ORIGIN;
   const contentType = req.headers.get('content-type') || '';
   if (!contentType.includes('multipart/form-data')) {
     return NextResponse.json({ message: 'multipart/form-data required' }, { status: 400 });
@@ -22,10 +23,14 @@ export async function POST(req: NextRequest) {
   fd.append('file', file);
   const cookie = req.headers.get('cookie') || '';
   const auth = req.headers.get('authorization') || '';
-  const res = await fetch(`${backend}/api/backend/v1/post/upload`, {
+  const target = backendOrigin
+    ? `${backendOrigin}/api/backend/v1/user/file-upload`
+    : `${feOrigin}/api/backend/v1/user/file-upload`;
+  const res = await fetch(target, {
     method: 'POST',
     body: fd,
     headers: { 'cookie': cookie, ...(auth ? { authorization: auth } : {}) },
+    credentials: 'include' as any,
   });
   const text = await res.text();
   return new NextResponse(text, { status: res.status, headers: { 'content-type': res.headers.get('content-type') || 'application/json' } });
@@ -33,23 +38,5 @@ export async function POST(req: NextRequest) {
 
 export const runtime = "nodejs";
 
-export async function POST(req: Request) {
-  const origin = process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:3006";
-  // Use the existing backend file upload endpoint
-  const path = "/api/backend/v1/user/file-upload";
-  const target = new URL(path, origin).toString();
-  const cookie = req.headers.get("cookie") ?? "";
-  const form = await req.formData();
-  try {
-    const res = await fetch(target, { method: "POST", headers: { cookie }, body: form });
-    const text = await res.text();
-    return new Response(text, {
-      status: res.status,
-      headers: { "content-type": res.headers.get("content-type") || "application/json" },
-    });
-  } catch (e: any) {
-    return new Response(`Media proxy error: ${e?.message || String(e)}`, { status: 502 });
-  }
-}
 
 

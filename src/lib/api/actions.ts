@@ -26,6 +26,7 @@ export async function applyAction<T = any>(env: ActionEnvelope<T>) {
   });
   const json = await res.json().catch(()=>({}));
   if (!res.ok) throw new Error(json?.error || "Action failed");
+  try { (await import('../snapshotBus')).emitSnapshotRefresh(); } catch {}
   return json as { ok: boolean; summary?: string; deduped?: boolean; idemKey?: string };
 }
 
