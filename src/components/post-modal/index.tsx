@@ -272,17 +272,30 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
     );
   };
 
-  const handleSavePost = (postId: string) => {
-    if (saveStates) {
-      savePost(postId);
-      setSaveState(() => false);
-      setSaveLikecount((prev) => prev - 1);
-    } else {
-      savePost(postId);
-      setSaveState(() => true);
-      setSaveLikecount((prev) => prev + 1);
+  const handleSavePost = async (postId: string) => {
+    try {
+      // Optimistic UI update without refetch
+      if (saveStates) {
+        setSaveState(() => false);
+        setSaveLikecount((prev) => Math.max(0, (prev || 1) - 1));
+      } else {
+        setSaveState(() => true);
+        setSaveLikecount((prev) => (isNaN(prev) ? 1 : prev + 1));
+      }
+      // Persist to localStorage so reopening the modal doesn't reset
+      try {
+        const raw = typeof window !== 'undefined' ? window.localStorage.getItem('savedPosts') : null;
+        const map = raw ? JSON.parse(raw) : {};
+        map[String(postId)] = !saveStates;
+        if (typeof window !== 'undefined') window.localStorage.setItem('savedPosts', JSON.stringify(map));
+      } catch {}
+      await savePost(postId);
+      // No invalidation here to avoid media reload
+    } catch (e) {
+      // Revert optimistic on error
+      setSaveState((prev) => !prev);
+      setSaveLikecount((prev) => (typeof prev === 'number' ? Math.max(0, prev + (saveStates ? 1 : -1)) : prev));
     }
-    appDispatch(postsApi.util.invalidateTags([TAG_GET_FILE_INFO_BY_ID]));
   };
 
   const isOwnProfile = postDetails?.userInfo[0]?._id === user?._id;
@@ -330,6 +343,15 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
             isPinned: !postDetails?.isPinned,
           })
         );
+        // reflect instantly in this modal UI
+        try {
+          setPostDetails((prev) => ({ ...(prev as any), isPinned: !postDetails?.isPinned }));
+        } catch {}
+        try {
+          appDispatch(havemeApi.util.invalidateTags([TAG_GET_USER_INFO] as any));
+          appDispatch(postsApi.util.invalidateTags([TAG_GET_FILE_INFO_BY_ID, TAG_GET_USER_POSTS_BY_USERNAME] as any));
+          appDispatch(usersApi.util.invalidateTags([TAG_GET_USER_DETAILS_BY_USER_NAME] as any));
+        } catch {}
       })
       .catch((err) => {
         console.log(err);
@@ -422,14 +444,7 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
             <DialogContent className="sm:w-11/12 w-4/5 rounded-md p-0 border-0">
               <DialogHeader>
                 <DialogTitle>
-                  <div className="m-2">
-                    <AvatarWithDescription
-                      imageUrl="/assets/images/Home/small-profile-img.svg"
-                      userName="Christina Jack"
-                      ImageFallBackText="cj"
-                      userNameTag="@username"
-                    />
-                  </div>
+                  <div className="m-2" />
                 </DialogTitle>
               </DialogHeader>
               <Form {...form}>
@@ -525,6 +540,15 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
                 className="p-2 border-[#0B0F14] light:bg-secondary dark:bg-[#0B0F14]"
                 side="top"
               >
+                {isOwnProfile && (
+                  <DropdownMenuItem>
+                    <div className="flex justify-between" onClick={() => togglePinStatus()}>
+                      <div className="flex gap-2 cursor-pointer">
+                        {postDetails?.isPinned ? "Unpin post" : "Pin post"}
+                      </div>
+                    </div>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem>
                   <div
                     className="flex justify-between"
@@ -562,18 +586,7 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
         <div className="flex flex-col w-full">
           <div className="flex justify-between px-3 py-2 bg-muted">
             <div className="flex">
-              <img
-                src={profilePhotoPath}
-                alt="profile"
-                className="rounded-full lg:size-24"
-              />
-              {/* <Image
-                height={64}
-                width={64}
-                src={profilePhotoPath}
-                alt="profile-img"
-              /> */}
-              <div className="ml-4 mt-2 flex flex-col ">
+              <div className="mt-2 flex flex-col ">
                 <div className="flex items-center ">
                   <div className="truncate max-w-28">{postDetails?.userInfo[0]?.fullName}</div>
                   {!isOwnProfile && (

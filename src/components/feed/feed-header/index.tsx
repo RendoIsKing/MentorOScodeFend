@@ -34,6 +34,11 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
     ? `z-20 ${className}`
     : `sticky top-0 z-30 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70 ${className}`;
 
+  // Hide tabs on mobile; use the new top-right dropdown in the overlay instead
+  if (isMobile) {
+    return null;
+  }
+
   return (
     <div className={wrapperClass}>
       <nav className="mx-auto max-w-[680px] px-4">

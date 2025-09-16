@@ -86,7 +86,7 @@ export default function EditProfilePage() {
   };
 
   return (
-    <>
+    <div className="min-h-[100dvh] overflow-y-auto pb-tabbar">
       <InnerPageHeader showBackButton={true} title="Edit Profile" />
       {!isMobile ? (
         <div>
@@ -229,6 +229,6 @@ export default function EditProfilePage() {
         </div>
       )}
       <EditProfile />
-    </>
+    </div>
   );
 }

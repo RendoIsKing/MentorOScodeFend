@@ -158,7 +158,7 @@ const CommentsComp: React.FC<IMyUserDataProps> = ({ feedData }) => {
               <p className="text-white">{feedData?.commentsCount}</p>
             </div>
           </DrawerTrigger>
-          <DrawerContent className="h-2/3">
+          <DrawerContent className="h-[88vh] pb-tabbar">
             <DrawerHeader>
               <div className="flex">
                 <DrawerTitle className="w-11/12 text-center text-muted-foreground mb-2">
@@ -179,7 +179,7 @@ const CommentsComp: React.FC<IMyUserDataProps> = ({ feedData }) => {
                 </div>
               )}
             </ScrollArea>
-            <DrawerFooter>
+            <DrawerFooter className="pb-tabbar">
               <div className="w-full border-t-2 border-muted">
                 <div className="flex items-center gap-6">
                   <div className="flex gap-2 w-full p-2 relative mt-2">
@@ -206,7 +206,7 @@ const CommentsComp: React.FC<IMyUserDataProps> = ({ feedData }) => {
                       </div>
                     )}
 
-                    <div className="absolute right-4 bottom-3 bg-primary rounded-full absolute right-1 cursor-pointer">
+                    <div className="absolute right-4 bottom-4 bg-primary rounded-full absolute right-1 cursor-pointer">
                       <img
                         src="/assets/images/inbox/send-message.svg"
                         alt="send"

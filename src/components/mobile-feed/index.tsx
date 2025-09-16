@@ -34,6 +34,7 @@ import {
   TAG_GET_TAGGED_USERS_LIST,
   TAG_GET_USER_DETAILS_BY_USER_NAME,
   TAG_GET_USER_INFO,
+  TAG_GET_USER_POSTS_BY_USERNAME,
 } from "@/contracts/haveme/haveMeApiTags";
 import { havemeApi } from "@/redux/services/haveme";
 import ReportProblemAlert from "../report-problem";
@@ -66,6 +67,15 @@ const MobileFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
   );
   //save post state
   const [saveStates, setSaveState] = useState<boolean>(feedData?.isSaved);
+  // Persist saved state per post to avoid reset when remounting inside scroller
+  useEffect(() => {
+    try {
+      const raw = typeof window !== 'undefined' ? window.localStorage.getItem('savedPosts') : null;
+      const map = raw ? JSON.parse(raw) : {};
+      const stored = map?.[feedData?._id];
+      if (typeof stored === 'boolean') setSaveState(stored);
+    } catch {}
+  }, [feedData?._id]);
   const [saveLikecount, setSaveLikecount] = useState<number>(
     feedData?.savedCount
   );
@@ -96,11 +106,11 @@ const MobileFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
         return !isNaN(prev) ? prev + 1 : 0 + 1;
       });
     }
-    appDispatch(havemeApi.util.invalidateTags([TAG_GET_USER_INFO]));
-    appDispatch(postsApi.util.invalidateTags([TAG_GET_FILE_INFO_BY_ID]));
-    appDispatch(
-      usersApi.util.invalidateTags([TAG_GET_USER_DETAILS_BY_USER_NAME])
-    );
+    // Avoid media restart: only invalidate related lists if not currently viewing scroller (handled upstream)
+    try {
+      appDispatch(havemeApi.util.invalidateTags([TAG_GET_USER_INFO] as any));
+      appDispatch(usersApi.util.invalidateTags([TAG_GET_USER_DETAILS_BY_USER_NAME] as any));
+    } catch {}
   };
 
   useEffect(() => {
@@ -113,17 +123,30 @@ const MobileFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
     }
   }, [feedData?.likesCount]);
 
-  const handleSavePost = (postId: string) => {
-    if (saveStates) {
-      savePost(postId);
-      setSaveState(() => false);
-      setSaveLikecount((prev) => prev - 1);
-    } else {
-      savePost(postId);
-      setSaveState(() => true);
-      setSaveLikecount((prev) => prev + 1);
+  const handleSavePost = async (postId: string) => {
+    try {
+      // Optimistic UI first
+      if (saveStates) {
+        setSaveState(() => false);
+        setSaveLikecount((prev) => Math.max(0, (prev || 1) - 1));
+      } else {
+        setSaveState(() => true);
+        setSaveLikecount((prev) => (isNaN(prev) ? 1 : prev + 1));
+      }
+      // Persist locally to avoid flicker on remounts
+      try {
+        const raw = typeof window !== 'undefined' ? window.localStorage.getItem('savedPosts') : null;
+        const map = raw ? JSON.parse(raw) : {};
+        map[String(postId)] = !saveStates;
+        if (typeof window !== 'undefined') window.localStorage.setItem('savedPosts', JSON.stringify(map));
+      } catch {}
+      // Call API but do not trigger list invalidations to avoid media restart
+      await savePost(postId);
+    } catch (e) {
+      // Revert optimistic on error
+      setSaveState((prev) => !prev);
+      setSaveLikecount((prev) => (typeof prev === 'number' ? Math.max(0, prev + (saveStates ? 1 : -1)) : prev));
     }
-    appDispatch(postsApi.util.invalidateTags([TAG_GET_FILE_INFO_BY_ID]));
   };
 
   const handleFollowClick = useCallback(
@@ -186,8 +209,7 @@ const MobileFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
       >
         <img
           src={
-            // !saveStates
-            !feedData?.isSaved
+            !saveStates
               ? "/assets/images/Home/archive.svg"
               : "/assets/images/Home/bookmark-active.svg"
           }
@@ -195,7 +217,7 @@ const MobileFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
         />
         <p className={cn("text-white", { "text-amber-300": selectBookmark })}>
           {/* {saveLikecount} */}
-          {feedData?.isSaved ? 1 : 0}
+          {saveStates ? 1 : 0}
         </p>
       </div>
       {feedData?.userTags?.length > 0 && (

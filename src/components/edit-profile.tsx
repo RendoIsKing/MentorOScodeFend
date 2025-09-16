@@ -140,9 +140,9 @@ const EditProfile = () => {
   }
 
   return (
-    <div className="px-3 mt-0 lg:-mt-12 lg:flex lg:flex-col lg:justify-center lg:w-[55%] lg:mx-auto">
+    <div className="px-3 mt-0 lg:-mt-12 lg:flex lg:flex-col lg:justify-center lg:w-[55%] lg:mx-auto min-h-screen overflow-y-auto pb-tabbar">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="min-h-[100dvh] overflow-y-auto pb-tabbar">
           <div className="m-2 flex flex-col gap-4">
             <h2 className="text-primary my-1">About You</h2>
             <FormField

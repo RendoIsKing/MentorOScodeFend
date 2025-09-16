@@ -163,7 +163,15 @@ const EditPostModal: React.FC<IEditPostModalProps> = ({
 
   return (
     <div>
-      <Dialog>
+      <Dialog
+        onOpenChange={(isOpen) => {
+          try {
+            if (typeof document !== "undefined") {
+              document.body.classList.toggle("editing-post", Boolean(isOpen));
+            }
+          } catch {}
+        }}
+      >
         <DialogTrigger asChild>
           <Button
             variant={"link"}
@@ -176,7 +184,7 @@ const EditPostModal: React.FC<IEditPostModalProps> = ({
           onCloseAutoFocus={() => {
             dispatch({ type: "RESET_TAGGED_USERS" });
           }}
-          className="py-10 p-0 bg-[#171a1f] w-full max-w-[58rem] border-none bg-background max-h-screen items-center overflow-y-auto"
+          className="py-10 p-0 bg-[#171a1f] w-full max-w-[58rem] border-none bg-background max-h-screen items-center overflow-y-auto pb-tabbar"
         >
           <DialogHeader>
             <div className="flex justify-between items-center px-4 pt-2 w-full">
@@ -184,8 +192,8 @@ const EditPostModal: React.FC<IEditPostModalProps> = ({
             </div>
           </DialogHeader>
           <Form {...mediaPostForm}>
-            <form onSubmit={mediaPostForm.handleSubmit(onSubmit)}>
-              <div className="flex-col lg:flex lg:flex-row">
+            <form onSubmit={mediaPostForm.handleSubmit(onSubmit)} className="min-h-screen overflow-y-auto pb-tabbar">
+              <div className="flex-col lg:flex lg:flex-row pb-tabbar">
                 <div className="lg:w-1/2">
                   <div className="w-full max-h-[32rem]">
                     {fileType === "image" ? (

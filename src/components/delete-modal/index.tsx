@@ -11,11 +11,12 @@ import { Separator } from "../ui/separator";
 import EditPostModal from "../edit-post-modal";
 import { Ellipsis } from "lucide-react";
 import { IPostContentObject } from "@/contracts/responses/IPostContentResponse";
-import { useDeletePostMutation } from "@/redux/services/haveme/posts";
+import { postsApi, useDeletePostMutation, useUpdatePostMutation } from "@/redux/services/haveme/posts";
 import { toast } from "../ui/use-toast";
 import { usePostModalContext } from "@/context/PostModal";
-import { resetUserPosts } from "@/redux/slices/adapters";
+import { resetUserPosts, updatePost } from "@/redux/slices/adapters";
 import { useAppDispatch } from "@/redux/store";
+import { TAG_GET_FILE_INFO_BY_ID, TAG_GET_USER_POSTS_BY_USERNAME } from "@/contracts/haveme/haveMeApiTags";
 import { cn } from "@/lib/utils";
 import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
 
@@ -32,10 +33,12 @@ const DeleteModal: React.FC<IPostModalProps> = ({
 }) => {
   const dialogRef = useRef<HTMLDivElement>(null);
   const [deletePostTrigger] = useDeletePostMutation();
+  const [updatePostTrigger] = useUpdatePostMutation();
   const { togglePostModalOpen } = usePostModalContext();
   const appDispatcher = useAppDispatch();
   const { isMobile } = useClientHardwareInfo();
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isPinnedNow, setIsPinnedNow] = useState<boolean>(Boolean(postDetails?.isPinned));
 
   const handleDeleteClick = () => {
     setConfirmDelete(true);
@@ -91,6 +94,30 @@ const DeleteModal: React.FC<IPostModalProps> = ({
       });
   };
 
+  const togglePinStatus = async () => {
+    try {
+      const nextPinned = !isPinnedNow;
+      await updatePostTrigger({ id: postDetails?._id, isPinned: nextPinned })
+        .unwrap()
+        .then(() => {
+          setIsPinnedNow(nextPinned);
+          appDispatcher(updatePost({ _id: postDetails?._id, isPinned: nextPinned }));
+          try {
+            appDispatcher(postsApi.util.invalidateTags([
+              { type: TAG_GET_FILE_INFO_BY_ID, id: postDetails?._id } as any,
+              TAG_GET_USER_POSTS_BY_USERNAME,
+            ] as any));
+          } catch {}
+          toast({ variant: "success", description: "Pinned status changed." });
+          setOpenPopup(false);
+          togglePostModalOpen(false);
+        });
+    } catch (err) {
+      console.log(err);
+      toast({ variant: "destructive", description: "Something went wrong." });
+    }
+  };
+
   return (
     <div>
       <AlertDialog open={openPopup}>
@@ -115,6 +142,14 @@ const DeleteModal: React.FC<IPostModalProps> = ({
                 })}
               >
                 Delete the post
+              </p>
+            </div>
+            <div
+              className="flex flex-col border-b border-secondary align-middle text-start px-3 py-2 cursor-pointer"
+              onClick={() => togglePinStatus()}
+            >
+              <p className={cn("self-center", { "text-xl": isMobile })}>
+                {isPinnedNow ? "Unpin post" : "Pin post"}
               </p>
             </div>
           </AlertDialogHeader>

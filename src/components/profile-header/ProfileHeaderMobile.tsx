@@ -1,5 +1,6 @@
+"use client";
 import { Button } from "@/components/ui/button";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 import {
   ChevronRight,
@@ -45,7 +46,7 @@ import { baseServerUrl } from "@/lib/utils";
 import SocialInstagram from "@/assets/images/my-Profile/instagram.svg";
 import SocialYoutube from "@/assets/images/my-Profile/youtube.svg";
 import SocialTiktok from "@/assets/images/my-Profile/tiktok.svg";
-import { useGetUserDetailsQuery } from "@/redux/services/haveme";
+import { havemeApi, useGetUserDetailsQuery } from "@/redux/services/haveme";
 import { useGetUserDetailsByUserNameQuery, useUpdateMeMutation } from "@/redux/services/haveme/user";
 import { toast } from "../ui/use-toast";
 import ContentUploadOptions from "../upload-content-options";
@@ -65,7 +66,7 @@ import {
 } from "react-share";
 import { useSendNotificationMutation } from "@/redux/services/haveme/notifications";
 import { useAppDispatch } from "@/redux/store";
-import { TAG_GET_USER_DETAILS_BY_USER_NAME } from "@/contracts/haveme/haveMeApiTags";
+import { TAG_GET_USER_DETAILS_BY_USER_NAME, TAG_GET_USER_INFO } from "@/contracts/haveme/haveMeApiTags";
 import { Switch } from "@/components/ui/switch";
 
 const fontItalic = ABeeZee({
@@ -78,7 +79,6 @@ const ProfileHeaderMobile = () => {
   const router = useRouter();
   const userName = useParams();
   const { data, isLoading, isError } = useGetUserDetailsQuery();
-  const shareUrl = `${window.location.origin}/${userName.uid}`;
   const [followUser] = useFollowUserMutation();
   const [sendNotification] = useSendNotificationMutation();
   const appDispatch = useAppDispatch();
@@ -94,6 +94,7 @@ const ProfileHeaderMobile = () => {
     }
   );
 
+  // Determine ownership and render mode BEFORE effects use it
   const isOwnProfile = useMemo(() => {
     const currentId = data?.data?._id;
     const targetId = userDetailsData?._id;
@@ -102,10 +103,83 @@ const ProfileHeaderMobile = () => {
     const byUserName = (data?.data?.userName || "").toLowerCase() === routeUid.toLowerCase();
     return byId || byUserName;
   }, [data, userDetailsData, userName]);
-
-  // View-as toggle
   const [viewAsVisitor, setViewAsVisitor] = useState(false);
   const isOwnerRendered = isOwnProfile && !viewAsVisitor;
+
+  // Local follow state for instant UI updates
+  const [isFollowingLocal, setIsFollowingLocal] = useState<boolean | undefined>(undefined);
+  const [followBusy, setFollowBusy] = useState(false);
+  useEffect(() => {
+    const serverFlag = userDetailsData?.isFollowing;
+    setIsFollowingLocal(typeof serverFlag === 'boolean' ? serverFlag : undefined);
+  }, [userDetailsData?._id, userDetailsData?.isFollowing]);
+
+  // If follow state was changed elsewhere (Home), reflect it here immediately
+  useEffect(() => {
+    const updateFromCache = () => {
+      try {
+        const id = userDetailsData?._id;
+        const uname = (userDetailsData?.userName || "").toString();
+        if (!id && !uname) return;
+        const raw = typeof window !== 'undefined' ? window.localStorage.getItem('followedAuthors') : null;
+        const map = raw ? JSON.parse(raw) : {};
+        const byId = id ? map[String(id)] : undefined;
+        const byUser = uname ? map[String(uname)] : undefined;
+        const explicit = typeof byId === 'boolean' ? byId : (typeof byUser === 'boolean' ? byUser : undefined);
+        if (typeof explicit === 'boolean') setIsFollowingLocal(explicit);
+      } catch {}
+    };
+    updateFromCache();
+    const onCustom = () => updateFromCache();
+    const onStorage = (e?: StorageEvent) => { if (!e || e.key === 'followedAuthors') updateFromCache(); };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('follow-cache-changed', onCustom as any);
+      window.addEventListener('storage', onStorage as any);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('follow-cache-changed', onCustom as any);
+        window.removeEventListener('storage', onStorage as any);
+      }
+    };
+  }, [userDetailsData?._id, userDetailsData?.userName]);
+
+  // Keep Home feed pill in sync with the profile's current follow state.
+  // Prefer an explicit cache value (from Home) over a potentially stale server flag.
+  useEffect(() => {
+    try {
+      if (isOwnerRendered) return; // do not write cache for your own profile
+      const id = userDetailsData?._id;
+      const uname = (userDetailsData?.userName || "").toString();
+      if (!id && !uname) return;
+      const raw = typeof window !== 'undefined' ? window.localStorage.getItem('followedAuthors') : null;
+      const map = raw ? JSON.parse(raw) : {};
+      const byId = id ? map[String(id)] : undefined;
+      const byUser = uname ? map[String(uname)] : undefined;
+      const byUserLc = uname ? map[String(uname.toLowerCase())] : undefined;
+      const cacheFlag = typeof byId === 'boolean' ? byId : (typeof byUser === 'boolean' ? byUser : (typeof byUserLc === 'boolean' ? byUserLc : undefined));
+      const serverFlag = userDetailsData?.isFollowing;
+      if (typeof cacheFlag === 'boolean') {
+        // Trust cache immediately so the button flips as soon as Home pill is used
+        setIsFollowingLocal(cacheFlag);
+        return;
+      }
+      if (typeof serverFlag === 'boolean') {
+        const unameLc = uname.toLowerCase();
+        if (id) map[String(id)] = serverFlag;
+        if (uname) map[String(uname)] = serverFlag;
+        if (unameLc) map[String(unameLc)] = serverFlag;
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem('followedAuthors', JSON.stringify(map));
+          const evt = new Event('follow-cache-changed');
+          window.dispatchEvent(evt);
+        }
+        setIsFollowingLocal(serverFlag);
+      }
+    } catch {}
+  }, [isOwnerRendered, userDetailsData?._id, userDetailsData?.userName, userDetailsData?.isFollowing]);
+
+  // View-as toggle (state moved above to avoid TDZ for effects)
 
   // Inline bio editing
   const [isEditingBio, setIsEditingBio] = useState(false);
@@ -154,18 +228,44 @@ const ProfileHeaderMobile = () => {
 
   const handleFollowClick = useCallback(
     async (id) => {
+      if (followBusy) return;
+      setFollowBusy(true);
       await followUser({ followingTo: id })
         .unwrap()
         .then((res) => {
-          toast({ variant: "success", description: res.message || "User Followed." });
+          const isNowFollowing = Boolean(res?.data?.isFollowing ?? !Boolean(isFollowingLocal));
+          toast({ variant: "success", description: isNowFollowing ? (res.message || "Now following.") : (res.message || "Unfollowed.") });
           sendNotification({ title: "Follow notification", description: "User followed notification.", type: "push" });
+          // Update local cache for Home-feed follow pill consistency
+          try {
+            const raw = typeof window !== 'undefined' ? window.localStorage.getItem('followedAuthors') : null;
+            const map = raw ? JSON.parse(raw) : {};
+            const keyId = id ? String(id) : undefined;
+            const keyUser = (userDetailsData?.userName || "").toString();
+            const keyUserLc = keyUser.toLowerCase();
+            if (keyId) map[keyId] = isNowFollowing;
+            if (keyUser) map[keyUser] = isNowFollowing;
+            if (keyUserLc) map[keyUserLc] = isNowFollowing;
+            if (typeof window !== 'undefined') {
+              window.localStorage.setItem('followedAuthors', JSON.stringify(map));
+              // Broadcast to any open Home feed to refresh pill visibility
+              const evt = new Event('follow-cache-changed');
+              window.dispatchEvent(evt);
+            }
+          } catch {}
+          // Locally flip UI state without waiting for refetch
+          setIsFollowingLocal(isNowFollowing);
+          // Refresh profile details (follower counts, isFollowing)
           appDispatch(usersApi.util.invalidateTags([TAG_GET_USER_DETAILS_BY_USER_NAME]));
+          // Also refresh current user info (following count on your profile)
+          appDispatch(havemeApi.util.invalidateTags([TAG_GET_USER_INFO] as any));
         })
         .catch((err) => {
           toast({ variant: "destructive", description: err.message || "Something went wrong." });
-        });
+        })
+        .finally(() => setFollowBusy(false));
     },
-    [followUser]
+    [followUser, isFollowingLocal, followBusy]
   );
 
   return (
@@ -301,11 +401,8 @@ const ProfileHeaderMobile = () => {
           ) : (
             <div className="flex justify-between px-4 py-3">
               <SubscribePlan />
-              <Button size={"sleek"} className="w-36" onClick={() => handleFollowClick(userDetailsData?._id)}>
-                {userDetailsData?.isFollowing ? "Unfollow" : "Follow"}
-              </Button>
-              <Button variant={"secondary"} size="sleek" className=" py-2 px-4 italic lg: rounded-3xl bg-[#8B5Cf6] w-36">
-                Take me home
+              <Button size={"sleek"} className="w-36" onClick={() => handleFollowClick(userDetailsData?._id)} disabled={followBusy}>
+                {isFollowingLocal ? "Unfollow" : "Follow"}
               </Button>
               <Link href={"/chat"}>
                 <ChatIcon className="stroke-foreground" />

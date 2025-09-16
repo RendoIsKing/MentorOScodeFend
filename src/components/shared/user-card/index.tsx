@@ -30,6 +30,8 @@ const UserCard: React.FC<IUserCardProps> = ({
   hasPlan,
 }) => {
   const [followUser] = useFollowUserMutation();
+  const [isFollowingLocal, setIsFollowingLocal] = React.useState<boolean>(Boolean(isFollowing));
+  React.useEffect(() => { setIsFollowingLocal(Boolean(isFollowing)); }, [isFollowing]);
   const appDispatch = useAppDispatch();
 
   const handleFollowClick: React.MouseEventHandler<HTMLButtonElement> = async (
@@ -44,9 +46,9 @@ const UserCard: React.FC<IUserCardProps> = ({
           variant: "success",
           description: res.message || "User Followed.",
         });
-        appDispatch(
-          updateSearchUsers({ _id: userId, isFollowing: !isFollowing })
-        );
+        const isNowFollowing = Boolean(res?.data?.isFollowing ?? !isFollowingLocal);
+        setIsFollowingLocal(isNowFollowing);
+        appDispatch(updateSearchUsers({ _id: userId, isFollowing: isNowFollowing }));
       })
       .catch((err) => {
         toast({
@@ -78,7 +80,7 @@ const UserCard: React.FC<IUserCardProps> = ({
       >
         {hasPlan && <SubscribePlan type="card" userNameTag={userNameTag} />}
         <Button size="sleek" className="py-4 px-8" onClick={handleFollowClick}>
-          {isFollowing ? "Unfollow" : "Follow"}
+          {isFollowingLocal ? "Unfollow" : "Follow"}
         </Button>
       </CardFooter>
     </Card>

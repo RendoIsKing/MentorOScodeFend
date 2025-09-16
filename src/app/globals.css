@@ -14,6 +14,15 @@
 
 /* Prevent background page from rubber-banding behind full-bleed scrollers */
 body { overscroll-behavior-y: none; }
+.editing-post [data-role="mobile-topbar"],
+.editing-post [data-role="profile-avatar"],
+.editing-post [data-test="author-bar"],
+.editing-post [data-role="header-avatar"],
+.editing-post .header-avatar,
+.editing-post img[alt="profile"],
+.editing-post [data-edit-avatar] {
+  display: none !important;
+}
 
 /* Hide mobile top bar inside a full-bleed feed if tagged */
 .fullbleed [data-role="mobile-topbar"] { display: none !important; }

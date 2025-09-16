@@ -54,11 +54,13 @@ const Home = () => {
     const isVideo = (m?.mimeType && m.mimeType.startsWith('video/')) || /\.(mp4|webm|mov)$/i.test(m.path);
     const base = (process.env.NEXT_PUBLIC_API_SERVER as any) || '/api/backend';
     const src = m.path.startsWith('http') ? m.path : `${base}/${m.path}`;
+    const avatarPath = p?.userInfo?.[0]?.photo?.path || p?.userPhoto?.[0]?.path;
+    const avatarUrl = avatarPath ? (String(avatarPath).startsWith('http') ? avatarPath : `${base}/${avatarPath}`) : undefined;
     const user = {
       id: String(p?.userInfo?.[0]?._id || ""),
       username: String(p?.userInfo?.[0]?.userName || ""),
       displayName: String(p?.userInfo?.[0]?.fullName || ""),
-      avatarUrl: p?.userPhoto?.[0]?.path ? `${base}/${p.userPhoto[0].path}` : undefined,
+      avatarUrl,
       viewerFollows: Boolean(p?.isFollowing),
     };
     return [{ id: String(p._id ?? p.id), type: isVideo ? 'video' : 'image', src, user }];
@@ -78,7 +80,7 @@ const Home = () => {
             RightOverlay={({ post }) => {
               const original = byId.get(post.id);
               if (!original) return null as any;
-              return <PostInteraction postDetails={original} />;
+              return <PostInteraction postDetails={original as any} />;
             }}
           />
         </main>

@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import FeedHeader from "@/components/feed/feed-header";
 import FeedFooter from "@/components/feed/feed-footer";
 import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
 
@@ -39,12 +38,7 @@ export default function HomeLayout({
               />
             );
           })}
-          <div className="flex justify-center">
-            <div>
-              <FeedHeader />
-              {children}
-            </div>
-          </div>
+          <div className="flex justify-center">{children}</div>
         </>
       )}
     </>
