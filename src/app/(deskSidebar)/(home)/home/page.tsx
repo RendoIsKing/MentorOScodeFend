@@ -63,7 +63,7 @@ const Home = () => {
       avatarUrl,
       viewerFollows: Boolean(p?.isFollowing),
     };
-    return [{ id: String(p._id ?? p.id), type: isVideo ? 'video' : 'image', src, user }];
+    return [{ id: String(p._id ?? p.id), type: isVideo ? 'video' : 'image', src, user, caption: String(p?.content || ""), createdAt: p?.createdAt }];
   });
   return (
     <div className="min-h-[100dvh] bg-background">

@@ -7,7 +7,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import Flip from "@/assets/images/Home/flip.svg";
 import { ChevronRight, Info, Tags, ThumbsDown } from "lucide-react";
 import { baseServerUrl, cn, getInitials } from "@/lib/utils";
 import CommentsComp from "@/components/comments-comp";
@@ -305,20 +304,7 @@ const MobileFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
         </Drawer>
       )}
 
-      {isPortraitHardware && (
-        <div
-          className="flex flex-col items-center gap-2 justify-center"
-          onClick={() =>
-            setSoftwareOrientation(
-              orientation === "landscape-primary"
-                ? "portrait-primary"
-                : "landscape-primary"
-            )
-          }
-        >
-          <Flip />
-        </div>
-      )}
+      {/* Flip button removed */}
       {isReportUserOpen && (
         <ReportProblemAlert
           isOpen={isReportUserOpen}

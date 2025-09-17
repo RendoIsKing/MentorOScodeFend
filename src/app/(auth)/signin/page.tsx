@@ -15,6 +15,7 @@ import { setUserPhoneNumber } from "@/redux/slices/user-info";
 import { useAppDispatch } from "@/redux/store";
 import { signinFormSchema } from "@/schemas/auth";
 import { setAuthData } from "@/redux/slices/auth";
+import AddToHomescreenPrompt from "@/components/shared/AddToHomescreenPrompt";
 
 const Signin = () => {
   const { isMobile } = useClientHardwareInfo();
@@ -76,6 +77,7 @@ const Signin = () => {
 
   return (
     <div>
+      <AddToHomescreenPrompt />
       {isMobile && (
         <PageHeader
           title="Sign In"

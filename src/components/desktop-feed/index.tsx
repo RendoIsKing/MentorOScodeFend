@@ -157,9 +157,7 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Link href="/flip">
-        <div className="flex flex-col items-center gap-2 justify-center"></div>
-      </Link>
+      {/* Flip media button removed */}
 
       {isReportUserOpen && (
         <ReportProblemAlert

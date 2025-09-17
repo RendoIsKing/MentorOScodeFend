@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { signupFormSchema } from "@/schemas/auth";
 import { useCountryCodeContext } from "@/context/countryCodeContext";
 import { phoneNumberRefine } from "@/lib/utils";
+import AddToHomescreenPrompt from "@/components/shared/AddToHomescreenPrompt";
 
 const Signup = () => {
   const { countryCode } = useCountryCodeContext();
@@ -106,6 +107,7 @@ const Signup = () => {
 
   return (
     <div>
+      <AddToHomescreenPrompt />
       {isMobile && (
         <PageHeader title="Sign Up" description="Enter Your Phone Number" />
       )}
