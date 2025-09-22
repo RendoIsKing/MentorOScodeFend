@@ -403,13 +403,15 @@ const ChatHistory: React.FC = () => {
   const pathName = usePathname();
   const rawUserFromPath = pathName.split("/")[pathName.split("/").length - 1];
   const decodedUserFromPath = decodeURIComponent(rawUserFromPath);
-  const displayName = decodedUserFromPath; // e.g., "The PT"
+  const displayName = decodedUserFromPath; // e.g., "The PT" or "Coach Majen"
   const handleName = decodedUserFromPath.replace(/\s+/g, "_"); // e.g., "Coach_Engh"
   const router = useRouter();
   const { isMobile } = useClientHardwareInfo();
   const [activeTab, setActiveTab] = useState("avatar");
   const [createItem, { isLoading }] = useCreateItemMutation();
   const [userId, setUserID] = useState<string | null>(null);
+  const isMajen = displayName.toLowerCase().includes('majen');
+  const [avatarUrl, setAvatarUrl] = useState<string>("/assets/images/inbox/the-pt.jpg");
 
   const {
     data: chatData,
@@ -487,6 +489,19 @@ const ChatHistory: React.FC = () => {
     setInputMessage("");
     try {
       const apiBase = baseServerUrl || '/api/backend';
+      if (isMajen) {
+        // Persist user msg and get AI reply via Majen endpoint
+        try { await fetch(`${apiBase}/v1/interaction/chat/coach-majen/message`, { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ sender:'user', text:newMessage.text }) }); } catch {}
+        const historyPayload = messages.slice(-10).map((m: any) => ({ role: m.sender === 'user' ? 'user' : 'assistant', content: m.text }));
+        const r = await fetch(`${apiBase}/v1/interaction/chat/majen`, { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ message: newMessage.text, history: historyPayload }) });
+        const j = await r.json().catch(()=>({}));
+        const assistantText = j?.reply || 'Beklager, noe gikk galt.';
+        setMessages((prev)=>[...prev, { sender:'other', text: assistantText, time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), date: new Date().toLocaleDateString() }]);
+        try { await fetch(`${apiBase}/v1/interaction/chat/coach-majen/message`, { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ sender:'assistant', text:assistantText }) }); } catch {}
+        // update inbox preview
+        try { if (typeof window !== 'undefined') { window.localStorage.setItem('chat-coach-majen', '1'); window.localStorage.setItem('inbox-conv-coach-majen', JSON.stringify({ name: 'Coach Majen', last: newMessage.text, avatar: avatarUrl })); window.dispatchEvent(new Event('inbox-refresh')); } } catch {}
+        return;
+      }
       // On first message in a session, check profile; if missing, start guided onboarding
       if (!onboardingChecked && !onboardingActive) {
         try {
@@ -596,6 +611,7 @@ const ChatHistory: React.FC = () => {
   };
 
   useEffect(() => {
+    if (isMajen) return; // handled by thread loader below
     if (chatData) {
       // console.log("chatData", chatData);
       const initialMessages = chatData?.chat?.map((message: any) => {
@@ -631,7 +647,23 @@ const ChatHistory: React.FC = () => {
           const uid = meData?.data?._id || meData?.data?.id;
           if (uid) setUserID(uid);
         } catch {}
-
+        if (isMajen) {
+          try {
+            // Resolve Majen avatar
+            const r = await fetch(`${apiBase}/v1/user/find?userName=coachmajen`, { credentials:'include' });
+            const j = await r.json();
+            const photoPath = j?.data?.photo?.path;
+            if (photoPath) setAvatarUrl(`${apiBase}/${photoPath}`);
+          } catch {}
+          // Load Majen thread
+          const r2 = await fetch(`${apiBase}/v1/interaction/chat/coach-majen/thread`, { credentials:'include' });
+          const t = await r2.json();
+          if (Array.isArray(t?.messages)) {
+            const restored = t.messages.map((m:any)=>({ sender: m.sender === 'user' ? 'user' : 'other', text: m.text }));
+            setMessages(restored);
+          }
+          return;
+        }
         const threadUrl = userId ? `${apiBase}/v1/interaction/chat/engh/thread?userId=${userId}` : `${apiBase}/v1/interaction/chat/engh/thread`;
         const r = await fetch(threadUrl, { credentials:'include' });
         const data = await r.json();
@@ -683,7 +715,7 @@ const ChatHistory: React.FC = () => {
                         : `rounded-full ring ring-white ring-offset-0 cursor-pointer`
                     }
                     alt="profile picture"
-                    src={"/assets/images/inbox/the-pt.jpg"}
+                    src={avatarUrl}
                     height={56}
                     width={56}
                   />
@@ -691,7 +723,7 @@ const ChatHistory: React.FC = () => {
 
                 <div className="ml-4 text-white h-full mt-2">
                   <h2 className="z-10 gap-y-1 overflow-hidden leading-6 ">
-                    The PT (AI)
+                    {displayName}
                   </h2>
                 </div>
               </div>

@@ -342,7 +342,7 @@ function InboxBody({ loggedInUser, fullName, image }: InboxBodyProps) {
         if (raw) {
           try {
             const j = JSON.parse(raw);
-            setMajenRow({ name: String(j?.name || 'Coach Majen'), message: String(j?.last || 'Say hi'), profilePhoto: String(j?.avatar || '/assets/images/inbox/the-pt.jpg'), href: '/coach-majen' });
+            setMajenRow({ name: String(j?.name || 'Coach Majen'), message: String(j?.last || 'Say hi'), profilePhoto: String(j?.avatar || '/assets/images/inbox/the-pt.jpg'), href: '/room/Coach%20Majen' });
           } catch { setMajenRow(null); }
         }
       } catch {}
