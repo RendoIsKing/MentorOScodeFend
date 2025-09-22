@@ -404,7 +404,7 @@ const ProfileHeaderMobile = () => {
               <Button size={"sleek"} className="w-36" onClick={() => handleFollowClick(userDetailsData?._id)} disabled={followBusy}>
                 {isFollowingLocal ? "Unfollow" : "Follow"}
               </Button>
-              <Link href={"/chat"}>
+              <Link href={(userDetailsData?.userName ? String(userDetailsData.userName).toLowerCase().replace(/-/g,'') : '') === 'coachmajen' ? "/coach-majen" : "/chat"}>
                 <ChatIcon className="stroke-foreground" />
               </Link>
             </div>

@@ -293,6 +293,7 @@ interface UserChatProps {
   name: string;
   message: string;
   profilePhoto: string;
+  href?: string;
 }
 
 interface UserId {
@@ -313,6 +314,7 @@ const userChats: UserChatProps[] = [
     name: "The PT",
     message: "Hi there!",
     profilePhoto: "/assets/images/inbox/the-pt.jpg",
+    href: "/room/The PT",
   },
 ];
 
@@ -320,6 +322,8 @@ function InboxBody({ loggedInUser, fullName, image }: InboxBodyProps) {
   const totalUnreadCount = 2;
   const { isMobile } = useClientHardwareInfo();
   const [inputValue, setInputValue] = useState("");
+  const [majenPinned, setMajenPinned] = useState<boolean>(false);
+  const [majenRow, setMajenRow] = useState<UserChatProps | null>(null);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -328,6 +332,26 @@ function InboxBody({ loggedInUser, fullName, image }: InboxBodyProps) {
   const resetField = () => {
     setInputValue("");
   };
+
+  useEffect(() => {
+    const update = () => {
+      try {
+        const flag = typeof window !== 'undefined' ? window.localStorage.getItem('chat-coach-majen') : null;
+        setMajenPinned(flag === '1');
+        const raw = typeof window !== 'undefined' ? window.localStorage.getItem('inbox-conv-coach-majen') : null;
+        if (raw) {
+          try {
+            const j = JSON.parse(raw);
+            setMajenRow({ name: String(j?.name || 'Coach Majen'), message: String(j?.last || 'Say hi'), profilePhoto: String(j?.avatar || '/assets/images/inbox/the-pt.jpg'), href: '/coach-majen' });
+          } catch { setMajenRow(null); }
+        }
+      } catch {}
+    };
+    update();
+    const onEvt = () => update();
+    if (typeof window !== 'undefined') window.addEventListener('inbox-refresh', onEvt);
+    return () => { if (typeof window !== 'undefined') window.removeEventListener('inbox-refresh', onEvt); };
+  }, []);
 
   return (
     <>
@@ -376,8 +400,8 @@ function InboxBody({ loggedInUser, fullName, image }: InboxBodyProps) {
            <h1 className="text-muted-foreground">
             Unread messages ({totalUnreadCount})
           </h1>
-          {userChats.map((chat, index) => (
-            <Link key={index} href={`/room/${chat.name}`}>
+          {[(majenPinned && majenRow) ? majenRow : null, ...userChats].filter(Boolean).map((chat: any, index: number) => (
+            <Link key={index} href={chat.href || `/room/${chat.name}`}>
               <UserChat
                 name={chat.name}
                 message={chat.message}

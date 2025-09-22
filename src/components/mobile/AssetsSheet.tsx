@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function AssetsSheet({ triggerLabel = "Assets", iconOnly = false, menu = "default" }: { triggerLabel?: string; iconOnly?: boolean; menu?: "default"|"plans" }) {
+export default function AssetsSheet({ triggerLabel = "Assets", iconOnly = false, menu = "default", className = "" }: { triggerLabel?: string; iconOnly?: boolean; menu?: "default"|"plans"; className?: string }) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -22,7 +22,7 @@ export default function AssetsSheet({ triggerLabel = "Assets", iconOnly = false,
         onClickCapture={(e) => { stopAll(e); }}
         onMouseDown={(e) => { stopAll(e); }}
         onTouchStart={(e) => { stopAll(e); }}
-        className={`pointer-events-auto min-h-[36px] min-w-[44px] ${iconOnly? 'px-0 w-9 h-9 rounded-full border' : 'px-3 rounded-full border'} flex items-center justify-center gap-2 bg-background hover:bg-accent active:scale-95`}
+        className={`${className} pointer-events-auto min-h-[36px] min-w-[44px] ${iconOnly? 'px-0 w-9 h-9 rounded-full border' : 'px-3 rounded-full border'} flex items-center justify-center gap-2 active:scale-95`}
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
         {!iconOnly && <span className="text-sm">{triggerLabel}</span>}

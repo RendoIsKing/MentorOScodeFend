@@ -164,7 +164,13 @@ function ProfileHeaderDesktop() {
                   <img onClick={() => setOpenShareModel(true)} src="/assets/images/my-Profile/share.svg" className="cursor-pointer" alt="share" />
                 ) : (
                   <div className="flex w-[84px] justify-between">
-                    <img onClick={() => setOpenChatPopup(true)} src="/assets/images/search-user-profile/inbox-message.svg" className="cursor-pointer" alt="message" />
+                    <img onClick={() => {
+                      const uname = (userDetailsData?.userName || '').toString().toLowerCase();
+                      if (uname.replace(/-/g,'') === 'coachmajen') {
+                        return router.push('/coach-majen');
+                      }
+                      setOpenChatPopup(true);
+                    }} src="/assets/images/search-user-profile/inbox-message.svg" className="cursor-pointer" alt="message" />
                     <img src="/assets/images/Sidebar/notification-bing.svg" className="cursor-pointer" alt="notification" onClick={() => setIsNotificationModal(true)} />
                   </div>
                 )}
