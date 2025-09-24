@@ -491,13 +491,13 @@ const ChatHistory: React.FC = () => {
       const apiBase = baseServerUrl || '/api/backend';
       if (isMajen) {
         // Persist user msg and get AI reply via Majen endpoint
-        try { await fetch(`${apiBase}/v1/interaction/chat/coach-majen/message`, { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ sender:'user', text:newMessage.text }) }); } catch {}
+        try { await fetch(`${apiBase}/v1/interaction/chat/coach-majen/message`, { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ userId, sender:'user', text:newMessage.text }) }); } catch {}
         const historyPayload = messages.slice(-10).map((m: any) => ({ role: m.sender === 'user' ? 'user' : 'assistant', content: m.text }));
         const r = await fetch(`${apiBase}/v1/interaction/chat/majen`, { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ message: newMessage.text, history: historyPayload }) });
         const j = await r.json().catch(()=>({}));
         const assistantText = j?.reply || 'Beklager, noe gikk galt.';
         setMessages((prev)=>[...prev, { sender:'other', text: assistantText, time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), date: new Date().toLocaleDateString() }]);
-        try { await fetch(`${apiBase}/v1/interaction/chat/coach-majen/message`, { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ sender:'assistant', text:assistantText }) }); } catch {}
+        try { await fetch(`${apiBase}/v1/interaction/chat/coach-majen/message`, { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ userId, sender:'assistant', text:assistantText }) }); } catch {}
         // update inbox preview
         try { if (typeof window !== 'undefined') { window.localStorage.setItem('chat-coach-majen', '1'); window.localStorage.setItem('inbox-conv-coach-majen', JSON.stringify({ name: 'Coach Majen', last: newMessage.text, avatar: avatarUrl })); window.dispatchEvent(new Event('inbox-refresh')); } } catch {}
         return;
