@@ -1,56 +1,42 @@
 import React from "react";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import Image from "next/image";
 
-interface INotificationWithDescriptionProps {
-  imageUrl: string;
-  userImageUrl: string;
-  title: string;
-  type: string;
-  description: string;
-  // name: string;
-  // time: string;
-  // reply: string;
+interface NotificationProps {
+  actorAvatar?: string; // left profile pic
+  actorName?: string;   // left actor name
+  verb: "follow" | "like_post" | "comment" | string;
+  text?: string;        // comment text if any
+  mediaThumb?: string;  // right media thumbnail for like/comment
 }
 
-const NotificationDescription: React.FC<INotificationWithDescriptionProps> = ({
-  imageUrl,
-  userImageUrl,
-  title,
-  type,
-  description,
-  // name,
-  // time,
-  // description,
-  // reply,
-}) => {
-  return (
-    <div>
-      <div className="flex justify-between">
-        <div className="flex mt-3 mb-4">
-          <div className="flex justify-between">
-            <Image src={imageUrl} width={45} height={45} alt="post_img" />
-            <div className="flex flex-col relative left-2">
-              <Label>
-                {title}{" "}
-                <span className="text-sm text-muted-foreground">
-                  {description}
-                </span>{" "}
-              </Label>
-              <div className="text-sm text-muted-foreground mt-2">
-                {/* <span className="text-primary">{title} </span> */}
-                <Label>{type}</Label>
-              </div>
-            </div>
-          </div>
-        </div>
-        <Image src={userImageUrl} alt="more" width={45} height={45} />
-      </div>
+const NotificationRow: React.FC<NotificationProps> = ({ actorAvatar, actorName, verb, text, mediaThumb }) => {
+  const leftSrc = actorAvatar || "/assets/images/Notification/user-another1.svg";
+  const rightSrc = mediaThumb || "";
 
-      <Separator />
+  const renderLine = () => {
+    if (verb === "follow") return (<span><strong>{actorName}</strong> started following you</span>);
+    if (verb === "like_post") return (<span><strong>{actorName}</strong> liked your post</span>);
+    if (verb === "comment") return (<span><strong>{actorName}</strong> commented on your post</span>);
+    return (<span><strong>{actorName}</strong> {verb}</span>);
+  };
+
+  return (
+    <div className="flex items-start justify-between gap-3 py-3">
+      <div className="flex items-start gap-3 min-w-0">
+        <img src={leftSrc} alt="avatar" className="h-11 w-11 rounded-full object-cover" />
+        <div className="min-w-0">
+          <div className="text-sm leading-tight">{renderLine()}</div>
+          {text ? (
+            <div className="text-xs text-muted-foreground mt-1 line-clamp-2 break-words">
+              {text}
+            </div>
+          ) : null}
+        </div>
+      </div>
+      { (verb === "like_post" || verb === "comment") && rightSrc ? (
+        <img src={rightSrc} alt="media" className="h-11 w-11 rounded object-cover" />
+      ) : null }
     </div>
   );
 };
 
-export default NotificationDescription;
+export default NotificationRow;

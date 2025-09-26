@@ -83,9 +83,22 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
     }
   };
 
+  const author = (Array.isArray((feedData as any)?.userInfo) ? (feedData as any).userInfo[0] : (feedData as any).userInfo) as any;
+  // Prefer top-level userPhoto (Home API often provides this), then userInfo fallbacks
+  const upTop = (feedData as any)?.userPhoto;
+  let rawPath = (Array.isArray(upTop) && upTop[0]?.path) ? upTop[0].path : undefined;
+  if (!rawPath) rawPath = author?.photoPath || author?.photo?.path || (Array.isArray(author?.userPhoto) ? author?.userPhoto?.[0]?.path : author?.userPhoto?.path) || author?.photoId;
+  const authorAvatar = rawPath ? (String(rawPath).startsWith('http') ? String(rawPath) : `${baseServerUrl}/${rawPath}`) : "/assets/images/search/small-profile-img.svg";
+  const authorUserName = ((author?.userName) || ((Array.isArray((feedData as any)?.userInfo) ? (feedData as any).userInfo[0]?.userName : (feedData as any).userInfo?.userName)) || '').toString();
+
   return (
     <div className="flex flex-col gap-y-4">
-      {/* Tip removed */}
+      {/* Author avatar (desktop only) */}
+      <div className="flex justify-center">
+        <Link href={`/${authorUserName.toLowerCase()}`} className="inline-block" aria-label="Open author profile">
+          <img src={authorAvatar} alt="author avatar" className="h-10 w-10 rounded-full object-cover shadow" />
+        </Link>
+      </div>
 
       <div className="flex justify-center ">
         <div

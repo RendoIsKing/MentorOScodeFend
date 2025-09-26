@@ -151,8 +151,11 @@ const Followers: React.FC<ITabsModalProps> = ({ tabValue }) => {
   const appDispatch = useAppDispatch();
 
   const selectedTab = useMemo(() => {
-    return isMobile ? searchParams.get("tab") || "" : tabValue || "";
-  }, [isMobile, tabValue, searchParams]);
+    const fromQuery = searchParams.get("tab") || "";
+    const fromProp = tabValue || "";
+    // Prefer explicit query param; fall back to prop; finally default to 'followers'
+    return (fromQuery || fromProp || "followers") as string;
+  }, [tabValue, searchParams]);
 
   const handleFollowClick = useCallback(
     async (id) => {

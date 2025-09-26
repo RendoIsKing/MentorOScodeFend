@@ -8,6 +8,7 @@ import { postsApi } from "@/redux/services/haveme/posts";
 import { useAppDispatch } from "@/redux/store";
 import { TAG_GET_TAGGED_USERS_LIST, TAG_GET_USER_DETAILS_BY_USER_NAME, TAG_GET_FILE_INFO_BY_ID, TAG_GET_USER_INFO, TAG_GET_FILE_INFO } from "@/contracts/haveme/haveMeApiTags";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
 
 
 
@@ -46,6 +47,8 @@ export default function FullBleedFeed({
 }) {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(typeof initialIndex === 'number' ? Math.max(0, Math.min(initialIndex, posts.length - 1)) : 0);
+  // Read once at the component root so hooks order never changes
+  const { isMobile } = useClientHardwareInfo();
   // Session-local followed authors to keep pill hidden even before refetch returns
   const [followedBySession, setFollowedBySession] = useState<Record<string, boolean>>({});
   const [recentlyFollowedAt, setRecentlyFollowedAt] = useState<Record<string, number>>({});
@@ -145,7 +148,7 @@ export default function FullBleedFeed({
       </div>
 
       {/* Fixed author bar overlay for the currently visible post */}
-      {active?.user ? (
+      {active?.user && isMobile ? (
         createPortal(
           (() => {
             const hasOpenUi = typeof document !== 'undefined' && Boolean(
@@ -162,7 +165,7 @@ export default function FullBleedFeed({
                       href={`/${active.user?.username || active.user?.id || ""}`}
                       className="flex items-center gap-2 rounded-full bg-black/35 px-2 py-1"
                     >
-                      <img src={active.user.avatarUrl || "/assets/images/Home/small-profile-img.svg"} alt="" className="h-10 w-10 rounded-full object-cover" />
+                      <img src={(active as any).user?.avatarUrl || (active as any).user?.photo?.path || "/assets/images/Home/small-profile-img.svg"} alt="" className="h-10 w-10 rounded-full object-cover" />
                       <div className="flex min-w-0 flex-col">
                         <span className="truncate text-sm font-semibold text-white leading-tight">{active.user.displayName || active.user.username || ""}</span>
                         {active?.createdAt ? (
@@ -170,6 +173,7 @@ export default function FullBleedFeed({
                         ) : null}
                       </div>
                     </Link>
+                    {/* Follow pill only on mobile */}
                     {!isOwn && !isFollowingNow ? (
                       <FollowPill
                         authorId={authorId}

@@ -28,6 +28,7 @@ import { useGetUserDetailsQuery } from "@/redux/services/haveme";
 import { useUpdateMeMutation } from "@/redux/services/haveme/user";
 import { useGetUserDetailsByUserNameQuery } from "@/redux/services/haveme/user";
 import { baseServerUrl, cn } from "@/lib/utils";
+import UserStats from "@/components/user-stats";
 
 const fontItalic = ABeeZee({
   subsets: ["latin"],
@@ -226,6 +227,26 @@ function ProfileHeaderDesktop() {
                 )}
                 <Separator />
               </div>
+              {/* Desktop stats: show for both self and others */}
+              {isOwnerRendered ? (
+                <UserStats
+                  isOwnProfile={true}
+                  followersCount={data?.data?.followersCount}
+                  followingCount={data?.data?.followingCount}
+                  subscribersCount={data?.data?.subscriberCount}
+                  postsCount={data?.data?.postsCount}
+                  likeCount={data?.data?.totalLikes}
+                />
+              ) : (
+                <UserStats
+                  isOwnProfile={false}
+                  followersCount={userDetailsData?.followersCount}
+                  followingCount={userDetailsData?.followingCount}
+                  subscribersCount={userDetailsData?.subscriberCount}
+                  postsCount={userDetailsData?.postsCount}
+                  likeCount={userDetailsData?.totalLikes}
+                />
+              )}
               <div className="flex">
                 <ContentUploadOptions />
               </div>
