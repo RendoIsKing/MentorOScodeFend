@@ -144,6 +144,7 @@ export interface Message {
   time: string;
   date: string;
   image?: string;
+  type?: string;
 }
 
 interface AvatarChatHistoryProps {
@@ -259,6 +260,67 @@ const AvatarChatHistory: React.FC<AvatarChatHistoryProps> = ({
                       }}
                     />
                   )
+                )}
+                {/* Plan proposal detection and Choose button */}
+                {message.sender === 'other' && message.text && (
+                  (() => {
+                    // Check if this is a plan proposal (contains ##Type: and proper header) - supports Norwegian weekdays
+                    const isPlanProposal = /^(Ny|Endring på)\s.+\n\s*##Type:\s*(Treningsplan|Kostholdsplan|Mål)\s*\n\s*Plan:\s*(.+)$/im.test(message.text);
+                    if (isPlanProposal) {
+                      const typeMatch = message.text.match(/##Type:\s*(Treningsplan|Kostholdsplan|Mål)/i);
+                      const planType = typeMatch ? typeMatch[1] : 'Plan';
+                      return (
+                        <div className="mt-2">
+                          <button
+                            onClick={async () => {
+                              try {
+                                const apiBase = baseServerUrl || '/api/backend';
+                                const uid = await resolveUserId(apiBase);
+                                const r = await fetch(`${apiBase}/v1/interaction/chat/engh/actions/applyPlanChange`, {
+                                  method: 'POST',
+                                  credentials: 'include',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ text: message.text, userId: uid })
+                                });
+                                const result = await r.json();
+                                if (result?.ok) {
+                                  // Refresh plans
+                                  try { window.dispatchEvent(new CustomEvent('plansUpdated')); } catch {}
+                                  // Show success message
+                                  setMessages(prev => [...prev, {
+                                    sender: 'other',
+                                    text: `${planType} lagt til!`,
+                                    time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
+                                    date: new Date().toLocaleDateString()
+                                  }]);
+                                } else {
+                                  // Show error message
+                                  setMessages(prev => [...prev, {
+                                    sender: 'other',
+                                    text: 'Kunne ikke legge til plan. Prøv igjen.',
+                                    time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
+                                    date: new Date().toLocaleDateString()
+                                  }]);
+                                }
+                              } catch (error) {
+                                console.error('Error applying plan:', error);
+                                setMessages(prev => [...prev, {
+                                  sender: 'other',
+                                  text: 'Kunne ikke legge til plan. Prøv igjen.',
+                                  time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
+                                  date: new Date().toLocaleDateString()
+                                }]);
+                              }
+                            }}
+                            className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-md border bg-primary text-primary-foreground hover:bg-primary/90"
+                          >
+                            Choose {planType}
+                          </button>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()
                 )}
                 {/* Save-as control under assistant messages */}
                 {message.sender === 'other' && (

@@ -387,6 +387,7 @@ export interface Message {
   time?: string;
   date?: string;
   image?: string;
+  type?: string;
 }
 
 interface ApiResponse {
@@ -496,7 +497,8 @@ const ChatHistory: React.FC = () => {
         const r = await fetch(`${apiBase}/v1/interaction/chat/majen`, { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ message: newMessage.text, history: historyPayload }) });
         const j = await r.json().catch(()=>({}));
         const assistantText = j?.reply || 'Beklager, noe gikk galt.';
-        setMessages((prev)=>[...prev, { sender:'other', text: assistantText, time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), date: new Date().toLocaleDateString() }]);
+        const messageType = j?.type || 'normal';
+        setMessages((prev)=>[...prev, { sender:'other', text: assistantText, time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), date: new Date().toLocaleDateString(), type: messageType }]);
         try { await fetch(`${apiBase}/v1/interaction/chat/coach-majen/message`, { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ userId, sender:'assistant', text:assistantText }) }); } catch {}
         // update inbox preview
         try { if (typeof window !== 'undefined') { window.localStorage.setItem('chat-coach-majen', '1'); window.localStorage.setItem('inbox-conv-coach-majen', JSON.stringify({ name: 'Coach Majen', last: newMessage.text, avatar: avatarUrl })); window.dispatchEvent(new Event('inbox-refresh')); } } catch {}
@@ -564,6 +566,7 @@ const ChatHistory: React.FC = () => {
       });
       const data = await res.json().catch(()=>({}));
       const assistantText = data?.reply || 'Beklager, noe gikk galt.';
+      const messageType = data?.type || 'normal';
       // Persist user and assistant messages
       try{ await fetch(`${apiBase}/v1/interaction/chat/engh/message`, { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ userId, sender:'user', text:newMessage.text }) }); }catch{}
       // Fire action decision engine in parallel; if it performs a change it will update plans
@@ -591,6 +594,7 @@ const ChatHistory: React.FC = () => {
           minute: "2-digit",
         }),
         date: new Date().toLocaleDateString(),
+        type: messageType,
       };
       setMessages((prevMessages) => [...prevMessages, apiResponseMessage]);
       try{ await fetch(`${apiBase}/v1/interaction/chat/engh/message`, { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ userId, sender:'assistant', text:assistantText }) }); }catch{}

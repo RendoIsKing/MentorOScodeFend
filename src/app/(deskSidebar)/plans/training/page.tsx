@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useUserOnboardingContext } from "@/context/UserOnboarding";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Copy, Printer } from "lucide-react";
 import PlansHeader from "@/components/plans/PlansHeader";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -19,8 +19,72 @@ export default function TrainingPlanPage(){
     return null;
   });
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [done, setDone] = useState<Record<string, boolean>>({});
   const [editMode, setEditMode] = useState(false);
+
+  // --- utilities ---
+  const daySlug = (label: string|undefined, idx: number): string => {
+    const v = String(label || '').trim().toLowerCase();
+    if (!v) return `d${idx}`;
+    // support Norwegian and English weekdays → 3-letter slug
+    const map: Record<string,string> = {
+      mandag:"mon", tirsdag:"tue", onsdag:"wed", torsdag:"thu", fredag:"fri", lørdag:"sat", lordag:"sat", søndag:"sun", sondag:"sun",
+      monday:"mon", tuesday:"tue", wednesday:"wed", thursday:"thu", friday:"fri", saturday:"sat", sunday:"sun",
+      mon:"mon", tue:"tue", wed:"wed", thu:"thu", fri:"fri", sat:"sat", sun:"sun",
+    };
+    const token = v.split(/[^a-zøæå]+/)[0];
+    return map[token] || token.slice(0,3) || `d${idx}`;
+  };
+
+  function pickGuidelines(p: any, day: any): string | string[] | null {
+    return p?.generalGuidelines
+      ?? p?.guidelines
+      ?? p?.notes
+      ?? p?.meta?.generalGuidelines
+      ?? day?.guidelines
+      ?? null;
+  }
+
+  // selected day management (query ?day=, fallback to localStorage, else first)
+  const [selected, setSelected] = useState<string | null>(null);
+  useEffect(() => {
+    const q = searchParams?.get('day');
+    if (q) { setSelected(q.toLowerCase()); return; }
+    try {
+      const last = localStorage.getItem('training:lastDay');
+      if (last) { setSelected(last); return; }
+    } catch {}
+    setSelected(null);
+  }, [searchParams]);
+
+  const selectDay = (slug: string) => {
+    try { localStorage.setItem('training:lastDay', slug); } catch {}
+    const sp = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+    sp.set('day', slug);
+    router.replace(`${pathname}?${sp.toString()}`);
+    setSelected(slug);
+  };
+
+  // keyboard left/right to change day
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!Array.isArray(plan) || !plan.length) return;
+      const slugs = plan.map((s:any,i:number)=> daySlug(s.day, i));
+      const cur = selected ?? slugs[0];
+      const idx = Math.max(0, slugs.indexOf(cur));
+      if (e.key === 'ArrowRight') {
+        const next = slugs[(idx + 1) % slugs.length];
+        selectDay(next);
+      } else if (e.key === 'ArrowLeft') {
+        const next = slugs[(idx - 1 + slugs.length) % slugs.length];
+        selectDay(next);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [plan, selected]);
 
   function copyPlan(){
     try{
@@ -100,99 +164,120 @@ export default function TrainingPlanPage(){
       </div>
       {Array.isArray(plan) && plan.length ? (
         <div className="space-y-6">
-          {/* Sticky intra-page nav */}
+          {/* Day selector */}
           <div className="sticky top-0 z-10 bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/60 border-b py-2">
-            <div className="flex flex-wrap gap-2">
-              {plan.map((s:any, idx:number)=> (
-                <a key={idx} href={`#s-${idx}`} className="text-xs px-2 py-1 rounded-md border hover:bg-muted">{s.day || `Økt ${idx+1}`}</a>
-              ))}
+            <div className="flex gap-2 overflow-x-auto no-scrollbar">
+              {plan.map((s:any, idx:number)=>{
+                const slug = daySlug(s.day, idx);
+                const isSel = (selected ?? slug) === slug;
+                return (
+                  <button
+                    key={idx}
+                    aria-pressed={isSel}
+                    aria-label={`Select ${s.day || `Økt ${idx+1}`}`}
+                    onClick={()=>selectDay(slug)}
+                    className={`text-xs px-3 py-1.5 rounded-md border whitespace-nowrap ${isSel? 'bg-muted font-medium' : 'hover:bg-muted'}`}
+                  >
+                    {s.day || `Økt ${idx+1}`}
+                  </button>
+                );
+              })}
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {plan.map((session:any, idx:number)=>(
-              <Card key={idx} id={`s-${idx}`} style={{ breakInside: 'avoid' }}>
-                <CardHeader>
-                  <CardTitle className="text-base">{session.day || `Økt ${idx+1}`}</CardTitle>
-                  <CardDescription>{session.focus}</CardDescription>
+
+          {/* Selected day */}
+          {(() => {
+            const slugs = plan.map((s:any,i:number)=> daySlug(s.day, i));
+            const cur = selected ?? slugs[0];
+            const selIdx = Math.max(0, slugs.indexOf(cur));
+            const session = plan[selIdx];
+            return (
+              <Card className="mx-auto w-full max-w-5xl rounded-2xl border border-zinc-800/60 bg-zinc-900/60 p-5 md:p-7 shadow-sm">
+                <CardHeader className="p-0">
+                  <CardTitle className="text-2xl md:text-3xl font-semibold">{session.day || `Økt ${selIdx+1}`}</CardTitle>
+                  {session.focus ? <CardDescription className="text-lg md:text-xl text-zinc-400">{session.focus}</CardDescription> : null}
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-0 mt-4 md:mt-6">
                   {/* Completion summary */}
-                  <div className="mb-2 text-xs text-muted-foreground flex items-center gap-2">
-                    {(() => { const total = (session.sets||[]).length; const d = Object.keys(done).filter(k=>k.startsWith(`${idx}-`) && done[k]).length; return <span>{d}/{total} done</span>; })()}
+                  <div className="mb-3 text-xs text-muted-foreground flex items-center gap-2">
+                    {(() => { const total = (session.sets||[]).length; const d = Object.keys(done).filter(k=>k.startsWith(`${selIdx}-`) && done[k]).length; return <span>{d}/{total} done</span>; })()}
                     <button className="px-2 py-0.5 rounded border hover:bg-muted" onClick={()=>{
-                      setDone(prev=>{ const next={...prev}; (session.sets||[]).forEach((_:any,i:number)=>{ next[`${idx}-${i}`]=true; }); return next; });
+                      setDone(prev=>{ const next={...prev}; (session.sets||[]).forEach((_:any,i:number)=>{ next[`${selIdx}-${i}`]=true; }); return next; });
                     }}>Mark all done</button>
                   </div>
-                  <div className="space-y-1 text-sm">
+
+                  <div className="space-y-3 md:space-y-4 mt-2">
                     {(session.sets||[]).map((x:any,i:number)=>{
-                      const key = `${idx}-${i}`;
+                      const key = `${selIdx}-${i}`;
                       return editMode ? (
                         <div key={i} className="grid grid-cols-12 gap-2 items-center">
                           <input className="col-span-7 px-2 py-1 rounded border bg-background" value={x.exercise} onChange={(e)=>{
-                            setPlan((p:any)=>{
-                              const np = [...p]; np[idx] = { ...np[idx], sets: np[idx].sets.map((s:any, si:number)=> si===i? { ...s, exercise: e.target.value } : s) }; return np;
-                            });
+                            setPlan((p:any)=>{ const np=[...p]; np[selIdx]={...np[selIdx], sets: np[selIdx].sets.map((s:any,si:number)=> si===i?{...s, exercise:e.target.value}:s)}; return np;});
                           }} />
                           <input type="number" className="col-span-2 px-2 py-1 rounded border bg-background" value={x.sets} onChange={(e)=>{
                             const v = Math.max(1, parseInt(e.target.value||'1',10));
-                            setPlan((p:any)=>{ const np=[...p]; np[idx]={...np[idx], sets: np[idx].sets.map((s:any,si:number)=> si===i?{...s, sets:v}:s)}; return np;});
+                            setPlan((p:any)=>{ const np=[...p]; np[selIdx]={...np[selIdx], sets: np[selIdx].sets.map((s:any,si:number)=> si===i?{...s, sets:v}:s)}; return np;});
                           }} />
                           <input type="number" className="col-span-2 px-2 py-1 rounded border bg-background" value={x.reps} onChange={(e)=>{
                             const v = Math.max(1, parseInt(e.target.value||'1',10));
-                            setPlan((p:any)=>{ const np=[...p]; np[idx]={...np[idx], sets: np[idx].sets.map((s:any,si:number)=> si===i?{...s, reps:v}:s)}; return np;});
+                            setPlan((p:any)=>{ const np=[...p]; np[selIdx]={...np[selIdx], sets: np[selIdx].sets.map((s:any,si:number)=> si===i?{...s, reps:v}:s)}; return np;});
                           }} />
                           <button className="col-span-1 text-xs" onClick={()=>{
-                            setPlan((p:any)=>{ const np=[...p]; np[idx]={...np[idx], sets: np[idx].sets.filter((_:any,si:number)=> si!==i)}; return np;});
+                            setPlan((p:any)=>{ const np=[...p]; np[selIdx]={...np[selIdx], sets: np[selIdx].sets.filter((_:any,si:number)=> si!==i)}; return np;});
                           }}>✕</button>
                         </div>
                       ) : (
-                        <div key={i} className="flex items-start gap-2">
-                          <input type="checkbox" checked={!!done[key]} onChange={()=>setDone(prev=>({ ...prev, [key]: !prev[key] }))} className="mt-0.5" aria-label="mark done"/>
-                          <span className={done[key]? 'line-through opacity-60' : ''}>{x.exercise} — {x.sets}x{x.reps}{x.weight?` @ ${x.weight}kg`:''}</span>
+                        <div key={i} className="flex items-start gap-3 md:gap-4 text-base md:text-lg leading-relaxed">
+                          <input type="checkbox" checked={!!done[key]} onChange={()=>setDone(prev=>({ ...prev, [key]: !prev[key] }))} className="mt-1.5" aria-label="mark done"/>
+                          <span className={done[key]? 'line-through opacity-60' : ''}>
+                            {x.exercise} — {x.sets}x{x.reps}{x.weight?` @ ${x.weight}kg`:''}
+                          </span>
                         </div>
                       );
                     })}
                     {editMode && (
                       <button className="text-xs px-2 py-1 rounded-md border hover:bg-muted" onClick={()=>{
-                        setPlan((p:any)=>{ const np=[...p]; const add={ exercise:'New exercise', sets:3, reps:8 }; np[idx]={...np[idx], sets:[...np[idx].sets, add]}; return np; });
+                        setPlan((p:any)=>{ const np=[...p]; const add={ exercise:'New exercise', sets:3, reps:8 }; np[selIdx]={...np[selIdx], sets:[...np[selIdx].sets, add]}; return np; });
                       }}>+ Add</button>
                     )}
                   </div>
+
                   {Array.isArray(session.notes) && session.notes.length ? (
-                    <div className="mt-3">
-                      <div className="text-xs text-muted-foreground mb-1">Notater</div>
-                      <ul className="list-disc pl-5 text-sm">
+                    <div className="mt-4">
+                      <div className="text-sm text-muted-foreground mb-1">Notater</div>
+                      <ul className="list-disc pl-5 text-base md:text-lg leading-relaxed">
                         {session.notes.map((n:string,i:number)=>(<li key={i}>{n}</li>))}
                       </ul>
                     </div>
                   ) : null}
                 </CardContent>
               </Card>
-            ))}
-          </div>
-          {plan?.[0]?.guidelines?.length ? (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Retningslinjer</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="list-disc pl-5 text-sm">
-                  {plan?.[0]?.guidelines.map((g:string, i:number)=>(<li key={i}>{g}</li>))}
-                </ul>
-              </CardContent>
-            </Card>
-          ) : null}
-          {plan?.[0]?.sourceText ? (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Full tekst</CardTitle>
-                <CardDescription>Original instruksjon fra Coach</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <pre className="whitespace-pre-wrap text-xs">{plan?.[0]?.sourceText}</pre>
-              </CardContent>
-            </Card>
-          ) : null}
+            );
+          })()}
+
+          {/* Guidelines card */}
+          {(() => {
+            const slugs = plan.map((s:any,i:number)=> daySlug(s.day, i));
+            const cur = selected ?? slugs[0];
+            const selIdx = Math.max(0, slugs.indexOf(cur));
+            const session = plan[selIdx];
+            const g = pickGuidelines(plan, session);
+            if (!g || (Array.isArray(g) && !g.length)) return null;
+            const render = (val: any) => {
+              if (Array.isArray(val)) {
+                return <ul className="list-disc pl-5 text-base md:text-lg leading-relaxed">{val.map((x:any,i:number)=>(<li key={i}>{String(x)}</li>))}</ul>;
+              }
+              const lines = String(val).split(/\n+/).filter(Boolean);
+              return <ul className="list-disc pl-5 text-base md:text-lg leading-relaxed">{lines.map((x:string,i:number)=>(<li key={i}>{x}</li>))}</ul>;
+            };
+            return (
+              <Card className="mx-auto w-full max-w-5xl rounded-2xl border border-zinc-800/60 bg-zinc-900/60 p-5 md:p-7 shadow-sm">
+                <CardHeader className="p-0"><CardTitle className="text-xl md:text-2xl font-semibold">Generelle retningslinjer</CardTitle></CardHeader>
+                <CardContent className="p-0 mt-3">{render(g)}</CardContent>
+              </Card>
+            );
+          })()}
+
         </div>
       ) : (
         <div className="text-muted-foreground text-sm">Ingen plan</div>
