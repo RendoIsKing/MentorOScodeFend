@@ -16,6 +16,8 @@ import { logEvent } from '@/lib/analytics';
 import type { StudentSnapshot } from '@/lib/types/student';
 import { useToast } from '@/components/ui/use-toast';
 import { onSnapshotRefresh } from '@/lib/snapshotBus';
+import ChangeList from '@/components/student/ChangeList';
+import ChangeDetailsModal from '@/components/student/ChangeDetailsModal';
 
 export default function StudentCenterPage() {
   const [period, setPeriod] = useState<'7d'|'30d'|'90d'|'ytd'>('30d');
@@ -27,6 +29,7 @@ export default function StudentCenterPage() {
   const isLoggedIn = useTypedSelector(selectIsAuthenticated);
   const router = useRouter();
   const { toast } = useToast();
+  const [selectedChange, setSelectedChange] = useState<any|null>(null);
 
   useEffect(() => {
     // Redirect unauthenticated users (simple guard; final routing can be in middleware)
@@ -403,7 +406,16 @@ export default function StudentCenterPage() {
             )}
           </CardContent>
         </Card>
+        <Card aria-label="Endringer">
+          <CardHeader>
+            <CardTitle>Siste endringer</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChangeList userId={user?._id || 'me'} onSelect={(it)=> setSelectedChange(it)} />
+          </CardContent>
+        </Card>
       </div>
+      <ChangeDetailsModal item={selectedChange} onClose={()=> setSelectedChange(null)} />
     </div>
   );
 }

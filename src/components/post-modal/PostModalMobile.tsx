@@ -37,7 +37,10 @@ const PostModalMobile: React.FC<IPostModalMobileProps> = ({ postId }) => {
   const [showTaggedPeople, setShowTaggedPeople] = useState(false);
   const [createImpressionTrigger] = useCreateImpressionMutation();
   const appDispatch = useAppDispatch();
-  const currentUserId = (useTypedSelector((s: any) => s?.auth?.user?._id) as string | null) || (useUserOnboardingContext()?.user?._id as string | null) || null;
+  // Always call hooks unconditionally at top level
+  const onboardingCtx = useUserOnboardingContext();
+  const authUserId = useTypedSelector((s: any) => s?.auth?.user?._id) as string | null;
+  const currentUserId = authUserId || (onboardingCtx?.user?._id as string | null) || null;
 
   const fileType = postDetails?.media?.[0]?.mediaType;
   const { isMobile, orientation, softwareOrientation, hardwareOrientation } =

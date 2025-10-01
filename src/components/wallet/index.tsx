@@ -23,6 +23,7 @@ import {
   useSetDefaultCardMutation,
 } from "@/redux/services/haveme/card";
 import { cn } from "@/lib/utils";
+import { useState } from 'react';
 
 // TODO: Make this font definition dynamic
 const fontItalic = ABeeZee({
@@ -64,6 +65,7 @@ const cardArr = [
 
 const Wallet: React.FC = () => {
   const router = useRouter();
+  const [subStatus, setSubStatus] = useState<string>('');
 
   const { data: cardsData, isLoading } = useGetUserCardsQuery();
   return (
@@ -111,7 +113,27 @@ const Wallet: React.FC = () => {
             </div>
           </div>
           <div
-            onClick={() => router.push("/wallet/help-support")}
+            onClick={async () => {
+              try {
+                setSubStatus('');
+                const apiBase = process.env.NEXT_PUBLIC_API_SERVER ? `${process.env.NEXT_PUBLIC_API_SERVER}/v1` : '/api/backend/v1';
+                const r = await fetch(`${apiBase}/payments/create-session`, { method:'POST', credentials:'include' });
+                const j = await r.json().catch(()=>({}));
+                if (r.ok && j?.data?.clientSecret) {
+                  setSubStatus(`Client secret created: ${j.data.clientSecret.slice(0,8)}…`);
+                  // Quick entitlement check
+                  try {
+                    const gate = await fetch('/api/backend/v1/feature/protected-check', { credentials:'include' });
+                    if (gate.status === 403) setSubStatus((s)=> s + ' • gated (403)');
+                    if (gate.status === 200) setSubStatus((s)=> s + ' • entitled (200)');
+                  } catch {}
+                } else {
+                  setSubStatus('Failed to create session');
+                }
+              } catch {
+                setSubStatus('Failed to create session');
+              }
+            }}
             className="lg:flex lg:flex-col lg:justify-between rounded-xl bg-muted-foreground/20 w-1/2 lg:w-3/12 p-3 ml-2 lg:cursor-pointer"
           >
             <div className="mt-2 mb-3">
@@ -129,6 +151,7 @@ const Wallet: React.FC = () => {
             </div>
           </div>
         </div>
+        {subStatus ? (<div className="mt-3 text-sm text-muted-foreground">{subStatus}</div>) : null}
       </div>
     </div>
   );

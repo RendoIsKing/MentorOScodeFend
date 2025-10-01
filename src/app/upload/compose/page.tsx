@@ -11,6 +11,7 @@ export default function ComposePage() {
   const [name, setName] = useState<string>("draft");
   const [caption, setCaption] = useState("");
   const [tags, setTags] = useState("");
+  const [visibility, setVisibility] = useState<'public' | 'followers' | 'subscribers'>("public");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -72,7 +73,7 @@ export default function ComposePage() {
       const payload = {
         content: caption || "",
         tags: tagsArray,
-        privacy: "public",
+        privacy: visibility === 'subscribers' ? 'subscriber' : visibility,
         status: "published",
         type: "post",
         media: mediaDto,
@@ -110,6 +111,16 @@ export default function ComposePage() {
         <div>
           <label className="block text-sm mb-1">Tags (comma separated)</label>
           <input value={tags} onChange={(e)=>setTags(e.target.value)} className="w-full h-10 rounded-lg border px-3 text-sm" placeholder="fitness, strength, daily" />
+        </div>
+        <div>
+          <label className="block text-sm mb-1">Visibility</label>
+          <div className="flex gap-2">
+            <select value={visibility} onChange={(e)=>setVisibility(e.target.value as any)} className="h-10 rounded-lg border px-3 text-sm">
+              <option value="public">Public</option>
+              <option value="followers">Followers</option>
+              <option value="subscribers">Subscribers</option>
+            </select>
+          </div>
         </div>
         {err && <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">{err}</div>}
         <div className="flex items-center gap-2">
