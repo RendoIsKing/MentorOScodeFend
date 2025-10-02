@@ -1,9 +1,8 @@
 ## Hva som må gjøres (neste sprint(er))
 
 ### Kjerne
-- Ferdigstille synlighetsmerke og rapporterings-aksjon i feeden; koble `POST /post/:id/report` og per-user+IP limit.
-- Legge til E2E smoke-flow: Stripe subscribe → entitlement-gating på beskyttede ruter.
-- Utvide smoke-skript for backend med flere scenarier (moderation, posts visibility).
+- Stripe: endelig E2E verifisering mot ekte webhook (ikke bare simulering), og UI-status etter kjøp.
+- Utvide backend smokes ved behov (moderation-admin stub, posts visibility edge-cases).
 
 ### Observability
 - Sentry performance-spans for nøkkelruter (chat, actions, payments, feed-load).

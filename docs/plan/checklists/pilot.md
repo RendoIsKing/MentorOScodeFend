@@ -25,4 +25,13 @@
 - [ ] `docker compose up -d --build` starter FE/BE/DB
 - [ ] README/Docs oppdatert for lokal kjøring, seed og smoke
 
+### Milestones (status)
+- [x] Auth/Rate-limit/Zod/ChangeEvent pipeline
+- [x] Student Center endringer (liste + detaljer) med live oppdatering
+- [x] Feed: synlighetsmerke, tabs og Report
+- [x] Wallet: create-session smoke
+- [x] Entitlement-guard (`/feature/protected-check`); simulert flip 403→200
+- [x] CI workflow aktiv (FE)
+- [x] Docker Compose
+
 
