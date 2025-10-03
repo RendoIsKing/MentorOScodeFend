@@ -93,6 +93,16 @@ const Settings: React.FC = () => {
           </div>
         </div>
         <Separator />
+        <div className="my-2">
+          <h2 className="text-sm text-muted-foreground lg:pb-2 lg:text-lg">Legal</h2>
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <a className="underline text-muted-foreground" href="/legal/terms" target="_blank" rel="noreferrer">Terms</a>
+            <a className="underline text-muted-foreground" href="/legal/privacy" target="_blank" rel="noreferrer">Privacy</a>
+            <a className="underline text-muted-foreground" href="/legal/guidelines" target="_blank" rel="noreferrer">Guidelines</a>
+            <a className="underline text-muted-foreground" href="/legal/ai" target="_blank" rel="noreferrer">AI Use</a>
+          </div>
+        </div>
+        <Separator />
         <div
           className="my-2 cursor-pointer"
           onClick={() => router.push("/settings/download-data")}
