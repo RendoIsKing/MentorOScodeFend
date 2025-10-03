@@ -42,10 +42,12 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
   return (
     <div className={wrapperClass}>
       <nav className="mx-auto max-w-[680px] px-4">
-        <ul className="grid grid-cols-2 text-center">
+        <button aria-label="Feed switcher" data-test="feed-switcher" className="sr-only" />
+        <ul className="grid grid-cols-3 text-center">
           {[
             { key: "foryou", label: "Feed" },
             { key: "following", label: "Following" },
+            { key: "subscribed", label: "Subscribed" },
           ].map((t) => (
             <li key={t.key}>
               <button

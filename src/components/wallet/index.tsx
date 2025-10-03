@@ -113,6 +113,7 @@ const Wallet: React.FC = () => {
             </div>
           </div>
           <div
+            data-test="wallet-help-support"
             onClick={async () => {
               try {
                 setSubStatus('');
@@ -204,7 +205,7 @@ const Wallet: React.FC = () => {
             </div>
           </div>
         </div>
-        {subStatus ? (<div className="mt-3 text-sm text-muted-foreground">{subStatus}</div>) : null}
+        {subStatus ? (<div data-test="wallet-client-secret" className="mt-3 text-sm text-muted-foreground">{subStatus}</div>) : null}
       </div>
     </div>
   );

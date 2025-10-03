@@ -1,0 +1,87 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - button "Toggle theme" [ref=e4] [cursor=pointer]:
+      - img [ref=e5] [cursor=pointer]
+      - img
+      - generic [ref=e11] [cursor=pointer]: Toggle theme
+    - generic [ref=e13]:
+      - generic [ref=e15]:
+        - heading "Mentor OS" [level=1] [ref=e18] [cursor=pointer]:
+          - generic [ref=e19] [cursor=pointer]:
+            - generic [ref=e20] [cursor=pointer]: Mentor
+            - generic [ref=e21] [cursor=pointer]: OS
+        - generic [ref=e22]:
+          - generic [ref=e24]:
+            - button "Home" [ref=e25] [cursor=pointer]:
+              - generic [ref=e26] [cursor=pointer]:
+                - img [ref=e27] [cursor=pointer]
+                - text: Home
+            - button "Search" [ref=e30] [cursor=pointer]:
+              - generic [ref=e31] [cursor=pointer]:
+                - img [ref=e32] [cursor=pointer]
+                - text: Search
+            - button "Chat" [ref=e34] [cursor=pointer]:
+              - generic [ref=e35] [cursor=pointer]:
+                - img [ref=e36] [cursor=pointer]
+                - text: Chat
+            - button "Notifications" [ref=e39] [cursor=pointer]:
+              - generic [ref=e40] [cursor=pointer]:
+                - img [ref=e41] [cursor=pointer]
+                - text: Notifications
+            - button "Wallet" [ref=e44] [cursor=pointer]:
+              - generic [ref=e45] [cursor=pointer]:
+                - img [ref=e46] [cursor=pointer]
+                - text: Wallet
+            - button "Creator Center" [ref=e49] [cursor=pointer]:
+              - generic [ref=e50] [cursor=pointer]:
+                - img [ref=e51] [cursor=pointer]
+                - text: Creator Center
+            - button "Upload" [ref=e55] [cursor=pointer]:
+              - generic [ref=e56] [cursor=pointer]:
+                - img [ref=e57] [cursor=pointer]
+                - text: Upload
+            - button "Profile" [ref=e61] [cursor=pointer]:
+              - generic [ref=e62] [cursor=pointer]:
+                - img [ref=e63] [cursor=pointer]
+                - text: Profile
+            - button "Student Center" [ref=e67] [cursor=pointer]:
+              - generic [ref=e68] [cursor=pointer]:
+                - img [ref=e69] [cursor=pointer]
+                - text: Student Center
+          - generic [ref=e73] [cursor=pointer]:
+            - img [ref=e74] [cursor=pointer]
+            - text: More
+      - generic [ref=e78]:
+        - generic [ref=e79]:
+          - img [ref=e81] [cursor=pointer]
+          - generic [ref=e84]: Wallet
+        - generic [ref=e85]:
+          - generic [ref=e87]:
+            - generic [ref=e88]: Payment Methods
+            - button "Add payment method" [ref=e90] [cursor=pointer]
+          - generic [ref=e91]:
+            - generic [ref=e92]: Services
+            - generic [ref=e93]:
+              - generic [ref=e94] [cursor=pointer]:
+                - img "dollar-circle" [ref=e96] [cursor=pointer]
+                - generic [ref=e97] [cursor=pointer]:
+                  - generic [ref=e98] [cursor=pointer]: Transactions
+                  - img [ref=e100] [cursor=pointer]
+              - generic [ref=e102] [cursor=pointer]:
+                - img "message-question" [ref=e104] [cursor=pointer]
+                - generic [ref=e105] [cursor=pointer]:
+                  - generic [ref=e106] [cursor=pointer]: Help & Support
+                  - img [ref=e108] [cursor=pointer]
+              - generic [ref=e110] [cursor=pointer]:
+                - img "subscribe" [ref=e112] [cursor=pointer]
+                - generic [ref=e113] [cursor=pointer]:
+                  - generic [ref=e114] [cursor=pointer]: Subscribe
+                  - img [ref=e116] [cursor=pointer]
+            - generic [ref=e118]: Failed to create session
+    - region "Notifications (F8)":
+      - list
+  - alert [ref=e121]
+```
