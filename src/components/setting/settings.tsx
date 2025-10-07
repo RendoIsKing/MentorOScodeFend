@@ -116,7 +116,7 @@ const Settings: React.FC = () => {
                 Download your data
               </h3>
               <p className="text-sm lg:text-muted-foreground ">
-                Get a copy of your MentorOS data
+                Get a copy of your Mentorio data
               </p>
             </div>
             <ChevronRightIcon className="text-primary" />

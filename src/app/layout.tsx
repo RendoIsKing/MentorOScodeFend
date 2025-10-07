@@ -51,9 +51,7 @@ export default function RootLayout({
   }
 
   useEffect(() => {
-    // Set document title and other metadata directly
-    document.title = "MentorOS";
-    // You can also manipulate other metadata properties here
+    document.title = "Mentorio";
   }, []);
 
   const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY);
