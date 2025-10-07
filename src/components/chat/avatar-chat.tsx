@@ -194,6 +194,11 @@ const AvatarChatHistory: React.FC<AvatarChatHistoryProps> = ({
     scrollToBottom();
   }, [messages]);
 
+  // Container owns chat state; this component is display-only. We surface feedback without mutating messages here.
+  function addSystemMessage(_text: string) {
+    // no-op in this presentation component
+  }
+
   return (
     <div>
       {messages.map((message, index) => {
@@ -287,29 +292,14 @@ const AvatarChatHistory: React.FC<AvatarChatHistoryProps> = ({
                                   // Refresh plans
                                   try { window.dispatchEvent(new CustomEvent('plansUpdated')); } catch {}
                                   // Show success message
-                                  setMessages(prev => [...prev, {
-                                    sender: 'other',
-                                    text: `${planType} lagt til!`,
-                                    time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
-                                    date: new Date().toLocaleDateString()
-                                  }]);
+                                  addSystemMessage(`${planType} lagt til!`);
                                 } else {
                                   // Show error message
-                                  setMessages(prev => [...prev, {
-                                    sender: 'other',
-                                    text: 'Kunne ikke legge til plan. Prøv igjen.',
-                                    time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
-                                    date: new Date().toLocaleDateString()
-                                  }]);
+                                  addSystemMessage('Kunne ikke legge til plan. Prøv igjen.');
                                 }
                               } catch (error) {
                                 console.error('Error applying plan:', error);
-                                setMessages(prev => [...prev, {
-                                  sender: 'other',
-                                  text: 'Kunne ikke legge til plan. Prøv igjen.',
-                                  time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
-                                  date: new Date().toLocaleDateString()
-                                }]);
+                                addSystemMessage('Kunne ikke legge til plan. Prøv igjen.');
                               }
                             }}
                             className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-md border bg-primary text-primary-foreground hover:bg-primary/90"
