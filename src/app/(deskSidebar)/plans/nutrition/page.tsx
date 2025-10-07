@@ -49,7 +49,7 @@ export default function NutritionPlanPage(){
       const meals: any[] = [];
       const headerIter = block.matchAll(/(^|\n)\s*(?:[-•]\s*)?\**\s*(Frokost|Lunsj|Middag|Kveldssnack|Kveldsmat|Snack|Breakfast|Lunch|Dinner)\s*\**\s*:?[\t ]*(?=\n|$)/gim);
       const headers: {name:string; index:number}[] = [];
-      for (const m of headerIter) headers.push({ name: m[2], index: (m as any).index as number });
+      for (const m of Array.from(headerIter)) headers.push({ name: (m as any)[2], index: (m as any).index as number });
       const endIdx = block.length;
       for (let h=0; h<headers.length; h++){
         const start = headers[h].index;
@@ -82,9 +82,9 @@ export default function NutritionPlanPage(){
       // Allow optional leading '###' and/or '**bold**'
       const headerRe = /(^|\n)\s*(?:#+\s*)?\**\s*(?:Dag\s*(\d+)|(Mandag|Tirsdag|Onsdag|Torsdag|Fredag|Lørdag|Søndag|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday))\s*\**\s*(?=\n|$)/gim;
       const matches: { label: string; index: number }[] = [];
-      for (const m of text.matchAll(headerRe)){
+      for (const m of Array.from(text.matchAll(headerRe))){
         const idx = (m as any).index as number;
-        const label = m[2] ? `Dag ${m[2]}` : (m[3] || '').replace(/^./, c=>c.toUpperCase());
+        const label = (m as any)[2] ? `Dag ${(m as any)[2]}` : (((m as any)[3] || '') as string).replace(/^./, c=>c.toUpperCase());
         // Advance to next line after the header token
         const afterHeader = text.slice(idx).match(/^[^\n]*\n/)?.[0]?.length || 0;
         matches.push({ label, index: idx + afterHeader });
