@@ -1,6 +1,6 @@
 "use client";
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = false;
 import { useEffect, useMemo, useState } from "react";
 import { useUserOnboardingContext } from "@/context/UserOnboarding";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
