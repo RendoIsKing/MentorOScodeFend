@@ -42,7 +42,7 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
   return (
     <div className={wrapperClass}>
       <nav className="mx-auto max-w-[680px] px-4">
-        <button aria-label="Feed switcher" data-test="feed-switcher" className="sr-only" />
+        {/* hidden mobile switcher removed to avoid test role collisions */}
         <ul className="grid grid-cols-3 text-center">
           {[
             { key: "foryou", label: "Feed" },

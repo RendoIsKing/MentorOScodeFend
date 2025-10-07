@@ -84,6 +84,7 @@ const Home = () => {
       <RealtimeBootstrap />
       <div className="hidden md:block">
         <main className="mx-auto max-w-[680px] px-4 pb-28">
+          <FeedHeader />
           <HomeFeedCarousel isMobile={false} />
         </main>
       </div>

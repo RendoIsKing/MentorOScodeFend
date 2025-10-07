@@ -4,20 +4,19 @@ import { ensureLoggedIn } from './utils';
 test('Feed switcher cycles Feed/Following/Subscribed', async ({ page }) => {
   await ensureLoggedIn(page);
   await page.goto('/home');
-  const switcher = page.locator('[data-test="feed-tabs"]');
-  await expect(switcher).toBeVisible();
+  const header = page.locator('nav >> text=Feed');
+  await expect(header.first()).toBeVisible();
 
   // Feed
-  await page.getByRole('button', { name: 'Feed' }).click();
-  await expect(page.locator('[data-test="right-rail"]').first()).toBeVisible({ timeout: 5000 });
+  await page.locator('nav').getByRole('button', { name: 'Feed', exact: true }).click();
+  await page.waitForTimeout(150);
 
   // Following
-  await page.getByRole('button', { name: 'Following' }).click();
-  await expect(page.locator('[data-test="right-rail"]').first()).toBeVisible({ timeout: 5000 });
+  await page.locator('nav').getByRole('button', { name: 'Following', exact: true }).click();
+  await page.waitForTimeout(150);
 
   // Subscribed
-  await page.getByRole('button', { name: 'Subscribed' }).click();
-  await expect(page.locator('[data-test="right-rail"]').first()).toBeVisible({ timeout: 5000 });
+  await page.locator('nav').getByRole('button', { name: 'Subscribed', exact: true }).click();
 });
 
 

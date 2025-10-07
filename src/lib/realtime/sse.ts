@@ -89,6 +89,7 @@ class RealtimeSseClient {
 
   private connect() {
     try {
+      try { (window as any).__SENTRY__?.addBreadcrumb?.({ category: 'sse', message: 'connect', level: 'info' }); } catch {}
       const es = new EventSource(this.url, { withCredentials: this.withCredentials } as any);
       this.es = es;
       this.backoffMs = 1000;
@@ -105,6 +106,7 @@ class RealtimeSseClient {
 
       es.addEventListener('open', () => {
         this.lastHeartbeatAt = Date.now();
+        try { (window as any).__SENTRY__?.addBreadcrumb?.({ category: 'sse', message: 'open', level: 'info' }); } catch {}
       });
 
       const bind = (name: keyof EventMap) => {
@@ -121,6 +123,7 @@ class RealtimeSseClient {
       (Object.keys(this.handlers) as (keyof EventMap)[]).forEach((k) => k !== '*' && bind(k));
 
       es.onerror = () => {
+        try { (window as any).__SENTRY__?.addBreadcrumb?.({ category: 'sse', message: `error/backoff ${this.backoffMs}ms`, level: 'warning' }); } catch {}
         // Will reconnect with backoff
         this.reconnect();
       };
