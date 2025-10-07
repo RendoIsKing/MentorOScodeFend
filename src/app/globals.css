@@ -78,7 +78,7 @@ body { overscroll-behavior-y: none; }
   }
 
   /* Sidebar typography:
-     Use the same font family as the MentorOS logotype (system fallback if custom not available).
+     Use the same font family as the Mentorio logotype (system fallback if custom not available).
      We keep sizes unchanged by only overriding font-family and font-weight.
   */
   .sidebar-text,
