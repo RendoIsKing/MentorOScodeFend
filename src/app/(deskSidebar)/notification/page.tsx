@@ -228,7 +228,7 @@ const Notification = () => {
               const notifTs = createdAt ? new Date(createdAt).getTime() : Number.MAX_SAFE_INTEGER;
               const alreadyUsed = new Set<string>([
                 ...Object.values(assignedCommentIdByNotif),
-                ...locallyChosen,
+                ...Array.from(locallyChosen),
               ]);
               // Prefer comments at or before notification time; pick closest not already used
               const sorted = byActor.slice().sort((a:any,b:any)=> new Date(a?.createdAt||0).getTime() - new Date(b?.createdAt||0).getTime());
