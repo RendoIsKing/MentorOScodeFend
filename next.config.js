@@ -67,9 +67,11 @@ const nextConfig = {
     })(),
   },
   async rewrites() {
-    const origin = process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:3006";
+    const origin = process.env.NEXT_PUBLIC_API_SERVER
+      || process.env.NEXT_PUBLIC_BACKEND_ORIGIN
+      || "http://localhost:3006";
     return [
-      // /api/backend/* -> http://localhost:3006/api/backend/*
+      // Proxy all FE calls under /api/backend/* to the real backend origin
       { source: "/api/backend/:path*", destination: `${origin}/api/backend/:path*` },
     ];
   },
