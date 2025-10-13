@@ -31,8 +31,15 @@ export async function middleware(request: NextRequest) {
   const userAuthToken = request.cookies.get("auth_token");
   const currentPath = request.nextUrl.pathname;
 
-  // Prefer env in production, but fall back to current request origin
-  const baseDomain = process.env.NEXT_PUBLIC_DOMAIN || request.nextUrl.origin;
+  // Normalize host and hard-redirect any app.* subdomain to the apex
+  const host = request.headers.get('host') || '';
+  if (host.startsWith('app.')) {
+    const target = `https://${host.replace(/^app\./, '')}${request.nextUrl.pathname}${request.nextUrl.search}${request.nextUrl.hash}`;
+    return NextResponse.redirect(target);
+  }
+
+  // Always base redirects on current host (without app.)
+  const baseDomain = `https://${host}`;
 
   // Public paths that don't require authentication
   const publicPaths = [
