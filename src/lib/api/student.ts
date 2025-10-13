@@ -151,4 +151,15 @@ export async function deleteWeightEntry(userId: string, date: string) {
   return res.json();
 }
 
+export async function fetchRecentChanges(
+  userId: string,
+  limit = 10
+) {
+  const id = userId === 'me' ? 'me' : encodeURIComponent(userId);
+  const url = `${BASE}/student/${id}/changes?limit=${limit}`;
+  const res = await fetch(url, { credentials: 'include', headers: { ...getAuthHeaders() } });
+  if (!res.ok) throw new Error('Failed to load changes');
+  return res.json();
+}
+
 

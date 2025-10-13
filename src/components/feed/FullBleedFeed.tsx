@@ -16,6 +16,7 @@ type Post = {
   id: string;
   type: 'image' | 'video';
   src: string;
+  visibility?: 'public' | 'followers' | 'subscribers';
   user?: {
     id?: string;
     username?: string;
@@ -240,6 +241,25 @@ const FullBleedItem = memo(function FullBleedItem({
       {/* Gradient for readability */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/60 to-transparent z-10" />
 
+      {/* Visibility badge */}
+      <div className="absolute left-3 top-3 z-30 pointer-events-none">
+        {post.visibility ? (
+          <span
+            data-test="visibility-badge"
+            className={cn(
+              "pointer-events-auto select-none rounded-full px-2 py-1 text-xs font-semibold",
+              post.visibility === 'public' ? 'bg-white/85 text-black' :
+              post.visibility === 'followers' ? 'bg-amber-400 text-black' :
+              'bg-emerald-400 text-black'
+            )}
+            aria-label={`Visibility: ${post.visibility}`}
+            title={`Visibility: ${post.visibility}`}
+          >
+            {post.visibility === 'public' ? 'Public' : post.visibility === 'followers' ? 'Followers' : 'Subscribers'}
+          </span>
+        ) : null}
+      </div>
+
       {/* Media as background only - do not intercept taps */}
       {post.type === 'video' ? (
         <video
@@ -262,6 +282,11 @@ const FullBleedItem = memo(function FullBleedItem({
           <RightOverlay post={post} />
         </div>
       ) : null}
+
+      {/* Report action (always available) */}
+      <div className="absolute right-3 top-3 z-30">
+        <ReportButton postId={post.id} />
+      </div>
 
       {/* Caption bar - always show if provided */}
       {post?.caption ? (
@@ -387,4 +412,42 @@ function formatRelativeTime(iso?: string) {
     const d = Math.floor(h / 24);
     return `${d}d`;
   } catch { return ""; }
+}
+
+// --- Visibility badge + Report button additions inside the feed item ---
+function ReportButton({ postId }: { postId: string }) {
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
+  const onReport = async () => {
+    if (busy || done) return;
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/backend/v1/post/${encodeURIComponent(postId)}/report`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: 'Inappropriate' }),
+        credentials: 'include',
+      });
+      if (res.ok) setDone(true);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setBusy(false);
+    }
+  };
+  if (done) return (
+    <span className="rounded-full bg-black/40 px-2 py-1 text-xs font-semibold text-white">Reported</span>
+  );
+  return (
+    <button
+      data-test="report-button"
+      onClick={(e) => { e.preventDefault(); e.stopPropagation(); onReport(); }}
+      disabled={busy}
+      className="rounded-full bg-black/40 px-2 py-1 text-xs font-semibold text-white hover:bg-black/60"
+      aria-label="Report post"
+      title="Report post"
+    >
+      {busy ? '…' : 'Report'}
+    </button>
+  );
 }

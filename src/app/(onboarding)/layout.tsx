@@ -16,7 +16,7 @@ export default function OnBoardingLayout({
         </div>
       )}
       {children}
-      {/* {!isMobile && <h1 className="fixed bottom-8">© 2024 MentorOS</h1>} */}
+      {/* {!isMobile && <h1 className="fixed bottom-8">© 2024 Mentorio</h1>} */}
     </div>
   );
 }

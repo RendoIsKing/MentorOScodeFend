@@ -11,6 +11,7 @@ import { useGetPostsQuery } from "@/redux/services/haveme/posts";
 import useFCM from "@/utils/hooks/useFCM";
 import { useUpdateFCMTokenMutation } from "@/redux/services/haveme/notifications";
 import { useUserOnboardingContext } from "@/context/UserOnboarding";
+import RealtimeBootstrap from '@/components/realtime/RealtimeBootstrap';
 
 const Home = () => {
   const { isMobile, orientation } = useClientHardwareInfo();
@@ -38,12 +39,23 @@ const Home = () => {
     }
   }, [fcmToken]);
 
-  // Fetch real posts for mobile full-bleed feed
+  // Determine current feed filter from localStorage ('feed' | 'following' | 'subscribed')
+  const filterKey = (() => {
+    try {
+      const raw = typeof window !== 'undefined' ? window.localStorage.getItem('homeFeedFilter') : null;
+      return (raw || 'feed').toLowerCase();
+    } catch {
+      return 'feed';
+    }
+  })();
+  // Map to backend filter enum values
+  const apiFilter = filterKey === 'following' ? 'FOLLOWING' : (filterKey === 'subscribed' ? 'SUBSCRIBED' : 'ALL');
+  // Fetch real posts for mobile full-bleed feed with mapped filter
   const { data: postDetails } = useGetPostsQuery({
     perPage: 10,
     page: 1,
     search: "",
-    filter: "foryou",
+    filter: apiFilter,
     includeSelf: true,
   } as any);
   const items = (postDetails as any)?.data ?? [];
@@ -63,12 +75,16 @@ const Home = () => {
       avatarUrl,
       viewerFollows: Boolean(p?.isFollowing),
     };
-    return [{ id: String(p._id ?? p.id), type: isVideo ? 'video' : 'image', src, user, caption: String(p?.content || ""), createdAt: p?.createdAt }];
+    const privacy: string | undefined = typeof p?.privacy === 'string' ? p.privacy.toLowerCase() : undefined;
+    const visibility = privacy === 'followers' ? 'followers' : (privacy === 'subscriber' ? 'subscribers' : (privacy === 'public' ? 'public' : undefined));
+    return [{ id: String(p._id ?? p.id), type: isVideo ? 'video' : 'image', src, user, caption: String(p?.content || ""), createdAt: p?.createdAt, visibility }];
   });
   return (
     <div className="min-h-[100dvh] bg-background">
+      <RealtimeBootstrap />
       <div className="hidden md:block">
         <main className="mx-auto max-w-[680px] px-4 pb-28">
+          <FeedHeader />
           <HomeFeedCarousel isMobile={false} />
         </main>
       </div>

@@ -8,6 +8,7 @@ import {
   IAppBanner,
   useNotificationBannerContext,
 } from "@/context/NotificationBanner";
+import FirstRunTos from '@/components/realtime/FirstRunTos';
 
 export default function HomeLayout({
   children,
@@ -18,6 +19,7 @@ export default function HomeLayout({
   const { banners } = useNotificationBannerContext();
   return (
     <>
+      <FirstRunTos />
       {isMobile && (
         <div className="">
           {children}

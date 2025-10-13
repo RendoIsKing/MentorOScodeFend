@@ -23,6 +23,7 @@ import {
   useSetDefaultCardMutation,
 } from "@/redux/services/haveme/card";
 import { cn } from "@/lib/utils";
+import { useState } from 'react';
 
 // TODO: Make this font definition dynamic
 const fontItalic = ABeeZee({
@@ -64,6 +65,7 @@ const cardArr = [
 
 const Wallet: React.FC = () => {
   const router = useRouter();
+  const [subStatus, setSubStatus] = useState<string>('');
 
   const { data: cardsData, isLoading } = useGetUserCardsQuery();
   return (
@@ -91,7 +93,7 @@ const Wallet: React.FC = () => {
       </div>
       <div className="mx-4 lg:mx-12">
         <div className={` text-xl my-4 ${fontItalic.className}`}>Services</div>
-        <div className="flex justify-between lg:justify-start">
+        <div className="flex justify-between lg:justify-start gap-2 flex-wrap">
           <div
             onClick={() => router.push("/wallet/transactions")}
             className="lg:flex lg:flex-col lg:justify-between rounded-xl bg-muted-foreground/20 w-1/2 lg:w-3/12 lg:h-32 p-3 mr-2 lg:cursor-pointer"
@@ -111,7 +113,28 @@ const Wallet: React.FC = () => {
             </div>
           </div>
           <div
-            onClick={() => router.push("/wallet/help-support")}
+            data-test="wallet-help-support"
+            onClick={async () => {
+              try {
+                setSubStatus('');
+                const apiBase = process.env.NEXT_PUBLIC_API_SERVER ? `${process.env.NEXT_PUBLIC_API_SERVER}/v1` : '/api/backend/v1';
+                const r = await fetch(`${apiBase}/payments/create-session`, { method:'POST', credentials:'include' });
+                const j = await r.json().catch(()=>({}));
+                if (r.ok && j?.data?.clientSecret) {
+                  setSubStatus(`Client secret created: ${j.data.clientSecret.slice(0,8)}…`);
+                  // Quick entitlement check
+                  try {
+                    const gate = await fetch('/api/backend/v1/feature/protected-check', { credentials:'include' });
+                    if (gate.status === 403) setSubStatus((s)=> s + ' • gated (403)');
+                    if (gate.status === 200) setSubStatus((s)=> s + ' • entitled (200)');
+                  } catch {}
+                } else {
+                  setSubStatus('Failed to create session');
+                }
+              } catch {
+                setSubStatus('Failed to create session');
+              }
+            }}
             className="lg:flex lg:flex-col lg:justify-between rounded-xl bg-muted-foreground/20 w-1/2 lg:w-3/12 p-3 ml-2 lg:cursor-pointer"
           >
             <div className="mt-2 mb-3">
@@ -128,7 +151,61 @@ const Wallet: React.FC = () => {
               </div>
             </div>
           </div>
+          {/* Subscribe CTA */}
+          <div
+            onClick={async () => {
+              try {
+                setSubStatus('');
+                const apiBase = process.env.NEXT_PUBLIC_API_SERVER ? `${process.env.NEXT_PUBLIC_API_SERVER}/v1` : '/api/backend/v1';
+                const key = `idem-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                const r = await fetch(`${apiBase}/payments/create-session`, { method:'POST', credentials:'include', headers: { 'Idempotency-Key': key } });
+                const j = await r.json().catch(()=>({}));
+                if (r.ok && j?.data?.clientSecret) {
+                  setSubStatus(`Checkout started • ${j.data.clientSecret.slice(0,8)}…`);
+                  // Poll entitlement status (payments/status), fall back to protected-check
+                  let tries = 0; const maxTries = 20;
+                  const tick = async () => {
+                    tries++;
+                    try {
+                      const st = await fetch(`${apiBase}/payments/status`, { credentials:'include' });
+                      if (st.ok) {
+                        const sj = await st.json().catch(()=>({}));
+                        if (sj?.active) { setSubStatus('Entitled (active=true)'); return; }
+                      }
+                    } catch {}
+                    try {
+                      const gate = await fetch(`${apiBase}/feature/protected-check`, { credentials:'include' });
+                      if (gate.status === 200) { setSubStatus('Entitled (200)'); return; }
+                    } catch {}
+                    if (tries < maxTries) setTimeout(tick, 1500);
+                    else setSubStatus((s)=> s ? s + ' • timed out' : 'Timed out');
+                  };
+                  tick();
+                } else {
+                  setSubStatus('Failed to start checkout');
+                }
+              } catch {
+                setSubStatus('Failed to start checkout');
+              }
+            }}
+            className="lg:flex lg:flex-col lg:justify-between rounded-xl bg-muted-foreground/20 w-full lg:w-3/12 p-3 lg:cursor-pointer"
+          >
+            <div className="mt-2 mb-3">
+              <img
+                src="/assets/images/wallets/Payments.svg"
+                alt="subscribe"
+                className="text-primary lg:w-auto lg:h-auto w-8 h-8"
+              />
+            </div>
+            <div className="flex justify-between">
+              <div className={` ${fontItalic.className}`}>Subscribe</div>
+              <div>
+                <ChevronRight className="text-primary" />
+              </div>
+            </div>
+          </div>
         </div>
+        {subStatus ? (<div data-test="wallet-client-secret" className="mt-3 text-sm text-muted-foreground">{subStatus}</div>) : null}
       </div>
     </div>
   );

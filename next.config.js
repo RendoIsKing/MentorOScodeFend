@@ -48,24 +48,30 @@ const nextConfig = {
   reactStrictMode: false, // Add reactStrictMode option here
   images: {
     remotePatterns: (() => {
+      const patterns = [];
       const v = process.env.NEXT_PUBLIC_API_SERVER;
-      if (!v || !/^https?:\/\//.test(v)) return [];
-      try {
-        const u = new URL(v);
-        return [{
-          protocol: u.protocol.replace(':',''),
-          hostname: u.hostname,
-          port: u.port || '',
-        }];
-      } catch {
-        return [];
+      if (v && /^https?:\/\//.test(v)) {
+        try {
+          const u = new URL(v);
+          patterns.push({
+            protocol: u.protocol.replace(':',''),
+            hostname: u.hostname,
+            port: u.port || '',
+            pathname: '/**',
+          });
+        } catch {}
       }
+      // Always allow local backend during dev
+      patterns.push({ protocol: 'http', hostname: 'localhost', port: '3006', pathname: '/**' });
+      return patterns;
     })(),
   },
   async rewrites() {
-    const origin = process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:3006";
+    const origin = process.env.NEXT_PUBLIC_API_SERVER
+      || process.env.NEXT_PUBLIC_BACKEND_ORIGIN
+      || "http://localhost:3006";
     return [
-      // /api/backend/* -> http://localhost:3006/api/backend/*
+      // Proxy all FE calls under /api/backend/* to the real backend origin
       { source: "/api/backend/:path*", destination: `${origin}/api/backend/:path*` },
     ];
   },

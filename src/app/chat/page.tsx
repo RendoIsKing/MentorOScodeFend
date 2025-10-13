@@ -37,8 +37,8 @@ export default function CoachEnghChat() {
         setMessages([...newMessages, { sender: "coach", text: reply.reply }]);
       }
 
-      if (action && !action.noAction && action.summary) {
-        toast({ description: `Applied: ${action.summary}` });
+      if (action && !action.noAction && ('summary' in (action as any)) && (action as any).summary) {
+        toast({ description: `Applied: ${(action as any).summary}` });
         try {
           // Notify Student Center (and any listeners) to refresh snapshot
           window.dispatchEvent(new Event('plansUpdated'));
