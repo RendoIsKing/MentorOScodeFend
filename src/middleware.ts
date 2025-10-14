@@ -121,7 +121,13 @@ export async function middleware(request: NextRequest) {
       currentPath.startsWith(path)
     );
 
-    // Redirect authenticated users away from auth pages
+    // If we just came from verify-otp, always send to the first onboarding step
+    const fromVerify = request.nextUrl.searchParams.get("from") === "verify";
+    if (fromVerify) {
+      return NextResponse.redirect(new URL("/user-info", baseDomain));
+    }
+
+    // Redirect authenticated users away from auth pages if fully onboarded
     if (isPublicPath && allStepsCompleted && process.env.NODE_ENV === "production") {
       return NextResponse.redirect(
         new URL("/home", baseDomain)

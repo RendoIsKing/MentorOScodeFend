@@ -71,8 +71,8 @@ export default function VerifyOtpPage() {
       })
         .unwrap()
         .then((res) => {
-          //console.log("res", res);
-          router.replace("/user-info");
+          // After OTP, force onboarding start
+          router.replace("/user-info?from=verify");
 
           toast({
             variant: "success",
@@ -94,8 +94,8 @@ export default function VerifyOtpPage() {
       })
         .unwrap()
         .then((res) => {
-          //console.log("res", res);
-          router.replace("/user-info");
+          // After OTP, force onboarding start
+          router.replace("/user-info?from=verify");
 
           toast({
             variant: "success",
