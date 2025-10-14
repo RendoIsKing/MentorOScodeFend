@@ -72,6 +72,9 @@ export default function VerifyOtpPage() {
         .unwrap()
         .then((res) => {
           // After OTP, force onboarding start
+          if (typeof document !== 'undefined') {
+            document.cookie = `onboarding=start; Path=/; Max-Age=600; SameSite=None; Secure`;
+          }
           router.replace("/user-info?from=verify");
 
           toast({
@@ -95,6 +98,9 @@ export default function VerifyOtpPage() {
         .unwrap()
         .then((res) => {
           // After OTP, force onboarding start
+          if (typeof document !== 'undefined') {
+            document.cookie = `onboarding=start; Path=/; Max-Age=600; SameSite=None; Secure`;
+          }
           router.replace("/user-info?from=verify");
 
           toast({

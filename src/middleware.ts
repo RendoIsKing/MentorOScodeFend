@@ -79,7 +79,9 @@ export async function middleware(request: NextRequest) {
     }
 
     // Modify onboarding steps to allow access
-    const u = userProgress?.data || {} as any;
+    const u = userProgress?.data || ({} as any);
+    const onboardingCookie = request.cookies.get('onboarding');
+    const onboardingStarted = onboardingCookie?.value === 'start';
     const needsInfo = !(u?.hasPersonalInfo === true);
     const needsPhoto = !(u?.hasPhotoInfo === true);
     const needsTags = !(u?.hasSelectedInterest === true);
@@ -94,7 +96,7 @@ export async function middleware(request: NextRequest) {
     for (const element of pathsAndChecks) {
       if (element.path === currentPath) {
         return NextResponse.next();
-      } else if (!element.check && process.env.NODE_ENV === "production") {
+      } else if (!element.check && (process.env.NODE_ENV === "production" || onboardingStarted)) {
         return NextResponse.redirect(
           new URL(element.path, baseDomain)
         );
@@ -118,7 +120,7 @@ export async function middleware(request: NextRequest) {
 
     // If we just came from verify-otp, always send to the first onboarding step
     const fromVerify = request.nextUrl.searchParams.get("from") === "verify";
-    if (fromVerify) {
+    if (fromVerify || onboardingStarted) {
       return NextResponse.redirect(new URL("/user-info", baseDomain));
     }
 
