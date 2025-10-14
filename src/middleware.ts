@@ -10,13 +10,8 @@ async function getUserProgress(request: NextRequest, userAuthToken: string) {
       : `${request.nextUrl.origin}/api/backend`;
 
     const headers: Record<string, string> = {};
-    if (process.env.NEXT_PUBLIC_API_SERVER) {
-      // When talking directly to the backend, prefer Bearer auth
-      headers["Authorization"] = `Bearer ${userAuthToken}`;
-    } else if (userAuthToken) {
-      // When using the Next proxy, forward the cookie for session auth
-      headers["cookie"] = `auth_token=${userAuthToken}`;
-    }
+    // Prefer cookie-based auth to avoid CORS preflight with Authorization header
+    if (userAuthToken) headers["cookie"] = `auth_token=${userAuthToken}`;
 
     const response = await fetch(`${apiBase}/v1/auth/me`, { method: "GET", headers });
     const data = await response.json();
