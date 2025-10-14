@@ -79,10 +79,9 @@ export const havemeApi = createApi({
     baseUrl: `${process.env.NEXT_PUBLIC_API_SERVER || defaultBase}/v1`,
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as RootState).auth.token;
-      if (token) {
-        headers.set("authorization", `Bearer ${token}`);
-      }
+      // Avoid Authorization header to prevent CORS preflight; rely on cookie session
+      // const token = (getState() as RootState).auth.token;
+      // if (token) headers.set("authorization", `Bearer ${token}`);
       headers.set("ngrok-skip-browser-warning", "123");
       return headers;
     },

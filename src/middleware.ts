@@ -4,10 +4,8 @@ import type { NextRequest } from "next/server";
 async function getUserProgress(request: NextRequest, userAuthToken: string) {
   try {
     // Always use an absolute URL inside middleware
-    const configured = process.env.NEXT_PUBLIC_API_SERVER;
-    const apiBase = configured && /^https?:\/\//.test(configured)
-      ? configured
-      : `${request.nextUrl.origin}/api/backend`;
+    // Always proxy via Next origin to avoid cross-site preflight inside middleware
+    const apiBase = `${request.nextUrl.origin}/api/backend`;
 
     const headers: Record<string, string> = {};
     // Prefer cookie-based auth to avoid CORS preflight with Authorization header
