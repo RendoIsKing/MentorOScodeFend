@@ -34,8 +34,11 @@ export const UserOnboardingContextProvider = (props: any) => {
   const isLoggedIn = useTypedSelector(selectIsAuthenticated);
   const router = useRouter();
 
+  const hasSessionCookie = typeof document !== 'undefined' && document.cookie.includes('auth_token=');
+
   const { userData, isUserDataLoading } = useGetUserDetailsQuery(undefined, {
-    skip: !isLoggedIn,
+    // Only fetch when a session cookie is present to avoid CORS/preflight loops
+    skip: !hasSessionCookie,
     selectFromResult: ({ data, isLoading }) => {
       return {
         userData: data?.data,

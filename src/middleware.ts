@@ -49,8 +49,8 @@ export async function middleware(request: NextRequest) {
   // Initial onboarding path that should be accessible after signup
   const isInitialOnboardingPath = currentPath === "/user-info";
 
-  // Allow access to initial onboarding path if auth token exists
-  if (isInitialOnboardingPath && userAuthToken) {
+  // Allow access to initial onboarding path without forcing /auth/me first
+  if (isInitialOnboardingPath) {
     return NextResponse.next();
   }
 
