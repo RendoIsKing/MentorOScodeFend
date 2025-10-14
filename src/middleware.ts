@@ -86,10 +86,14 @@ export async function middleware(request: NextRequest) {
     }
 
     // Modify onboarding steps to allow access
+    const u = userProgress?.data || {} as any;
+    const needsInfo = !(u?.hasPersonalInfo === true);
+    const needsPhoto = !(u?.hasPhotoInfo === true);
+    const needsTags = !(u?.hasSelectedInterest === true);
     const pathsAndChecks = [
-      { path: "/user-info", check: true },
-      { path: "/user-photo", check: true },
-      { path: "/user-tags", check: true },
+      { path: "/user-info", check: !needsInfo },
+      { path: "/user-photo", check: !needsPhoto },
+      { path: "/user-tags", check: !needsTags },
       { path: "/age-confirmation", check: true },
     ];
 
@@ -104,9 +108,7 @@ export async function middleware(request: NextRequest) {
       }
     }
 
-    const allStepsCompleted = pathsAndChecks.every(
-      (element) => element.check
-    );
+    const allStepsCompleted = pathsAndChecks.every((element) => element.check);
 
     // Routes that require subscription
     const subscriptionRequiredPaths = [
