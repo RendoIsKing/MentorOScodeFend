@@ -82,7 +82,7 @@ export const havemeApi = createApi({
       // Avoid Authorization header to prevent CORS preflight; rely on cookie session
       // const token = (getState() as RootState).auth.token;
       // if (token) headers.set("authorization", `Bearer ${token}`);
-      headers.set("ngrok-skip-browser-warning", "123");
+      // Do not set any custom headers; they trigger CORS preflight on GET
       return headers;
     },
   }),

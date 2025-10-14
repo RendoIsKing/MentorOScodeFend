@@ -11,7 +11,7 @@ async function getUserProgress(request: NextRequest, userAuthToken: string) {
     // Prefer cookie-based auth to avoid CORS preflight with Authorization header
     if (userAuthToken) headers["cookie"] = `auth_token=${userAuthToken}`;
 
-    const response = await fetch(`${apiBase}/v1/auth/me`, { method: "GET", headers });
+    const response = await fetch(`${apiBase}/v1/auth/me`, { method: "GET", headers, cache: 'no-store' });
     const data = await response.json();
     return data;
   } catch (error) {
