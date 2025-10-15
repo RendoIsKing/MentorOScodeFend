@@ -54,16 +54,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // If no token and trying to access protected route
+  // If no token and trying to access protected route → always require signin
   if (!userAuthToken && !isPublicPath) {
-    // Check if the user is already on /signin, /signup, /forgotpassword, or /
+    // Allow auth pages and root to render
     if (currentPath === "/signin" || currentPath === "/signup" || currentPath === "/forgotpassword" || currentPath === "/") {
       return NextResponse.next();
     }
-    if (process.env.NODE_ENV === "production") {
-      const signupUrl = new URL("/signin", baseDomain);
-      return NextResponse.redirect(signupUrl);
-    }
+    const signinUrl = new URL("/signin", baseDomain);
+    return NextResponse.redirect(signinUrl);
   }
 
   // No special redirect for inbox
@@ -72,10 +70,10 @@ export async function middleware(request: NextRequest) {
   if (userAuthToken?.value) {
     const userProgress = await getUserProgress(request, userAuthToken.value);
 
-    // If failed to fetch user progress, redirect to signup
-    if (!userProgress?.data && process.env.NODE_ENV === "production") {
-      const signupUrl = new URL("/signup", baseDomain);
-      return NextResponse.redirect(signupUrl);
+    // If failed to fetch user progress, redirect to signin (token invalid/expired)
+    if (!userProgress?.data) {
+      const signinUrl = new URL("/signin", baseDomain);
+      return NextResponse.redirect(signinUrl);
     }
 
     // Modify onboarding steps to allow access
