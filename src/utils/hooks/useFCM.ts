@@ -13,6 +13,7 @@ const useFCM = () => {
     if (!("serviceWorker" in navigator)) return;
 
     const fcmmessaging = messaging();
+    if (!fcmmessaging) return; // Firebase not configured in this env
     const unsubscribe = onMessage(fcmmessaging, (payload) => {
       setMessages((messages) => [...messages, payload]);
     });

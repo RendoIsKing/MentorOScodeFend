@@ -15,9 +15,17 @@ const firebaseConfig: FirebaseOptions = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
-const firebaseapp = initializeApp(firebaseConfig);
+// Initialize Firebase only when required envs are present
+let firebaseapp: ReturnType<typeof initializeApp> | null = null;
+try {
+  if (firebaseConfig.projectId && firebaseConfig.apiKey && firebaseConfig.appId) {
+    firebaseapp = initializeApp(firebaseConfig);
+  }
+} catch {}
 
-export const messaging = () => getMessaging(firebaseapp);
+export const messaging = () => {
+  if (!firebaseapp) return null as any;
+  return getMessaging(firebaseapp);
+};
 
 export default firebaseapp;
