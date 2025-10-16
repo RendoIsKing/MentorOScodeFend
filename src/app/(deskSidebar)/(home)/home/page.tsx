@@ -49,7 +49,7 @@ const Home = () => {
     }
   })();
   // Map to backend filter enum values
-  const apiFilter = filterKey === 'following' ? 'FOLLOWING' : (filterKey === 'subscribed' ? 'SUBSCRIBED' : 'ALL');
+  const apiFilter = filterKey === 'following' ? 'following' : (filterKey === 'subscribed' ? 'subscribed' : 'all');
   // Fetch real posts for mobile full-bleed feed with mapped filter
   const { data: postDetails } = useGetPostsQuery({
     perPage: 10,

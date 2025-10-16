@@ -64,8 +64,11 @@ export const postsApi = havemeApi.injectEndpoints({
     getPosts: builder.query<IPostContentResponse, IGetPostContentRequest>({
       providesTags: [TAG_GET_FILE_INFO],
       query: (body) => {
-        let { page = 1, perPage = 10, search, filter = "all" } = body;
-        let url = `/post?page=${page}&perPage=${perPage}&search=${search}&filter=${filter}`;
+        let { page = 1, perPage = 10, search = "", filter = "all", includeSelf } = body as any;
+        // Accept both enum (ALL) and string (all)
+        const normalizedFilter = String(filter || 'all').toLowerCase();
+        let url = `/post?page=${page}&perPage=${perPage}&search=${encodeURIComponent(search)}&filter=${normalizedFilter}`;
+        if (typeof includeSelf !== 'undefined') url += `&includeSelf=${includeSelf}`;
         return {
           url: url,
           method: "GET",

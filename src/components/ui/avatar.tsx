@@ -27,6 +27,7 @@ const AvatarImage = React.forwardRef<
   <AvatarPrimitive.Image
     ref={ref}
     className={cn("aspect-square h-full w-full object-cover", className)}
+    onError={(e)=>{ try { (e.target as HTMLImageElement).style.display='none'; } catch {} }}
     {...props}
   />
 ))
