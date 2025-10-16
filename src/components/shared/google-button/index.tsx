@@ -4,6 +4,8 @@ import { GoogleLogin } from "@react-oauth/google";
 type Props = { label?: string };
 
 const GoogleButton: React.FC<Props> = ({ label = "Continue with Google" }) => {
+  // Hide button entirely if client ID is not configured in this environment
+  if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) return null;
   const apiBase = process.env.NEXT_PUBLIC_API_SERVER || "/api/backend";
   return (
     <div className="flex items-center justify-center pt-2">
