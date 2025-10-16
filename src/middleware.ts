@@ -43,6 +43,11 @@ export async function middleware(request: NextRequest) {
     "/admin",
   ];
 
+  // Skip the old tags step entirely – redirect requests hitting it
+  if (request.nextUrl.pathname === "/user-tags") {
+    return NextResponse.redirect(new URL("/age-confirmation", baseDomain));
+  }
+
   // Check if current path is public
   const isPublicPath = publicPaths.includes(currentPath);
 
@@ -82,11 +87,11 @@ export async function middleware(request: NextRequest) {
     const onboardingStarted = onboardingCookie?.value === 'start';
     const needsInfo = !(u?.hasPersonalInfo === true);
     const needsPhoto = !(u?.hasPhotoInfo === true);
-    const needsTags = !(u?.hasSelectedInterest === true);
+    // We no longer require the tags step in onboarding
+    const needsTags = false;
     const pathsAndChecks = [
       { path: "/user-info", check: !needsInfo },
       { path: "/user-photo", check: !needsPhoto },
-      { path: "/user-tags", check: !needsTags },
       { path: "/age-confirmation", check: true },
     ];
 

@@ -49,7 +49,8 @@ export const UserOnboardingContextProvider = (props: any) => {
 
   const USER_INFO = "/user-info";
   const USER_PHOTO = "/user-photo";
-  const USER_TAGS = "/user-tags";
+  // Tags step removed
+  const USER_TAGS = "/age-confirmation";
   const AGE_CONFIRMATION = "/age-confirmation";
   const HOME = "/home";
 
@@ -60,8 +61,9 @@ export const UserOnboardingContextProvider = (props: any) => {
           return USER_INFO;
         case !userData.hasPhotoInfo:
           return USER_PHOTO;
+        // Skip selected interest step
         case !userData.hasSelectedInterest:
-          return USER_TAGS;
+          return AGE_CONFIRMATION;
         default:
           return HOME;
       }
