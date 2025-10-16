@@ -6,8 +6,7 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { ABeeZee } from "next/font/google";
 import { FormMessage } from "@/components/ui/form";
-import GoogleButton from "../google-button";
-import CustomHr from "../custom-hr";
+// Google button and separator are now controlled by pages to avoid duplicates
 import PasswordInput from "@/components/password-input";
 import { useFormContext } from "react-hook-form";
 import PhoneEmailInput from "@/components/PhoneEmailInput";
@@ -99,12 +98,7 @@ const AuthInputs = ({ type }) => {
           ? "Continue"
           : "Forget"}
       </Button>
-      {(type !== "forgot" || type !== "reset") && (
-        <>
-          <GoogleButton />
-          <CustomHr />
-        </>
-      )}
+      {/* Google button rendered by page (signin/signup) to avoid duplicates */}
       {type === "signin" && (
         <div className="w-full text-center mt-2">
           <Link

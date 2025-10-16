@@ -17,6 +17,7 @@ import { signinFormSchema } from "@/schemas/auth";
 import { setAuthData } from "@/redux/slices/auth";
 import AddToHomescreenPrompt from "@/components/shared/AddToHomescreenPrompt";
 import GoogleButton from "@/components/shared/google-button";
+import CustomHr from "@/components/shared/custom-hr";
 
 const Signin = () => {
   const { isMobile } = useClientHardwareInfo();
@@ -131,6 +132,7 @@ const Signin = () => {
                 </Form>
                 <div className="mt-4">
                   <GoogleButton mode="signin" />
+                  <CustomHr />
                 </div>
               </div>
             </div>

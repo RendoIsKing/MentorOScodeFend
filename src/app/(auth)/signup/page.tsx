@@ -19,6 +19,7 @@ import { useCountryCodeContext } from "@/context/countryCodeContext";
 import { phoneNumberRefine } from "@/lib/utils";
 import AddToHomescreenPrompt from "@/components/shared/AddToHomescreenPrompt";
 import GoogleButton from "@/components/shared/google-button";
+import CustomHr from "@/components/shared/custom-hr";
 
 const Signup = () => {
   const { countryCode } = useCountryCodeContext();
@@ -162,6 +163,7 @@ const Signup = () => {
                 </Form>
                 <div className="mt-4">
                   <GoogleButton mode="signup" />
+                  <CustomHr />
                 </div>
               </div>
             </div>
