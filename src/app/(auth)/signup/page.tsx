@@ -161,7 +161,7 @@ const Signup = () => {
                   </form>
                 </Form>
                 <div className="mt-4">
-                  <GoogleButton />
+                  <GoogleButton mode="signup" />
                 </div>
               </div>
             </div>
