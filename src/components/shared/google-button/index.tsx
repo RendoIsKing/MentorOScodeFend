@@ -12,10 +12,16 @@ const GoogleButton: React.FC<Props> = ({ label = "Continue with Google", mode = 
   const apiBase = process.env.NEXT_PUBLIC_API_SERVER || "/api/backend";
   return (
     <div className="flex items-center justify-center pt-2">
-      <div className="w-full">
+      <div className="w-full flex justify-center">
         <GoogleLogin
-          // Prefer Google-provided label when possible
+          // Force Google to show correct wording and centered large button
           text={mode === "signup" ? ("signup_with" as any) : ("signin_with" as any)}
+          context={mode === "signup" ? ("signup" as any) : ("signin" as any)}
+          shape={"rectangular" as any}
+          theme={"outline" as any}
+          size={"large" as any}
+          logo_alignment={"left" as any}
+          width={270 as any}
           onSuccess={async (cred) => {
             try {
               const idToken = cred.credential;
