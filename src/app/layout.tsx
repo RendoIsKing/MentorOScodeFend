@@ -77,36 +77,67 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
-              <Elements stripe={stripePromise}>
-                <HomeHeaderFilterProvider>
-                  <ScreenOrientationProvider>
-                    <UserOnboardingContextProvider>
-                      <NotificationBannerContextProvider>
-                        <PostModalProvider>
-                          <UserTagsContextProvider>
-                            <CountryCodeProvider>
-                            <PushInit />
-                            <div className="absolute top-20 z-50 opacity-50 right-0">
-                              <ModeToggle />
-                            </div>
-                            <div className="pb-tabbar md:pb-0">
-                              <ErrorBoundary fallback={<div className="p-4 text-muted-foreground text-sm">Kunne ikke laste. Prøv å oppdatere.</div>}>
-                                {postslot}
-                                {children}
-                              </ErrorBoundary>
-                            </div>
-                            <MobileTabBar />
-                            <Toaster />
-                            </CountryCodeProvider>
-                          </UserTagsContextProvider>
-                        </PostModalProvider>
-                      </NotificationBannerContextProvider>
-                    </UserOnboardingContextProvider>
-                  </ScreenOrientationProvider>
-                </HomeHeaderFilterProvider>
-              </Elements>
-              </GoogleOAuthProvider>
+              {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
+                <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string}>
+                  <Elements stripe={stripePromise}>
+                    <HomeHeaderFilterProvider>
+                      <ScreenOrientationProvider>
+                        <UserOnboardingContextProvider>
+                          <NotificationBannerContextProvider>
+                            <PostModalProvider>
+                              <UserTagsContextProvider>
+                                <CountryCodeProvider>
+                                <PushInit />
+                                <div className="absolute top-20 z-50 opacity-50 right-0">
+                                  <ModeToggle />
+                                </div>
+                                <div className="pb-tabbar md:pb-0">
+                                  <ErrorBoundary fallback={<div className="p-4 text-muted-foreground text-sm">Kunne ikke laste. Prøv å oppdatere.</div>}>
+                                    {postslot}
+                                    {children}
+                                  </ErrorBoundary>
+                                </div>
+                                <MobileTabBar />
+                                <Toaster />
+                                </CountryCodeProvider>
+                              </UserTagsContextProvider>
+                            </PostModalProvider>
+                          </NotificationBannerContextProvider>
+                        </UserOnboardingContextProvider>
+                      </ScreenOrientationProvider>
+                    </HomeHeaderFilterProvider>
+                  </Elements>
+                </GoogleOAuthProvider>
+              ) : (
+                <Elements stripe={stripePromise}>
+                  <HomeHeaderFilterProvider>
+                    <ScreenOrientationProvider>
+                      <UserOnboardingContextProvider>
+                        <NotificationBannerContextProvider>
+                          <PostModalProvider>
+                            <UserTagsContextProvider>
+                              <CountryCodeProvider>
+                              <PushInit />
+                              <div className="absolute top-20 z-50 opacity-50 right-0">
+                                <ModeToggle />
+                              </div>
+                              <div className="pb-tabbar md:pb-0">
+                                <ErrorBoundary fallback={<div className="p-4 text-muted-foreground text-sm">Kunne ikke laste. Prøv å oppdatere.</div>}>
+                                  {postslot}
+                                  {children}
+                                </ErrorBoundary>
+                              </div>
+                              <MobileTabBar />
+                              <Toaster />
+                              </CountryCodeProvider>
+                            </UserTagsContextProvider>
+                          </PostModalProvider>
+                        </NotificationBannerContextProvider>
+                      </UserOnboardingContextProvider>
+                    </ScreenOrientationProvider>
+                  </HomeHeaderFilterProvider>
+                </Elements>
+              )}
             </ThemeProvider>
           </Provider>
         </main>
