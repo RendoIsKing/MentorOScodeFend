@@ -16,6 +16,7 @@ import { useAppDispatch } from "@/redux/store";
 import { signinFormSchema } from "@/schemas/auth";
 import { setAuthData } from "@/redux/slices/auth";
 import AddToHomescreenPrompt from "@/components/shared/AddToHomescreenPrompt";
+import GoogleButton from "@/components/shared/google-button";
 
 const Signin = () => {
   const { isMobile } = useClientHardwareInfo();
@@ -128,6 +129,9 @@ const Signin = () => {
                     />
                   </form>
                 </Form>
+                <div className="mt-4">
+                  <GoogleButton />
+                </div>
               </div>
             </div>
           </div>

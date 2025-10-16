@@ -22,6 +22,7 @@ import { useUpdateFCMTokenMutation } from "@/redux/services/haveme/notifications
 import dynamic from "next/dynamic";
 import ErrorBoundary from "@/components/common/ErrorBoundary";
 import type { Viewport } from "next";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const fontNormal = ABeeZee({
   subsets: ["latin"],
@@ -76,6 +77,7 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
+              <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
               <Elements stripe={stripePromise}>
                 <HomeHeaderFilterProvider>
                   <ScreenOrientationProvider>
@@ -104,6 +106,7 @@ export default function RootLayout({
                   </ScreenOrientationProvider>
                 </HomeHeaderFilterProvider>
               </Elements>
+              </GoogleOAuthProvider>
             </ThemeProvider>
           </Provider>
         </main>

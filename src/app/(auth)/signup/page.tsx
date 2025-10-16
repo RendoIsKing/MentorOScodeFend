@@ -18,6 +18,7 @@ import { signupFormSchema } from "@/schemas/auth";
 import { useCountryCodeContext } from "@/context/countryCodeContext";
 import { phoneNumberRefine } from "@/lib/utils";
 import AddToHomescreenPrompt from "@/components/shared/AddToHomescreenPrompt";
+import GoogleButton from "@/components/shared/google-button";
 
 const Signup = () => {
   const { countryCode } = useCountryCodeContext();
@@ -159,6 +160,9 @@ const Signup = () => {
                     />
                   </form>
                 </Form>
+                <div className="mt-4">
+                  <GoogleButton />
+                </div>
               </div>
             </div>
           </div>
