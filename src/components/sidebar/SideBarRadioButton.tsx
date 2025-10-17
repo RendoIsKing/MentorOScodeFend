@@ -36,7 +36,7 @@ const SideBarRadioButton = () => {
   const { toggleContentUploadOpen } = useContentUploadContext();
   const { user } = useUserOnboardingContext();
   const auth = useTypedSelector((state) => state.auth);
-  const currentUserName = user?.userName || auth?.authenticated?.user?.userName;
+  const currentUserName = (user?.userName || auth?.authenticated?.user?.userName || '').toString();
 
   const handleButtonClick = (
     buttonIndex: number,
@@ -129,7 +129,7 @@ const SideBarRadioButton = () => {
     {
       id: 8,
       name: "Profile",
-      url: currentUserName ? `/${currentUserName}` : "/home",
+      url: currentUserName ? `/${currentUserName}` : "/signin",
       icon: <CircleUserRound size={30} strokeWidth={1.5} absoluteStrokeWidth />,
       segment: currentUserName,
       hasDocumentVerified: false, // Enable button
