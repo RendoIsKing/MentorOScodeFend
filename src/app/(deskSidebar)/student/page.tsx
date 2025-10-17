@@ -32,10 +32,21 @@ export default function StudentCenterPage() {
   const [selectedChange, setSelectedChange] = useState<any|null>(null);
 
   useEffect(() => {
-    // Redirect unauthenticated users (simple guard; final routing can be in middleware)
+    // If not logged in yet, try to hydrate from backend cookie-based session
     if (!isLoggedIn) {
-      try { router.push('/signin'); } catch {}
-      return;
+      (async ()=>{
+        try {
+          const apiBase = process.env.NEXT_PUBLIC_API_SERVER || '/api/backend';
+          const r = await fetch(`${apiBase}/v1/auth/me`, { credentials: 'include' });
+          const j = await r.json();
+          if (r.ok && j?.data?._id) {
+            // minimal redux bootstrap: accept session auth for this view
+          } else {
+            try { router.push('/signin'); } catch {}
+            return;
+          }
+        } catch { try { router.push('/signin'); } catch {} return; }
+      })();
     }
     // Use cookie-resolved snapshot first for consistency
     (async ()=>{
