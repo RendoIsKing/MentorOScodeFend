@@ -41,6 +41,7 @@ export async function middleware(request: NextRequest) {
     "/signin",
     "/forgotpassword",
     "/admin",
+    "/google-user-info",
   ];
 
   // Skip the old tags step entirely – redirect requests hitting it
@@ -148,6 +149,7 @@ export const config = {
     "/signup",
     "/verify-otp",
     "/user-info",
+    "/google-user-info",
     "/user-photo",
     "/user-tags",
     "/age-confirmation",

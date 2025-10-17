@@ -34,8 +34,17 @@ const GoogleButton: React.FC<Props> = ({ label = "Continue with Google", mode = 
               });
               const body = await res.json();
               if (!res.ok) throw new Error(body?.message || "Google login failed");
-              // Consumers should read cookie or redux via me endpoint afterwards
-              window.location.href = "/home";
+              
+              // Check if user needs onboarding (new Google user)
+              const isNewUser = body?.isNewUser || false;
+              
+              if (isNewUser) {
+                // Redirect to Google-specific onboarding page
+                window.location.href = "/google-user-info";
+              } else {
+                // Existing user, go to home
+                window.location.href = "/home";
+              }
             } catch (e) {
               console.error(e);
               alert("Google login failed");
