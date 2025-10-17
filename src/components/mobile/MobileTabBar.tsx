@@ -41,7 +41,8 @@ export default function MobileTabBar() {
   const pathname = usePathname();
   const is = (href: string) => pathname === href || pathname?.startsWith(href);
   const { data } = useGetUserDetailsQuery();
-  const profileHref = data?.data?.userName ? `/${data.data.userName}` : "/profile";
+  const profileUserName = (data?.data?.userName || data?.data?.fullName || '').toString();
+  const profileHref = profileUserName ? `/${profileUserName}` : "/signin";
 
   return (
     <nav className="md:hidden fixed inset-x-0 bottom-0 z-[9999] pointer-events-auto" data-test="bottom-nav">
