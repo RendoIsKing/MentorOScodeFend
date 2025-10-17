@@ -178,7 +178,7 @@ const GoogleUserInfo = () => {
                 Complete Your Profile
               </Label>
               <p className="text-sm text-muted-foreground">
-                We've got your email from Google. Just add a few more details.
+                We&apos;ve got your email from Google. Just add a few more details.
               </p>
             </>
           )}
