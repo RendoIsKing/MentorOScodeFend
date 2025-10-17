@@ -51,6 +51,9 @@ export async function middleware(request: NextRequest) {
   // Check if current path is public
   const isPublicPath = publicPaths.includes(currentPath);
 
+  // Profile routes (username-based) - allow access without special redirects
+  const isProfileRoute = currentPath.match(/^\/[a-zA-Z0-9_-]+$/);
+
   // Initial onboarding path that should be accessible after signup
   const isInitialOnboardingPath = currentPath === "/user-info";
 
@@ -61,8 +64,8 @@ export async function middleware(request: NextRequest) {
 
   // If no token and trying to access protected route → always require signin
   if (!userAuthToken && !isPublicPath) {
-    // Allow auth pages and root to render
-    if (currentPath === "/signin" || currentPath === "/signup" || currentPath === "/forgotpassword" || currentPath === "/") {
+    // Allow auth pages, root, and profile routes to render
+    if (currentPath === "/signin" || currentPath === "/signup" || currentPath === "/forgotpassword" || currentPath === "/" || isProfileRoute) {
       return NextResponse.next();
     }
     const signinUrl = new URL("/signin", baseDomain);
@@ -128,7 +131,8 @@ export async function middleware(request: NextRequest) {
     }
 
     // Redirect authenticated users away from auth pages if fully onboarded
-    if (isPublicPath && allStepsCompleted && process.env.NODE_ENV === "production") {
+    // But don't redirect from profile routes
+    if (isPublicPath && !isProfileRoute && allStepsCompleted && process.env.NODE_ENV === "production") {
       return NextResponse.redirect(
         new URL("/home", baseDomain)
       );
@@ -156,5 +160,6 @@ export const config = {
     "/notification/:id*",
     "/settings/:id*",
     "/admin/:id*",
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };
