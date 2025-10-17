@@ -22,8 +22,9 @@ export default function SideBarPageLayout({
         <div>{children}</div>
       ) : (
         <>
-          <div className="flex">
-            <div className="flex flex-col w-[220px] min-w-[200px] max-w-[240px] border-r border-secondary">
+          <div className="flex flex-row">
+            {/* Sidebar left */}
+            <div className="flex flex-col w-[240px] min-w-[220px] max-w-[260px] border-r border-secondary">
               <Sidebar />
             </div>
             <ScrollArea className="flex flex-col flex-grow h-screen">
