@@ -140,7 +140,7 @@ const Signup = () => {
       ) : (
         <div className="min-h-[calc(100vh-120px)] flex items-center justify-center px-4">
           <div className="w-full max-w-[520px] border lg:border-muted-foreground/30 lg:rounded-lg p-8">
-            <div className="p-0 mb-2">
+            <div className="p-0 mb-2 flex justify-center">
               <Logo />
             </div>
             <div className="p-2">
