@@ -13,7 +13,7 @@ export default function Wordmark({ className = "" }: { className?: string }) {
           <defs>
             <linearGradient id="mviolet" x1="0" x2="1" y1="0" y2="1">
               <stop offset="0%" stopColor="#6C2EF5" />
-              <stop offset="100%" stopColor="#D946EF" />
+              <stop offset="100%" stopColor="#F97316" />
             </linearGradient>
           </defs>
           {/* Violet M */}
@@ -30,7 +30,7 @@ export default function Wordmark({ className = "" }: { className?: string }) {
             <span className="relative inline-block align-baseline" style={{ width: "0.65ch" }}>
               {/* dotless i so we can replace the dot */}
               <span className="leading-none" style={{ WebkitTextFillColor: "transparent" }}>ı</span>
-              <span className="absolute -top-1 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-[--logo-accent]"></span>
+              <span className="absolute -top-0.5 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-[--logo-accent]"></span>
             </span>
             <span>o</span>
           </span>
