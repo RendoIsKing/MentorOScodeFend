@@ -7,16 +7,34 @@ const sora = Sora({ subsets: ["latin"], weight: ["700","800"], display: "swap" }
 export default function Wordmark({ className = "" }: { className?: string }) {
   return (
     <div className={`select-none whitespace-nowrap ${className}`} aria-label="Mentorio logo">
-      <h1 className={`${sora.className} my-0 leading-none tracking-tight text-2xl md:text-3xl`}> 
-        <span className="inline-flex items-baseline">
-          <span className="text-[--logo-primary]">Mentor</span>
-          <span className="relative">
-            <span className="text-[--logo-primary]">i</span>
-            <span className="absolute -top-2 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-[--logo-accent]"></span>
+      <div className="flex items-end gap-2">
+        {/* Monogram M with emerald arrow above */}
+        <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden fill="none">
+          <defs>
+            <linearGradient id="mviolet" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0%" stopColor="#6C2EF5" />
+              <stop offset="100%" stopColor="#D946EF" />
+            </linearGradient>
+          </defs>
+          {/* Violet M */}
+          <path d="M2 22V4l5 6 5-6 5 6 5-6v18" stroke="url(#mviolet)" strokeWidth="2.2" strokeLinejoin="round"/>
+          {/* Emerald arrow ABOVE the M */}
+          <path d="M12 1l3 3M12 1l-3 3" stroke="#10B981" strokeWidth="2.2" strokeLinecap="round"/>
+        </svg>
+
+        {/* Word part 'entorio' with emerald dot as the single i dot */}
+        <h1 className={`${sora.className} my-0 leading-none tracking-tight text-2xl md:text-3xl`}>
+          <span className="inline-flex items-baseline">
+            <span className="text-[--logo-primary]">entor</span>
+            <span className="relative inline-block">
+              {/* dotless i so we can replace the dot */}
+              <span className="text-[--logo-primary]">ı</span>
+              <span className="absolute -top-2 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-[--logo-accent]"></span>
+            </span>
+            <span className="text-[--logo-primary]">o</span>
           </span>
-          <span className="text-[--logo-primary]">o</span>
-        </span>
-      </h1>
+        </h1>
+      </div>
       <style jsx global>{`
         :root { --logo-primary: #6C2EF5; --logo-accent: #10B981; }
         .dark { --logo-primary: #6C2EF5; --logo-accent: #10B981; }
