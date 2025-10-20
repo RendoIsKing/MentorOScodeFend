@@ -1,0 +1,13 @@
+<svg width="384" height="384" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mSplit" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0%" stop-color="#6C2EF5" />
+      <stop offset="50%" stop-color="#6C2EF5" />
+      <stop offset="50.1%" stop-color="#F97316" />
+      <stop offset="100%" stop-color="#F97316" />
+    </linearGradient>
+  </defs>
+  <path d="M2 22V4l5 6 5-6 5 6 5-6v18" stroke="url(#mSplit)" stroke-width="2.2" stroke-linejoin="round" />
+</svg>
+
+
