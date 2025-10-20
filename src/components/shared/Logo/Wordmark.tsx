@@ -10,8 +10,16 @@ export default function Wordmark({ className = "" }: { className?: string }) {
       <div className="flex items-end gap-0">
         {/* Monogram M with emerald arrow above */}
         <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden fill="none">
-          {/* Solid violet M (no arrow) */}
-          <path d="M2 22V4l5 6 5-6 5 6 5-6v18" stroke="#6C2EF5" strokeWidth="2.2" strokeLinejoin="round"/>
+          <defs>
+            <linearGradient id="mSplit" x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0%" stopColor="#6C2EF5" />
+              <stop offset="50%" stopColor="#6C2EF5" />
+              <stop offset="50.1%" stopColor="#F97316" />
+              <stop offset="100%" stopColor="#F97316" />
+            </linearGradient>
+          </defs>
+          {/* Split-color M: left half violet, right half orange */}
+          <path d="M2 22V4l5 6 5-6 5 6 5-6v18" stroke="url(#mSplit)" strokeWidth="2.2" strokeLinejoin="round"/>
         </svg>
 
         {/* Word part 'entorio' with a standard i (no green dot). */}
