@@ -1,20 +1,22 @@
 import React from "react";
-import { Orbitron } from "next/font/google";
+import Wordmark from "./Wordmark";
+import MonogramBars from "./MonogramBars";
+import MonogramArrow from "./MonogramArrow";
 
-const orbitron = Orbitron({ subsets: ["latin"], weight: ["700", "800"] });
+export type LogoVariant = "wordmark" | "bars" | "arrow";
 
-const Logo = () => {
-  return (
-    <div className="px-2 select-none whitespace-nowrap">
-      <h1
-        className={`${orbitron.className} my-0 leading-none tracking-tight text-2xl md:text-3xl`}
-      >
-        <span className="inline-flex items-baseline">
-          <span className="text-[#6C2EF5]">Mentorio</span>
-        </span>
-      </h1>
-    </div>
-  );
+function getVariantFromSearch(): LogoVariant | null {
+  if (typeof window === "undefined") return null;
+  const v = new URLSearchParams(window.location.search).get("logo");
+  if (v === "bars" || v === "arrow" || v === "wordmark") return v;
+  return null;
+}
+
+const Logo = ({ variant, className = "" }: { variant?: LogoVariant; className?: string }) => {
+  const chosen: LogoVariant = variant || getVariantFromSearch() || "wordmark";
+  if (chosen === "bars") return <MonogramBars className={className} />;
+  if (chosen === "arrow") return <MonogramArrow className={className} />;
+  return <Wordmark className={className} />;
 };
 
 export default Logo;
