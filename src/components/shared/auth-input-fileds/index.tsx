@@ -82,7 +82,7 @@ const AuthInputs = ({ type, afterBelow }: AuthInputsProps) => {
         </>
       )}
 
-      {(type !== "forgot" || type !== "reset") && (
+      {(type !== "forgot" && type !== "reset") && (
         <div className={`mt-6 lg:${fontItalic.className} font-light`}>
           <p>By continuing, you agree to our</p>
           <div className="flex">
