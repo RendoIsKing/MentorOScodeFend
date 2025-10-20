@@ -130,41 +130,34 @@ const Signup = () => {
           </form>
         </Form>
       ) : (
-        <div className="mx-auto my-8">
-          <div className="flex justify-center items-center gap-12">
-            <img
-              src="/assets/images/Signup/phone1.svg"
-              alt="Phone_Image"
-              className="flex-1"
-            />
-            <div className="border flex-1 lg:border-muted-foreground/30 lg:rounded-lg p-12 pl-8 lg:w-[41%]">
-              <div className="p-0">
-                <Logo />
-              </div>
-              <div className="p-2">
-                <PageHeader
-                  title="Sign Up"
-                  description="Enter Your Phone Number"
-                />
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="">
-                    <FormField
-                      control={form.control}
-                      name="phoneNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <AuthInputs type="signup" />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </form>
-                </Form>
-                <div className="mt-4">
-                  <GoogleButton mode="signup" />
-                  <CustomHr />
-                </div>
+        <div className="min-h-[calc(100vh-120px)] flex items-center justify-center px-4">
+          <div className="w-full max-w-[520px] border lg:border-muted-foreground/30 lg:rounded-lg p-8">
+            <div className="p-0 mb-2">
+              <Logo />
+            </div>
+            <div className="p-2">
+              <PageHeader
+                title="Sign Up"
+                description="Enter Your Phone Number"
+              />
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="">
+                  <FormField
+                    control={form.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <AuthInputs type="signup" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </form>
+              </Form>
+              <div className="mt-4">
+                <GoogleButton mode="signup" />
+                <CustomHr />
               </div>
             </div>
           </div>

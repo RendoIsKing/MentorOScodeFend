@@ -40,7 +40,24 @@ function IconUser({ active }: { active: boolean }) {
 export default function MobileTabBar() {
   const pathname = usePathname();
   const is = (href: string) => pathname === href || pathname?.startsWith(href);
-  const { data } = useGetUserDetailsQuery();
+
+  // Avoid unnecessary /auth/me calls on auth pages or when no session cookie exists
+  const isAuthPage = Boolean(
+    pathname === "/signin" ||
+    pathname === "/signup" ||
+    pathname?.startsWith("/forgotpassword") ||
+    pathname?.startsWith("/new-password") ||
+    pathname?.startsWith("/validate-otp") ||
+    pathname?.startsWith("/verify-otp") ||
+    pathname?.startsWith("/google-user-info")
+  );
+  const hasSessionCookie =
+    typeof document !== "undefined" && document.cookie.includes("auth_token=");
+
+  const { data } = useGetUserDetailsQuery(undefined, { skip: !hasSessionCookie });
+
+  // Do not render bottom bar on auth-related pages
+  if (isAuthPage) return null;
   const profileUserName = (data?.data?.userName || data?.data?.fullName || '').toString();
   const profileHref = profileUserName ? `/${profileUserName}` : "/signin";
 
