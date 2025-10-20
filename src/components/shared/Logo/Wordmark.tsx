@@ -21,7 +21,7 @@ export default function Wordmark({ className = "" }: { className?: string }) {
             className="inline-flex items-baseline"
             style={{
               backgroundImage:
-                "linear-gradient(90deg, #6C2EF5 0%, #6C2EF5 50%, #F97316 50%, #F97316 100%)",
+                "linear-gradient(90deg, #6C2EF5 0%, #6C2EF5 43%, #F97316 43%, #F97316 100%)",
               WebkitBackgroundClip: "text",
               color: "transparent",
             }}
