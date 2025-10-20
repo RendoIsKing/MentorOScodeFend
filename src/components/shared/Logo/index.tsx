@@ -10,7 +10,7 @@ const Logo = () => {
         className={`${orbitron.className} my-0 leading-none tracking-tight text-2xl md:text-3xl`}
       >
         <span className="inline-flex items-baseline">
-          <span className="text-[#3B0CA6]">Mentorio</span>
+          <span className="text-[#6C2EF5]">Mentorio</span>
         </span>
       </h1>
     </div>
