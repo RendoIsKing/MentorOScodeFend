@@ -133,25 +133,20 @@ const AgeConfirmation = () => {
   const submitReview = async () => {
     router.push("/home");
   };
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    confirmAgeTrigger(data)
-      .unwrap()
-      .then((res) => {
-        //console.log(res);
-        setOpenPopup(true);
-        router.push("/home");
-        toast({
-          variant: "success",
-          description: "User on boarded successfully",
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-        toast({
-          variant: "destructive",
-          description: "Something went wrong",
-        });
-      });
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    try {
+      const res = await confirmAgeTrigger(data).unwrap();
+      // Mark onboarding cookie cleared to avoid middleware forcing /user-info
+      if (typeof document !== 'undefined') {
+        document.cookie = "onboarding=; Path=/; Max-Age=0; SameSite=None; Secure";
+      }
+      setOpenPopup(true);
+      router.push("/home");
+      toast({ variant: "success", description: "User on boarded successfully" });
+    } catch (err) {
+      console.log(err);
+      toast({ variant: "destructive", description: "Something went wrong" });
+    }
   };
 
   return (

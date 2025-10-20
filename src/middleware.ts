@@ -125,10 +125,12 @@ export async function middleware(request: NextRequest) {
       currentPath.startsWith(path)
     );
 
-    // If we just came from verify-otp, always send to the first onboarding step
+    // If we just came from verify-otp, send to the first onboarding step only if needed.
+    // Previously this unconditionally redirected to /user-info, causing loops.
     const fromVerify = request.nextUrl.searchParams.get("from") === "verify";
-    if (fromVerify || onboardingStarted) {
-      return NextResponse.redirect(new URL("/user-info", baseDomain));
+    if (fromVerify && !pathsAndChecks.every((p) => p.check)) {
+      const firstIncomplete = pathsAndChecks.find((p) => !p.check);
+      if (firstIncomplete) return NextResponse.redirect(new URL(firstIncomplete.path, baseDomain));
     }
 
     // Redirect authenticated users away from auth pages if fully onboarded
