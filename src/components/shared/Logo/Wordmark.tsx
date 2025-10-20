@@ -9,17 +9,9 @@ export default function Wordmark({ className = "" }: { className?: string }) {
     <div className={`select-none whitespace-nowrap ${className}`} aria-label="Mentorio logo">
       <div className="flex items-end gap-0">
         {/* Monogram M with emerald arrow above */}
-        <svg width="34" height="34" viewBox="-3 -4 30 30" aria-hidden fill="none">
-          <defs>
-            <linearGradient id="mviolet" x1="0" x2="1" y1="0" y2="1">
-              <stop offset="0%" stopColor="#6C2EF5" />
-              <stop offset="100%" stopColor="#F97316" />
-            </linearGradient>
-          </defs>
-          {/* Violet M */}
-          <path d="M2 22V4l5 6 5-6 5 6 5-6v18" stroke="url(#mviolet)" strokeWidth="2.2" strokeLinejoin="round"/>
-          {/* Emerald arrow ABOVE the M with generous clearance */}
-          <path d="M12 -1.2l3 3.2M12 -1.2l-3 3.2" stroke="#10B981" strokeWidth="2.2" strokeLinecap="round"/>
+        <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden fill="none">
+          {/* Solid violet M (no arrow) */}
+          <path d="M2 22V4l5 6 5-6 5 6 5-6v18" stroke="#6C2EF5" strokeWidth="2.2" strokeLinejoin="round"/>
         </svg>
 
         {/* Word part 'entorio' with a standard i (no green dot). */}
