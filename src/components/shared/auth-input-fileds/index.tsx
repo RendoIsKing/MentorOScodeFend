@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { ABeeZee } from "next/font/google";
 import { FormMessage } from "@/components/ui/form";
-// Google button and separator are now controlled by pages to avoid duplicates
 import PasswordInput from "@/components/password-input";
 import { useFormContext } from "react-hook-form";
 import PhoneEmailInput from "@/components/PhoneEmailInput";
@@ -17,7 +16,13 @@ export const fontItalic = ABeeZee({
   style: "italic",
 });
 
-const AuthInputs = ({ type }) => {
+type AuthInputsProps = {
+  type: "signin" | "signup" | "forgot" | "reset";
+  // Rendered just after the password/forgot section and before the bottom link
+  afterBelow?: React.ReactNode;
+};
+
+const AuthInputs = ({ type, afterBelow }: AuthInputsProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const form = useFormContext();
@@ -109,6 +114,9 @@ const AuthInputs = ({ type }) => {
           </Link>
         </div>
       )}
+
+      {/* Inject external content (e.g., Google button + OR) right here */}
+      {afterBelow}
       <div className="text-base flex justify-center mt-8">
         {pathname !== "/signup" ? (
           <p>{`Don't have an account?`}</p>

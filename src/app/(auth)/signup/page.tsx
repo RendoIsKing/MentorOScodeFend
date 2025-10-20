@@ -122,7 +122,15 @@ const Signup = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <AuthInputs type="signup" />
+                    <AuthInputs
+                      type="signup"
+                      afterBelow={
+                        <div className="mt-4">
+                          <GoogleButton mode="signup" />
+                          <CustomHr />
+                        </div>
+                      }
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -148,17 +156,21 @@ const Signup = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <AuthInputs type="signup" />
+                          <AuthInputs
+                            type="signup"
+                            afterBelow={
+                              <div className="mt-4">
+                                <GoogleButton mode="signup" />
+                                <CustomHr />
+                              </div>
+                            }
+                          />
                         </FormControl>
                       </FormItem>
                     )}
                   />
                 </form>
               </Form>
-              <div className="mt-4">
-                <GoogleButton mode="signup" />
-                <CustomHr />
-              </div>
             </div>
           </div>
         </div>
