@@ -7,7 +7,7 @@ const sora = Sora({ subsets: ["latin"], weight: ["700","800"], display: "swap" }
 export default function Wordmark({ className = "" }: { className?: string }) {
   return (
     <div className={`select-none whitespace-nowrap ${className}`} aria-label="Mentorio logo">
-      <div className="flex items-end gap-2">
+      <div className="flex items-end gap-1">
         {/* Monogram M with emerald arrow above */}
         <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden fill="none">
           <defs>
@@ -18,8 +18,8 @@ export default function Wordmark({ className = "" }: { className?: string }) {
           </defs>
           {/* Violet M */}
           <path d="M2 22V4l5 6 5-6 5 6 5-6v18" stroke="url(#mviolet)" strokeWidth="2.2" strokeLinejoin="round"/>
-          {/* Emerald arrow ABOVE the M */}
-          <path d="M12 1l3 3M12 1l-3 3" stroke="#10B981" strokeWidth="2.2" strokeLinecap="round"/>
+          {/* Emerald arrow ABOVE the M (slightly higher overall, longer downwards) */}
+          <path d="M12 0.5l3 4.5M12 0.5l-3 4.5" stroke="#10B981" strokeWidth="2.2" strokeLinecap="round"/>
         </svg>
 
         {/* Word part 'entorio' with emerald dot as the single i dot */}
@@ -29,7 +29,7 @@ export default function Wordmark({ className = "" }: { className?: string }) {
             <span className="relative inline-block">
               {/* dotless i so we can replace the dot */}
               <span className="text-[--logo-primary]">ı</span>
-              <span className="absolute -top-2 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-[--logo-accent]"></span>
+              <span className="absolute -top-1 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-[--logo-accent]"></span>
             </span>
             <span className="text-[--logo-primary]">o</span>
           </span>
