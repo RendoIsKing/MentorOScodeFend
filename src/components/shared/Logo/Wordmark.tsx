@@ -22,17 +22,19 @@ export default function Wordmark({ className = "" }: { className?: string }) {
           <path d="M12 -1.2l3 3.2M12 -1.2l-3 3.2" stroke="#10B981" strokeWidth="2.2" strokeLinecap="round"/>
         </svg>
 
-        {/* Word part 'entorio' with emerald dot as the single i dot */}
-        {/* Apply gradient across the entire span, including the custom i */}
+        {/* Word part 'entorio' with a standard i (no green dot). */}
+        {/* Color split: first half violet, second half orange (no pink). */}
         <h1 className={`${sora.className} my-0 leading-none tracking-tight text-2xl md:text-3xl`}>
-          <span className="inline-flex items-baseline" style={{ backgroundImage: "linear-gradient(90deg,#6C2EF5 0%,#6C2EF5 55%,#F97316 55%,#F97316 100%)", WebkitBackgroundClip: "text", color: "transparent" }}>
-            <span>entor</span>
-            <span className="relative inline-block align-baseline" style={{ width: "0.7ch" }}>
-              {/* dotless i so we can replace the dot */}
-              <span className="leading-none">ı</span>
-              <span className="absolute -top-0.5 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-[--logo-accent]"></span>
-            </span>
-            <span>o</span>
+          <span
+            className="inline-flex items-baseline"
+            style={{
+              backgroundImage:
+                "linear-gradient(90deg, #6C2EF5 0%, #6C2EF5 50%, #F97316 50%, #F97316 100%)",
+              WebkitBackgroundClip: "text",
+              color: "transparent",
+            }}
+          >
+            entorio
           </span>
         </h1>
       </div>
