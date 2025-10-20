@@ -25,15 +25,7 @@ export default function Wordmark({ className = "" }: { className?: string }) {
         {/* Word part 'entorio' with a standard i (no green dot). */}
         {/* Color split: first half violet, second half orange (no pink). */}
         <h1 className={`${sora.className} my-0 leading-none tracking-tight text-2xl md:text-3xl`}>
-          <span
-            className="inline-flex items-baseline"
-            style={{
-              backgroundImage:
-                "linear-gradient(90deg, #6C2EF5 0%, #6C2EF5 43%, #F97316 43%, #F97316 100%)",
-              WebkitBackgroundClip: "text",
-              color: "transparent",
-            }}
-          >
+          <span className="inline-flex items-baseline" style={{ color: "#F97316" }}>
             entorio
           </span>
         </h1>
