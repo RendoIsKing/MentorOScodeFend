@@ -25,11 +25,11 @@ export default function Wordmark({ className = "" }: { className?: string }) {
         {/* Word part 'entorio' with emerald dot as the single i dot */}
         {/* Apply gradient across the entire span, including the custom i */}
         <h1 className={`${sora.className} my-0 leading-none tracking-tight text-2xl md:text-3xl`}>
-          <span className="inline-flex items-baseline" style={{ backgroundImage: "linear-gradient(135deg,#6C2EF5 0%,#F97316 100%)", WebkitBackgroundClip: "text", color: "transparent" }}>
+          <span className="inline-flex items-baseline" style={{ backgroundImage: "linear-gradient(90deg,#6C2EF5 0%,#6C2EF5 55%,#F97316 55%,#F97316 100%)", WebkitBackgroundClip: "text", color: "transparent" }}>
             <span>entor</span>
-            <span className="relative inline-block align-baseline" style={{ width: "0.65ch" }}>
+            <span className="relative inline-block align-baseline" style={{ width: "0.7ch" }}>
               {/* dotless i so we can replace the dot */}
-              <span className="leading-none" style={{ WebkitTextFillColor: "transparent" }}>ı</span>
+              <span className="leading-none">ı</span>
               <span className="absolute -top-0.5 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-[--logo-accent]"></span>
             </span>
             <span>o</span>
