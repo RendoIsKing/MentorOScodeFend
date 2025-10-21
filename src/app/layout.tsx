@@ -63,7 +63,7 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <link rel="manifest" href="/manifest.webmanifest" />
-        <link rel="icon" href="/assets/images/inbox/image.png" type="image/png" />
+        <link rel="icon" href="/assets/brand/mentorio-m-turquoise.svg" type="image/svg+xml" />
         <meta name="theme-color" content="#000000" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
