@@ -30,55 +30,54 @@ body { overscroll-behavior-y: none; }
 @layer base {
   /* Light Theme */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    /* Primary: Electric Violet #6C2EF5 */
-    --primary: 259 91% 57%;
-    --primary-foreground: 210 20% 98%;
-    /* Secondary: Emerald #10B981 */
-    --secondary: 160 84% 39%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 217.89 10.61% 64.9%;
-    /* Accent: Vibrant Orange #F97316 */
-    --accent: 24 95% 53%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 259 91% 57%;
+    --background: 210 31% 6%; /* #0B1015 */
+    --foreground: 210 40% 98%;
+    --card: 214 24% 18%; /* #1A2230 */
+    --card-foreground: 210 40% 98%;
+    --popover: 214 24% 18%;
+    --popover-foreground: 210 40% 98%;
+    /* Primary: Turquoise #12C8BE */
+    --primary: 177 83% 43%;
+    --primary-foreground: 210 40% 98%;
+    /* Secondary: Navy #1E3A8A */
+    --secondary: 224 64% 33%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 215 16% 35%;
+    --muted-foreground: 215 16% 70%;
+    /* Accent: Soft Gold #F4D47C */
+    --accent: 44 85% 72%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 20% 28%; /* #2A3545 */
+    --input: 217 20% 28%;
+    --ring: 177 83% 43%;
     --radius: 0.5rem;
-    --secondary-muted-foreground: 220 14% 56%;
+    --secondary-muted-foreground: 224 30% 60%;
   }
 
   .dark {
-    --background: 217.5 14.8% 10.6%;
-    --foreground: 0 0% 100%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    /* Primary: Electric Violet #6C2EF5 */
-    --primary: 259 91% 57%;
-    --primary-foreground: 210 20% 98%;
-    /* Secondary: Emerald #10B981 (slightly dimmed in dark) */
-    --secondary: 160 84% 37%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 216 13% 15%;
-    --muted-foreground: 217.89 10.61% 64.9%;
-    /* Accent: Vibrant Orange #F97316 (kept bright in dark mode) */
-    --accent: 24 95% 53%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 259 91% 57%;
+    --background: 210 31% 6%;
+    --foreground: 210 40% 98%;
+    --card: 214 24% 18%;
+    --card-foreground: 210 40% 98%;
+    --popover: 214 24% 18%;
+    --popover-foreground: 210 40% 98%;
+    /* Primary: Turquoise */
+    --primary: 177 83% 43%;
+    --primary-foreground: 210 40% 98%;
+    /* Secondary: Navy */
+    --secondary: 224 64% 33%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 215 16% 35%;
+    --muted-foreground: 215 16% 70%;
+    --accent: 44 85% 72%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 20% 28%;
+    --input: 217 20% 28%;
+    --ring: 177 83% 43%;
   }
 
   /* Sidebar typography:
