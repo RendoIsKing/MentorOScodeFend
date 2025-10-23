@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select";
 import Logo from "@/components/shared/Logo";
 import PageHeader from "@/components/shared/page-header";
-import { ABeeZee } from "next/font/google";
+import { Manrope } from "next/font/google";
 import {
   useCreateUserMutation,
   useLazyCheckUsernameQuery,
@@ -35,11 +35,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/components/ui/use-toast";
 import { useDebounce } from "@/hooks/use-debounce";
 
-const fontItalic = ABeeZee({
-  subsets: ["latin"],
-  weight: ["400"],
-  style: "italic",
-});
+const fontItalic = Manrope({ subsets: ["latin"], weight: ["700"], display: "swap" });
 
 const GoogleUserInfo = () => {
   const { toast } = useToast();

@@ -28,6 +28,9 @@ body { overscroll-behavior-y: none; }
 .fullbleed [data-role="mobile-topbar"] { display: none !important; }
 
 @layer base {
+  /* Force brand font everywhere and disable italics globally */
+  * { font-family: Manrope, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important; }
+  em, i, .italic { font-style: normal !important; }
   /* Light Theme */
   :root {
     --background: 210 31% 6%; /* #0B1015 */

@@ -4,17 +4,13 @@ import PhoneInput from "@/components/phone-input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { ABeeZee } from "next/font/google";
+import { Manrope } from "next/font/google";
 import { FormMessage } from "@/components/ui/form";
 import PasswordInput from "@/components/password-input";
 import { useFormContext } from "react-hook-form";
 import PhoneEmailInput from "@/components/PhoneEmailInput";
 
-export const fontItalic = ABeeZee({
-  subsets: ["latin"],
-  weight: ["400"],
-  style: "italic",
-});
+export const fontItalic = Manrope({ subsets: ["latin"], weight: ["400"], display: "swap" });
 
 type AuthInputsProps = {
   type: "signin" | "signup" | "forgot" | "reset";
@@ -83,7 +79,7 @@ const AuthInputs = ({ type, afterBelow }: AuthInputsProps) => {
       )}
 
       {(type !== "forgot" && type !== "reset") && (
-        <div className={`mt-6 lg:${fontItalic.className} font-light`}>
+        <div className={`mt-6 font-light`}>
           <p>By continuing, you agree to our</p>
           <div className="flex">
             <span className="text-primary">Terms of Services</span>

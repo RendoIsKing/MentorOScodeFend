@@ -11,7 +11,7 @@ import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
 
 import Logo from "@/components/shared/Logo";
 import Verification from "@/assets/images/Signup/verification.svg";
-import { ABeeZee } from "next/font/google";
+import { Manrope } from "next/font/google";
 import { z } from "zod";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -32,11 +32,7 @@ import {
 } from "@/redux/services/haveme";
 import { useRouter } from "next/navigation";
 
-const fontItalic = ABeeZee({
-  subsets: ["latin"],
-  weight: ["400"],
-  style: "italic",
-});
+const fontItalic = Manrope({ subsets: ["latin"], weight: ["700"], display: "swap" });
 
 const FormSchema = z.object({
   pin: z.string().min(6, {
@@ -169,7 +165,7 @@ export default function VerifyOtpPage() {
               )}
             />
             <div>
-              <p className="inline italic">
+              <p className="inline">
                 {`You will receive your verification code on your given number ${prefix} ${userMobileNumber} If you didn’t get the number then you can change
                 or edit the number.`}{" "}
               </p>

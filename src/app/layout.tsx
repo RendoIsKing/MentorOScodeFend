@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useLayoutEffect } from "react";
-import { ABeeZee } from "next/font/google";
+import { Manrope } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/theme-toggle";
 import { Provider } from "react-redux";
@@ -24,11 +24,7 @@ import ErrorBoundary from "@/components/common/ErrorBoundary";
 import type { Viewport } from "next";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-const fontNormal = ABeeZee({
-  subsets: ["latin"],
-  weight: ["400"],
-  style: "normal",
-});
+const fontNormal = Manrope({ subsets: ["latin"], weight: ["400"], display: "swap" });
 
 export const viewport: Viewport = {
   width: "device-width",

@@ -23,7 +23,7 @@ import Logo from "@/components/shared/Logo";
 import BackArrow from "@/assets/images/Signup/back.svg";
 import { differenceInYears } from "date-fns";
 
-import { ABeeZee } from "next/font/google";
+import { Manrope } from "next/font/google";
 import {
   useUploadDocumentMutation,
   useUploadFileMutation,
@@ -32,11 +32,7 @@ import { useCreateUserMutation } from "@/redux/services/haveme";
 import { useUserOnboardingContext } from "@/context/UserOnboarding";
 
 // TODO: Make this font definition dynamic
-const fontItalic = ABeeZee({
-  subsets: ["latin"],
-  weight: ["400"],
-  style: "italic",
-});
+const fontItalic = Manrope({ subsets: ["latin"], weight: ["700"], display: "swap" });
 
 const AgeConfirmation = () => {
   const { toast } = useToast();
