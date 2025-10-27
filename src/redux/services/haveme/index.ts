@@ -54,7 +54,7 @@ import { IGetFileResponse } from "@/contracts/requests/IGetFileResponse";
 import { IValidateOtpResponse } from "@/contracts/requests/IValidateOtpResponse";
 import { IValidateOtpRequest } from "@/contracts/requests/IValidateOtpRequest";
 
-const defaultBase = "/api/backend"; // proxied via next.config.js rewrites in dev
+const defaultBase = "/api/backend"; // always use same-origin proxy
 
 export const havemeApi = createApi({
   reducerPath: HAVE_ME_API_REDUCER_KEY,

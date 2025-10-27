@@ -51,7 +51,8 @@ const Signin = () => {
         payload.username = formData.loginMethod.username;
       }
 
-      const apiBase = process.env.NEXT_PUBLIC_API_SERVER || "/api/backend";
+      // Always use same-origin proxy so auth cookies attach to the web origin
+      const apiBase = "/api/backend";
       const res = await fetch(`${apiBase}/v1/auth/user-login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
