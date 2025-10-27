@@ -135,8 +135,18 @@ const ProfileInfo = () => {
     }
   }, [debouncedValue]);
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    if (usernameAvailability) {
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    // Re-check availability synchronously on submit to avoid debounce race
+    let available = Boolean(usernameAvailability);
+    if (!available) {
+      try {
+        const resp = await checkUsernameMethod({ username: data.username }).unwrap();
+        available = Boolean(resp?.isAvailable);
+      } catch {
+        available = false;
+      }
+    }
+    if (available) {
       let createUserObject = {
         fullName: formatFullName(data.fullName),
         userName: data.username,
