@@ -9,7 +9,8 @@ type Props = {
 const GoogleButton: React.FC<Props> = ({ label = "Continue with Google", mode = "signin" }) => {
   // Hide button entirely if client ID is not configured in this environment
   if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) return null;
-  const apiBase = process.env.NEXT_PUBLIC_API_SERVER || "/api/backend";
+  // Always use same-origin proxy so auth cookies land on the web origin
+  const apiBase = "/api/backend";
   return (
     <div className="flex items-center justify-center pt-2">
       <div className="w-full flex justify-center">
