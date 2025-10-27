@@ -32,9 +32,8 @@ class RealtimeSseClient {
   };
 
   constructor() {
-    const base = (typeof window !== 'undefined' && (process.env.NEXT_PUBLIC_API_SERVER as string))
-      ? `${process.env.NEXT_PUBLIC_API_SERVER}/v1`
-      : '/api/backend/v1';
+    // Always use same-origin proxy so the stream path matches backend mount
+    const base = '/api/backend/v1';
     this.url = `${base}/events/stream`;
   }
 
