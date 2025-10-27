@@ -1,9 +1,8 @@
 import type { StudentSnapshot, WeightEntry } from '@/lib/types/student';
 import { store } from '@/redux/store';
 
-const BASE = (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_API_SERVER)
-  ? `${process.env.NEXT_PUBLIC_API_SERVER}/v1`
-  : '/api/backend/v1';
+// Always use same-origin proxy in production so cookies and paths match backend mount
+const BASE = '/api/backend/v1';
 
 function getAuthHeaders() {
   try {

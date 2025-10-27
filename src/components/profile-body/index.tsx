@@ -85,7 +85,7 @@ export default function ProfileBody() {
           if (!cancelled) setSavedLocalPosts([]);
           return;
         }
-        const base = (process.env.NEXT_PUBLIC_API_SERVER as any) || '/api/backend';
+        const base = '/api/backend';
         const results = await Promise.all(
           ids.map(async (id) => {
             try {
