@@ -49,7 +49,7 @@ export const formatFullName = (fullName: string) => {
 
 // export const isAuthenticated = true;
 
-export const baseServerUrl = process.env.NEXT_PUBLIC_API_SERVER || "/api/backend";
+export const baseServerUrl = "/api/backend";
 
 // Import functions from date-fns
 
