@@ -79,10 +79,17 @@ export async function middleware(request: NextRequest) {
   if (userAuthToken?.value) {
     const userProgress = await getUserProgress(request, userAuthToken.value);
 
-    // If failed to fetch user progress, redirect to signin (token invalid/expired)
+    // If failed to fetch user progress (invalid/expired cookie)
     if (!userProgress?.data) {
+      // If already on a public/auth page, don't redirect – just render the page
+      if (isPublicPath) {
+        return NextResponse.next();
+      }
+      // Otherwise redirect to /signin and clear the bad cookie to break loops
       const signinUrl = new URL("/signin", baseDomain);
-      return NextResponse.redirect(signinUrl);
+      const resp = NextResponse.redirect(signinUrl);
+      try { resp.cookies.set('auth_token', '', { maxAge: 0, path: '/' }); } catch {}
+      return resp;
     }
 
     // Modify onboarding steps to allow access
