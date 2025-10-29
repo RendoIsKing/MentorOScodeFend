@@ -117,38 +117,37 @@ const GoogleUserInfo = () => {
     }
   }, [debouncedValue]);
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    if (usernameAvailability) {
-      let createUserObject = {
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    try {
+      // Ensure username availability check has completed; if not, check now
+      let available = Boolean(usernameAvailability);
+      if (!available && data.username) {
+        try {
+          const resp = await checkUsernameMethod({ username: data.username }).unwrap();
+          available = Boolean(resp?.isAvailable);
+        } catch {}
+      }
+      if (!available) {
+        form.setError("username", { type: "manual", message: "Username is already taken" });
+        return;
+      }
+
+      const createUserObject = {
         fullName: formatFullName(data.fullName),
         userName: data.username,
         gender:
           data.genderType.toLowerCase() === "other"
             ? data.otherGender
             : data.genderType,
-      };
-      
-      createUserMethod(createUserObject)
-        .unwrap()
-        .then((res) => {
-          router.replace("/user-photo");
-          toast({
-            variant: "success",
-            description: "Details added successfully",
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-          toast({
-            variant: "destructive",
-            description: err?.data?.error?.message || "Something went wrong",
-          });
-        });
-    } else {
-      form.setError("username", {
-        type: "manual",
-        message: "Username is already taken",
-      });
+      } as any;
+
+      await createUserMethod(createUserObject).unwrap();
+      // Force a full reload to ensure fresh /auth/me and avoid stale state from previous sessions
+      if (typeof window !== 'undefined') window.location.href = "/user-photo";
+      try { toast({ variant: "success", description: "Details added successfully" }); } catch {}
+    } catch (err: any) {
+      console.log(err);
+      toast({ variant: "destructive", description: err?.data?.error?.message || "Something went wrong" });
     }
   }
 
