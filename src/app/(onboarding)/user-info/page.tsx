@@ -29,6 +29,7 @@ import { ABeeZee } from "next/font/google";
 import {
   useCreateUserMutation,
   useLazyCheckUsernameQuery,
+  useGetUserDetailsQuery,
 } from "@/redux/services/haveme";
 import { formatFullName } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -53,8 +54,10 @@ const ProfileInfo = () => {
 
   const [checkUsernameMethod] = useLazyCheckUsernameQuery();
   const [createUserMethod] = useCreateUserMutation();
+  const { data: meData } = useGetUserDetailsQuery();
+  const isGoogleUser = Boolean(meData?.data?.googleId);
 
-  const FormSchema: any = z.object({
+  const baseSchema = {
     fullName: z.string().min(4, {
       message: "Full Name must be at least 4 characters.",
     }),
@@ -67,7 +70,10 @@ const ProfileInfo = () => {
       .regex(/^[a-zA-Z0-9]+$/, {
         message: "UserName must contain only alphanumeric characters.",
       }),
+  } as const;
 
+  const googleExtras = {} as const;
+  const phoneExtras = {
     emailAddress: z
       .string()
       .min(4, {
@@ -78,7 +84,11 @@ const ProfileInfo = () => {
     password: z.string().min(4, {
       message: "Password must be at least 4 characters.",
     }),
+  } as const;
 
+  const FormSchema: any = z.object({
+    ...(baseSchema as any),
+    ...(!isGoogleUser ? (phoneExtras as any) : (googleExtras as any)),
     genderType: z.string({
       required_error: "Please select your gender.",
     }),
@@ -266,51 +276,55 @@ const ProfileInfo = () => {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="emailAddress"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel
-                      className={` font-normal ${fontItalic.className}`}
-                    >
-                      Email Address{" "}
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        className="h-12"
-                        type="email"
-                        placeholder="Enter your email address"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {!isGoogleUser && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="emailAddress"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel
+                          className={` font-normal ${fontItalic.className}`}
+                        >
+                          Email Address{" "}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            className="h-12"
+                            type="email"
+                            placeholder="Enter your email address"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel
-                      className={` font-normal ${fontItalic.className}`}
-                    >
-                      Password{" "}
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        className="h-12"
-                        type="password"
-                        placeholder="Enter your Password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel
+                          className={` font-normal ${fontItalic.className}`}
+                        >
+                          Password{" "}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            className="h-12"
+                            type="password"
+                            placeholder="Enter your Password"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
 
               <FormField
                 control={form.control}
