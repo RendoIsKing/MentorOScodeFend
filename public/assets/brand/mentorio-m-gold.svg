@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Golden yellow Mentorio M on transparent background -->
+  <g fill="#FFC300">
+    <!-- Left stem -->
+    <rect x="64" y="96" width="80" height="320" rx="12"/>
+    <!-- Right stem -->
+    <rect x="368" y="96" width="80" height="320" rx="12"/>
+    <!-- Left diagonal -->
+    <path d="M144 96 h72 l88 150 c6 10 6 22 0 32 l-32 54 -128 -220 z"/>
+    <!-- Right diagonal -->
+    <path d="M448 96 h-72 l-88 150 c-6 10 -6 22 0 32 l32 54 128 -220 z"/>
+  </g>
+</svg>
+
