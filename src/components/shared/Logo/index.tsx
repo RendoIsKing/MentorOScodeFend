@@ -12,11 +12,11 @@ function getVariantFromSearch(): LogoVariant | null {
   return null;
 }
 
-const Logo = ({ variant, className = "" }: { variant?: LogoVariant; className?: string }) => {
+const Logo = ({ variant, className = "", highlightM = false }: { variant?: LogoVariant; className?: string; highlightM?: boolean }) => {
   const chosen: LogoVariant = variant || getVariantFromSearch() || "wordmark";
   if (chosen === "bars") return <MonogramBars className={className} />;
   if (chosen === "arrow") return <MonogramArrow className={className} />;
-  return <Wordmark className={className} />;
+  return <Wordmark className={className} highlightM={highlightM} />;
 };
 
 export default Logo;

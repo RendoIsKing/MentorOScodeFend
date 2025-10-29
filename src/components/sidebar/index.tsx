@@ -33,7 +33,7 @@ function SideBar() {
     <ContentUploadProvider>
       <div className="flex flex-col m-2">
         <div className="flex pt-6 pb-4 pl-2 pr-2 cursor-pointer h-[8vh]" onClick={() => router.push("/home")}>
-          <Logo />
+          <Logo highlightM />
         </div>
         <div className="flex border-r-0 flex-col justify-between h-[90vh] pt-4">
           <SideBarRadioButton />
