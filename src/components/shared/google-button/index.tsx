@@ -39,12 +39,23 @@ const GoogleButton: React.FC<Props> = ({ label = "Continue with Google", mode = 
               // Check if user needs onboarding (new Google user)
               const isNewUser = body?.isNewUser || false;
               
+              // Clear any stale local/session state to avoid showing a previous user
+              try {
+                if (typeof document !== 'undefined') {
+                  document.cookie = "onboarding=; Path=/; Max-Age=0; SameSite=None; Secure";
+                }
+                if (typeof localStorage !== 'undefined') {
+                  localStorage.removeItem('student.ex');
+                  localStorage.removeItem('student.p');
+                }
+                if (typeof sessionStorage !== 'undefined') sessionStorage.clear();
+              } catch {}
+
+              // Use replace to avoid going back to the auth page
               if (isNewUser) {
-                // Redirect to Google-specific onboarding page
-                window.location.href = "/google-user-info";
+                window.location.replace("/google-user-info?new=1");
               } else {
-                // Existing user, go to home
-                window.location.href = "/home";
+                window.location.replace("/home");
               }
             } catch (e) {
               console.error(e);
