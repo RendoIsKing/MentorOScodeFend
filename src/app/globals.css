@@ -33,30 +33,31 @@ body { overscroll-behavior-y: none; }
   em, i, .italic { font-style: normal !important; }
   /* Light Theme */
   :root {
-    --background: 210 31% 6%; /* #0B1015 */
-    --foreground: 210 40% 98%;
-    --card: 214 24% 18%; /* #1A2230 */
-    --card-foreground: 210 40% 98%;
-    --popover: 214 24% 18%;
-    --popover-foreground: 210 40% 98%;
-    /* Primary: Turquoise #12C8BE */
-    --primary: 177 83% 43%;
+    /* Light Theme (true light surfaces) */
+    --background: 0 0% 100%; /* #FFFFFF */
+    --foreground: 222 47% 11%; /* Slate-900 */
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    /* Primary default (overridden by .theme-yellow) */
+    --primary: 177 83% 43%; /* Turquoise */
     --primary-foreground: 210 40% 98%;
-    /* Secondary: Navy #1E3A8A */
+    /* Secondary: Navy */
     --secondary: 224 64% 33%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 215 16% 35%;
-    --muted-foreground: 215 16% 70%;
-    /* Accent: Soft Gold #F4D47C */
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    /* Accent default (soft gold) */
     --accent: 44 85% 72%;
     --accent-foreground: 222 47% 11%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217 20% 28%; /* #2A3545 */
-    --input: 217 20% 28%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
     --ring: 177 83% 43%;
     --radius: 0.5rem;
-    --secondary-muted-foreground: 224 30% 60%;
+    --secondary-muted-foreground: 224 30% 40%;
   }
 
   .dark {
