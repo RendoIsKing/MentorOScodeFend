@@ -91,7 +91,7 @@ const ProfilePhoto: React.FC<IProfilePhotoProps> = ({ isUpdating }) => {
       .then((res) => {
         const userData = res?.data;
         // setUser(userData);
-        router.replace("/user-tags");
+        router.replace("/age-confirmation");
       })
       .catch((err) => {
         console.log("error skipping photo", err);
@@ -128,7 +128,7 @@ const ProfilePhoto: React.FC<IProfilePhotoProps> = ({ isUpdating }) => {
         .then((res) => {
           const userData = res?.data;
           // setUser(userData);
-          router.replace("/user-tags");
+          router.replace("/age-confirmation");
         })
         .catch((err) => {
           console.log("Error saving photo", err);
