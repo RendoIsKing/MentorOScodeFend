@@ -55,7 +55,8 @@ const ProfileInfo = () => {
   const [checkUsernameMethod] = useLazyCheckUsernameQuery();
   const [createUserMethod] = useCreateUserMutation();
   const { data: meData } = useGetUserDetailsQuery();
-  const isGoogleUser = Boolean(meData?.data?.googleId);
+  // googleId may not be declared on the TS type; check dynamically
+  const isGoogleUser = Boolean((meData as any)?.data?.googleId);
 
   const baseSchema = {
     fullName: z.string().min(4, {
