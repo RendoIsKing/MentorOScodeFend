@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-  <!-- Solid golden-yellow M on transparent background (optimized for small sizes) -->
-  <path fill="#FFC300" d="M48 192V64h32l48 56 48-56h32v128h-32V112l-48 56-48-56v80z"/>
+<svg width="384" height="384" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <rect width="256" height="256" fill="none"/>
+  <!-- Golden monogram M (Manrope ExtraBold) -->
+  <text x="128" y="196" text-anchor="middle" font-family="'Manrope','Inter',Arial,sans-serif" font-size="188" font-weight="800" fill="#FFC300">M</text>
 </svg>
 
