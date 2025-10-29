@@ -6,8 +6,9 @@ const manrope = Manrope({ subsets: ["latin"], weight: ["800"], display: "swap" }
 export default function Wordmark({ className = "" }: { className?: string }) {
   return (
     <div className={`select-none whitespace-nowrap ${className}`} aria-label="Mentorio logo">
-      <h1 className={`${manrope.className} my-0 leading-none tracking-tight text-3xl md:text-4xl text-primary`} style={{ letterSpacing: "0.1px" }}>
-        Mentorio
+      <h1 className={`${manrope.className} my-0 leading-none tracking-tight text-3xl md:text-4xl`} style={{ letterSpacing: "0.1px" }}>
+        <span className="text-primary">M</span>
+        <span className="text-foreground">entorio</span>
       </h1>
     </div>
   );
