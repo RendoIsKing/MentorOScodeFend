@@ -15,7 +15,6 @@ import Upload from "@/assets/images/Sidebar/upload.svg";
 import { useContentUploadContext } from "@/context/open-content-modal";
 import ContentUploadAlert from "../upload-content-options/content-upload-alert";
 import { useUserOnboardingContext } from "@/context/UserOnboarding";
-import { useTypedSelector } from "@/redux/store";
 
 type SidebarTypes = {
   id: number;
@@ -35,8 +34,8 @@ const SideBarRadioButton = () => {
   const [openLivestreamModal, setOpenLivestreamModal] = useState(false);
   const { toggleContentUploadOpen } = useContentUploadContext();
   const { user } = useUserOnboardingContext();
-  const auth = useTypedSelector((state) => state.auth);
-  const currentUserName = (user?.userName || auth?.authenticated?.user?.userName || '').toString();
+  // Always use the live user from /auth/me to avoid stale redux state after Google sign-in
+  const currentUserName = (user?.userName || '').toString();
 
   const handleButtonClick = (
     buttonIndex: number,
@@ -129,7 +128,7 @@ const SideBarRadioButton = () => {
     {
       id: 8,
       name: "Profile",
-      url: currentUserName ? `/${currentUserName}` : "/signin",
+      url: currentUserName ? `/${currentUserName}` : "/home",
       icon: <CircleUserRound size={30} strokeWidth={1.5} absoluteStrokeWidth />,
       segment: currentUserName,
       hasDocumentVerified: false, // Enable button
