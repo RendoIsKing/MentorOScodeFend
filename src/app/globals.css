@@ -83,6 +83,31 @@ body { overscroll-behavior-y: none; }
     --ring: 177 83% 43%;
   }
 
+  /* Optional Theme: Bright Yellow
+     Primary: #FFD60A (hsl(50, 100%, 52%))
+     Secondary (Navy): #1E3A8A (hsl(224, 64%, 33%))
+     Accent (Turquoise): #12C8BE (hsl(177, 83%, 43%))
+     Usage: add class "theme-yellow" on <html> or <body> to enable
+  */
+  .theme-yellow {
+    --primary: 50 100% 52%; /* #FFD60A */
+    --primary-foreground: 222 47% 11%;
+    --secondary: 224 64% 33%; /* Navy */
+    --secondary-foreground: 210 40% 98%;
+    --accent: 177 83% 43%; /* Turquoise */
+    --accent-foreground: 222 47% 11%;
+    --ring: 50 100% 52%;
+  }
+  .dark.theme-yellow {
+    --primary: 50 100% 52%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 224 64% 33%;
+    --secondary-foreground: 210 40% 98%;
+    --accent: 177 83% 43%;
+    --accent-foreground: 222 47% 11%;
+    --ring: 50 100% 52%;
+  }
+
   /* Sidebar typography:
      Use the same font family as the Mentorio logotype (system fallback if custom not available).
      We keep sizes unchanged by only overriding font-family and font-weight.
