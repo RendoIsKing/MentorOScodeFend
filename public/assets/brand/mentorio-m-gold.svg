@@ -1,14 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Golden yellow Mentorio M on transparent background -->
-  <g fill="#FFC300">
-    <!-- Left stem -->
-    <rect x="64" y="96" width="80" height="320" rx="12"/>
-    <!-- Right stem -->
-    <rect x="368" y="96" width="80" height="320" rx="12"/>
-    <!-- Left diagonal -->
-    <path d="M144 96 h72 l88 150 c6 10 6 22 0 32 l-32 54 -128 -220 z"/>
-    <!-- Right diagonal -->
-    <path d="M448 96 h-72 l-88 150 c-6 10 -6 22 0 32 l32 54 128 -220 z"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- Circular navy badge with golden M designed for small favicon sizes -->
+  <defs>
+    <filter id="s" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <circle cx="128" cy="128" r="116" fill="#1E3A8A" filter="url(#s)"/>
+  <!-- Stylized M using rounded stroke for crisp rendering when downscaled -->
+  <path d="M 64 176 V 84 L 128 148 L 192 84 V 176" fill="none" stroke="#FFC300" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 
