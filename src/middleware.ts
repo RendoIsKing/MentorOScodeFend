@@ -102,7 +102,9 @@ export async function middleware(request: NextRequest) {
     const u = userProgress?.data || ({} as any);
     const onboardingCookie = request.cookies.get('onboarding');
     const onboardingStarted = onboardingCookie?.value === 'start';
-    const needsInfo = !(u?.hasPersonalInfo === true);
+    // For Google-linked users, skip the legacy /user-info step
+    const isGoogle = Boolean(u?.googleId);
+    const needsInfo = isGoogle ? false : !(u?.hasPersonalInfo === true);
     const needsPhoto = !(u?.hasPhotoInfo === true);
     // We no longer require the tags step in onboarding
     const needsTags = false;
