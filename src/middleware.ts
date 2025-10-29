@@ -92,6 +92,12 @@ export async function middleware(request: NextRequest) {
       return resp;
     }
 
+    // If the current request is the Google-specific onboarding screen, allow it even if other
+    // onboarding steps are pending. This prevents forced redirects back to /user-info.
+    if (currentPath === "/google-user-info") {
+      return NextResponse.next();
+    }
+
     // Modify onboarding steps to allow access
     const u = userProgress?.data || ({} as any);
     const onboardingCookie = request.cookies.get('onboarding');
