@@ -15,6 +15,7 @@ import Upload from "@/assets/images/Sidebar/upload.svg";
 import { useContentUploadContext } from "@/context/open-content-modal";
 import ContentUploadAlert from "../upload-content-options/content-upload-alert";
 import { useUserOnboardingContext } from "@/context/UserOnboarding";
+import { useGetUserDetailsQuery } from "@/redux/services/haveme";
 
 type SidebarTypes = {
   id: number;
@@ -34,8 +35,10 @@ const SideBarRadioButton = () => {
   const [openLivestreamModal, setOpenLivestreamModal] = useState(false);
   const { toggleContentUploadOpen } = useContentUploadContext();
   const { user } = useUserOnboardingContext();
-  // Always use the live user from /auth/me to avoid stale redux state after Google sign-in
-  const currentUserName = (user?.userName || '').toString();
+  const { data: me } = useGetUserDetailsQuery();
+  // Prefer live /auth/me; fall back to context
+  const resolvedUserName = (me as any)?.data?.userName || (me as any)?.data?.user?.userName || user?.userName || '';
+  const currentUserName = String(resolvedUserName || '');
 
   const handleButtonClick = (
     buttonIndex: number,
