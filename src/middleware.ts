@@ -106,7 +106,10 @@ export async function middleware(request: NextRequest) {
     const hasUserName = Boolean(u?.userName && String(u?.userName).trim().length > 0);
     // Require username to be set even for Google-linked users; route them to google-user-info until done
     const needsInfo = isGoogle ? !hasUserName : !(u?.hasPersonalInfo === true && hasUserName);
-    const needsPhoto = !(u?.hasPhotoInfo === true);
+    const hasPhotoFlag = Boolean(u?.hasPhotoInfo === true);
+    const hasPhotoId = Boolean(u?.photoId);
+    const hasPhotoObj = Boolean((u as any)?.photo?._id);
+    const needsPhoto = !(hasPhotoFlag || hasPhotoId || hasPhotoObj);
     // We no longer require the tags step in onboarding
     const needsTags = false;
     const pathsAndChecks = [
