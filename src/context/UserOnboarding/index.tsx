@@ -43,8 +43,11 @@ export const UserOnboardingContextProvider = (props: any) => {
     refetchOnReconnect: true,
     refetchOnFocus: true,
     selectFromResult: ({ data, isLoading }) => {
+      const raw: any = data?.data as any;
+      // Normalize both legacy { data: User } and new { data: { user: User, ... } }
+      const normalized = raw?.user ? raw.user : raw;
       return {
-        userData: data?.data,
+        userData: normalized,
         isUserDataLoading: isLoading,
       };
     },
