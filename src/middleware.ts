@@ -102,14 +102,15 @@ export async function middleware(request: NextRequest) {
     const u = userProgress?.data || ({} as any);
     const onboardingCookie = request.cookies.get('onboarding');
     const onboardingStarted = onboardingCookie?.value === 'start';
-    // For Google-linked users, skip the legacy /user-info step
     const isGoogle = Boolean(u?.googleId);
-    const needsInfo = isGoogle ? false : !(u?.hasPersonalInfo === true);
+    const hasUserName = Boolean(u?.userName && String(u?.userName).trim().length > 0);
+    // Require username to be set even for Google-linked users; route them to google-user-info until done
+    const needsInfo = isGoogle ? !hasUserName : !(u?.hasPersonalInfo === true && hasUserName);
     const needsPhoto = !(u?.hasPhotoInfo === true);
     // We no longer require the tags step in onboarding
     const needsTags = false;
     const pathsAndChecks = [
-      { path: "/user-info", check: !needsInfo },
+      { path: isGoogle ? "/google-user-info" : "/user-info", check: !needsInfo },
       { path: "/user-photo", check: !needsPhoto },
       { path: "/age-confirmation", check: true },
     ];
