@@ -63,13 +63,14 @@ const Home = () => {
   const posts = items.flatMap((p: any) => {
     const m = p?.mediaFiles?.[0];
     if (!m?.path) return [] as any[];
-    const isVideo = (m?.mimeType && m.mimeType.startsWith('video/')) || /\.(mp4|webm|mov)$/i.test(m.path);
+    const isVideo = (m?.mimeType && m.mimeType.startsWith('video/')) || /\.(mp4|webm|mov)$/i.test(m?.path || '');
     // Always use same-origin proxy for media so responses aren't blocked by cross-origin policies
     const base = '/api/backend';
-    // Prefer stable id-based file endpoint when available to avoid missing disk paths
-    const src = (m && (m._id || (m as any).id))
-      ? `${base}/v1/user/files/${String((m as any)._id || (m as any).id)}`
-      : (m?.path?.startsWith('http') ? m.path : `${base}/${m?.path || ''}`);
+    // Prefer stable id-based endpoint: use file doc id OR original mediaId from post object
+    const fileId = (m && ((m as any)._id || (m as any).id)) || (p?.media?.[0]?.mediaId);
+    const src = fileId
+      ? `${base}/v1/user/files/${String(fileId)}`
+      : (m?.path?.startsWith('http') ? m.path : (m?.path ? `${base}/${m.path}` : ''));
 
     // Avatar: prefer id-based file endpoint
     const avatarFileId = (p?.userInfo?.[0]?.photoId) || (p?.userPhoto?.[0]?._id) || (p?.userInfo?.[0]?.photo?._id);
