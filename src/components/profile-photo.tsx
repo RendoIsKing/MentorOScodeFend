@@ -26,6 +26,7 @@ import {
   useCreateUserMutation,
   useDeleteFileMutation,
   useSkipUserPhotoMutation,
+  useGetUserDetailsQuery,
 } from "@/redux/services/haveme";
 import { baseServerUrl, cn } from "@/lib/utils";
 import { useUpdateMeMutation } from "@/redux/services/haveme/user";
@@ -57,6 +58,7 @@ const ProfilePhoto: React.FC<IProfilePhotoProps> = ({ isUpdating }) => {
   const [skipProfilePhoto] = useSkipUserPhotoMutation();
   const [deleteProfilePhoto] = useDeleteFileMutation();
   const { toast } = useToast();
+  const { refetch: refetchMe } = useGetUserDetailsQuery();
 
   // Function to convert the captured image to a base64 string
   const convertToBase64 = (file: Blob) => {
@@ -85,21 +87,15 @@ const ProfilePhoto: React.FC<IProfilePhotoProps> = ({ isUpdating }) => {
     setPhotoPath(newPhotoPath);
   };
 
-  const skipPhoto = () => {
-    skipProfilePhoto({ isPhotoSkipped: true })
-      .unwrap()
-      .then((res) => {
-        const userData = res?.data;
-        // setUser(userData);
-        router.replace("/age-confirmation");
-      })
-      .catch((err) => {
-        console.log("error skipping photo", err);
-        toast({
-          variant: "destructive",
-          description: "Error while skipping photo",
-        });
-      });
+  const skipPhoto = async () => {
+    try {
+      await skipProfilePhoto({ isPhotoSkipped: true }).unwrap();
+      try { await refetchMe(); } catch {}
+      router.replace("/age-confirmation");
+    } catch (err) {
+      console.log("error skipping photo", err);
+      toast({ variant: "destructive", description: "Error while skipping photo" });
+    }
   };
 
   const removeProfilePhoto = () => {
@@ -118,25 +114,15 @@ const ProfilePhoto: React.FC<IProfilePhotoProps> = ({ isUpdating }) => {
       });
   };
 
-  const saveUserPhoto = () => {
-    if (photoId) {
-      let userPhotoObj = {
-        photoId: photoId,
-      };
-      savePhotoMethod(userPhotoObj)
-        .unwrap()
-        .then((res) => {
-          const userData = res?.data;
-          // setUser(userData);
-          router.replace("/age-confirmation");
-        })
-        .catch((err) => {
-          console.log("Error saving photo", err);
-          toast({
-            variant: "destructive",
-            description: "Error saving photo",
-          });
-        });
+  const saveUserPhoto = async () => {
+    if (!photoId) return;
+    try {
+      await savePhotoMethod({ photoId }).unwrap();
+      try { await refetchMe(); } catch {}
+      router.replace("/age-confirmation");
+    } catch (err) {
+      console.log("Error saving photo", err);
+      toast({ variant: "destructive", description: "Error saving photo" });
     }
   };
 
