@@ -66,9 +66,17 @@ const Home = () => {
     const isVideo = (m?.mimeType && m.mimeType.startsWith('video/')) || /\.(mp4|webm|mov)$/i.test(m.path);
     // Always use same-origin proxy for media so responses aren't blocked by cross-origin policies
     const base = '/api/backend';
-    const src = m.path.startsWith('http') ? m.path : `${base}/${m.path}`;
+    // Prefer stable id-based file endpoint when available to avoid missing disk paths
+    const src = (m && (m._id || (m as any).id))
+      ? `${base}/v1/user/files/${String((m as any)._id || (m as any).id)}`
+      : (m?.path?.startsWith('http') ? m.path : `${base}/${m?.path || ''}`);
+
+    // Avatar: prefer id-based file endpoint
+    const avatarFileId = (p?.userInfo?.[0]?.photoId) || (p?.userPhoto?.[0]?._id) || (p?.userInfo?.[0]?.photo?._id);
     const avatarPath = p?.userInfo?.[0]?.photo?.path || p?.userPhoto?.[0]?.path;
-    const avatarUrl = avatarPath ? (String(avatarPath).startsWith('http') ? avatarPath : `${base}/${avatarPath}`) : undefined;
+    const avatarUrl = avatarFileId
+      ? `${base}/v1/user/files/${String(avatarFileId)}`
+      : (avatarPath ? (String(avatarPath).startsWith('http') ? avatarPath : `${base}/${avatarPath}`) : undefined);
     const user = {
       id: String(p?.userInfo?.[0]?._id || ""),
       username: String(p?.userInfo?.[0]?.userName || ""),
