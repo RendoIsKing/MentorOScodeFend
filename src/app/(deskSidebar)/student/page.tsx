@@ -10,6 +10,7 @@ import { useStudentSnapshot } from '@/hooks/useStudentSnapshot';
 import { useTypedSelector } from '@/redux/store';
 import { selectIsAuthenticated } from '@/redux/slices/auth';
 import { useUserOnboardingContext } from '@/context/UserOnboarding';
+import { useGetUserDetailsQuery } from '@/redux/services/haveme';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { useRouter } from 'next/navigation';
 import { logEvent } from '@/lib/analytics';
@@ -22,6 +23,7 @@ import ChangeDetailsModal from '@/components/student/ChangeDetailsModal';
 export default function StudentCenterPage() {
   const [period, setPeriod] = useState<'7d'|'30d'|'90d'|'ytd'>('30d');
   const { user } = useUserOnboardingContext();
+  const { data: me } = useGetUserDetailsQuery();
   const { data, loading, error, refresh } = useStudentSnapshot(user?._id || 'me', period);
   const [exercise, setExercise] = useState<string>('');
   const [exerciseSeries, setExerciseSeries] = useState<{date:string; value:number}[] | null>(null);
@@ -109,8 +111,13 @@ export default function StudentCenterPage() {
   return (
     <div className="mx-auto max-w-screen-xl px-6 md:px-8 py-6 md:py-8 space-y-6 md:space-y-8">
       <Header
-        name={user?.fullName || user?.userName || 'Student'}
-        avatarUrl={(data as any)?.photo?.path ? `${baseServerUrl}/${(data as any).photo.path}` : (user?.photo?.path ? `${baseServerUrl}/${user.photo.path}` : undefined)}
+        name={(me as any)?.data?.fullName || (me as any)?.data?.user?.fullName || user?.fullName || (me as any)?.data?.userName || (me as any)?.data?.user?.userName || user?.userName || 'Student'}
+        avatarUrl={(() => {
+          const mePhoto = (me as any)?.data?.photo?.path || (me as any)?.data?.user?.photo?.path;
+          const snapPhoto = (data as any)?.photo?.path;
+          const p = mePhoto || snapPhoto || user?.photo?.path;
+          return p ? `${baseServerUrl}/${p}` : undefined;
+        })()}
         onPeriodChange={setPeriod}
       />
       {/* Inline weight logger removed as requested */}
