@@ -64,7 +64,8 @@ const Home = () => {
     const m = p?.mediaFiles?.[0];
     if (!m?.path) return [] as any[];
     const isVideo = (m?.mimeType && m.mimeType.startsWith('video/')) || /\.(mp4|webm|mov)$/i.test(m.path);
-    const base = (process.env.NEXT_PUBLIC_API_SERVER as any) || '/api/backend';
+    // Always use same-origin proxy for media so responses aren't blocked by cross-origin policies
+    const base = '/api/backend';
     const src = m.path.startsWith('http') ? m.path : `${base}/${m.path}`;
     const avatarPath = p?.userInfo?.[0]?.photo?.path || p?.userPhoto?.[0]?.path;
     const avatarUrl = avatarPath ? (String(avatarPath).startsWith('http') ? avatarPath : `${base}/${avatarPath}`) : undefined;
