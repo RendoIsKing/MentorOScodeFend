@@ -39,6 +39,9 @@ export const UserOnboardingContextProvider = (props: any) => {
   const { userData, isUserDataLoading } = useGetUserDetailsQuery(undefined, {
     // Only fetch when a session cookie is present to avoid CORS/preflight loops
     skip: !hasSessionCookie,
+    refetchOnMountOrArgChange: true,
+    refetchOnReconnect: true,
+    refetchOnFocus: true,
     selectFromResult: ({ data, isLoading }) => {
       return {
         userData: data?.data,
