@@ -99,15 +99,22 @@ function ProfileHeaderDesktop() {
   return (
     <div>
       <div className="relative">
-        <img
-          className="w-full h-64 object-cover"
-          src={
-            isOwnerRendered
-              ? `${baseServerUrl}/${data?.data?.coverPhoto?.path}`
-              : `${baseServerUrl}/${userDetailsData?.coverPhoto?.path}`
-          }
-          alt="cover"
-        />
+        {(() => {
+          const owner = isOwnerRendered ? (data as any)?.data : (userDetailsData as any);
+          const base = '/api/backend';
+          const coverId = owner?.coverPhoto?._id || owner?.coverPhotoId;
+          const coverPath = owner?.coverPhoto?.path;
+          const coverUrl = coverId
+            ? `${base}/v1/user/files/${String(coverId)}`
+            : (coverPath ? `${base}/${coverPath}` : undefined);
+          return (
+            <img
+              className="w-full h-64 object-cover"
+              src={coverUrl || '/assets/images/Signup/cover-placeholder.jpg'}
+              alt="cover"
+            />
+          );
+        })()}
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40">
           {!isOwnerRendered && (
             <>
@@ -144,15 +151,22 @@ function ProfileHeaderDesktop() {
 
       <div className="flex px-4 -mt-24 ">
         <Avatar className="block relative w-56">
-          <img
-            alt="profile image"
-            src={
-              isOwnerRendered
-                ? `${baseServerUrl}/${data?.data?.photo?.path}`
-                : `${baseServerUrl}/${userDetailsData?.photo?.path}`
-            }
-            className="rounded-full mx-2 lg:h-40 lg:w-40 object-cover"
-          />
+          {(() => {
+            const owner = isOwnerRendered ? (data as any)?.data : (userDetailsData as any);
+            const base = '/api/backend';
+            const avatarId = owner?.photo?._id || owner?.photoId;
+            const avatarPath = owner?.photo?.path;
+            const avatarUrl = avatarId
+              ? `${base}/v1/user/files/${String(avatarId)}`
+              : (avatarPath ? `${base}/${avatarPath}` : undefined);
+            return (
+              <img
+                alt="profile image"
+                src={avatarUrl || '/assets/images/Home/small-profile-img.svg'}
+                className="rounded-full mx-2 lg:h-40 lg:w-40 object-cover"
+              />
+            );
+          })()}
         </Avatar>
         <div className="flex gap-8 flex-col relative w-full m-8">
           <div>
