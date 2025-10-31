@@ -43,6 +43,7 @@ interface IMyUserDataProps {
 }
 
 import DeleteModal from "@/components/delete-modal";
+import { useGetUserDetailsQuery } from "@/redux/services/haveme";
 
 const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) => {
   const [selectBookmark, setSelectBookmark] = useState(false);
@@ -98,10 +99,13 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
     ? `${baseServerUrl}/v1/user/files/${String(avatarFileId)}`
     : (rawPath ? (String(rawPath).startsWith('http') ? String(rawPath) : `${baseServerUrl}/${rawPath}`) : "/assets/images/search/small-profile-img.svg");
   const authorUserName = ((author?.userName) || ((Array.isArray((feedData as any)?.userInfo) ? (feedData as any).userInfo[0]?.userName : (feedData as any).userInfo?.userName)) || '').toString();
+  // Resolve current user id robustly from props or /auth/me
+  const { data: me } = useGetUserDetailsQuery();
+  const resolvedCurrentUserId = (currentUserId as any) || (me as any)?.data?._id || (me as any)?.data?.user?._id || null;
   const isOwner = Boolean(
-    currentUserId && (
-      String(currentUserId) === String(author?._id || author?.id) ||
-      String(currentUserId) === String((feedData as any)?.user)
+    resolvedCurrentUserId && (
+      String(resolvedCurrentUserId) === String(author?._id || author?.id) ||
+      String(resolvedCurrentUserId) === String((feedData as any)?.user)
     )
   );
 
