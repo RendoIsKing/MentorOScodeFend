@@ -19,6 +19,7 @@ import { useUserOnboardingContext } from "@/context/UserOnboarding";
 import { useUpdateMeMutation } from "@/redux/services/haveme/user";
 import { useGetUserDetailsQuery, useLazyCheckUsernameQuery } from "@/redux/services/haveme";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useRouter } from "next/navigation";
 
 // min shouldbe added when api call is done
 const FormSchema = z.object({
@@ -56,6 +57,7 @@ const FormSchema = z.object({
 });
 
 const EditProfile = () => {
+  const router = useRouter();
   const { user } = useUserOnboardingContext();
   const { data: meData } = useGetUserDetailsQuery();
   const [updateMeTrigger] = useUpdateMeMutation();
@@ -139,6 +141,12 @@ const EditProfile = () => {
             variant: "success",
             description: response?.message,
           });
+          const prevUserName = (meData as any)?.data?.userName;
+          const nextUserName = data.userName;
+          if (nextUserName && prevUserName && nextUserName.toLowerCase() !== String(prevUserName).toLowerCase()) {
+            // Navigate to the new profile route so queries use the updated identifier
+            router.replace(`/${nextUserName.toLowerCase()}`);
+          }
         })
         .catch((error) => {
           toast({

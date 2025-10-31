@@ -134,6 +134,15 @@ export default function ProfileBody() {
   const { data: me } = useGetUserDetailsQuery();
   const isOwnProfile = Boolean(me?.data?._id && resolvedUser?._id && me?.data?._id === resolvedUser?._id);
 
+  // If viewing own profile, switch the posts query key to immutable user _id
+  useEffect(() => {
+    const selfId = me?.data?._id;
+    if (isOwnProfile && selfId && postQuery.userName !== selfId) {
+      setPostQuery((prev) => ({ ...prev, userName: selfId, page: 1 }));
+      appDispatcher(resetUserPosts());
+    }
+  }, [isOwnProfile, me?.data?._id]);
+
   const loadMorePosts = () => {
     if (currentTab === "saved") {
       setSavedQuery((prev) => ({ ...prev, page: prev.page + 1 }));
@@ -147,13 +156,16 @@ export default function ProfileBody() {
 
   const handleTabClick = (filter) => {
     appDispatcher(resetUserPosts());
-    const nextUserName = filter === "saved"
-      ? String(me?.data?.userName || resolvedUser?.userName || postQuery.userName)
+    const ownIdOrName = isOwnProfile
+      ? String(me?.data?._id || "")
       : String(resolvedUser?.userName || postQuery.userName);
+    const nextUserName = filter === "saved"
+      ? ownIdOrName
+      : ownIdOrName;
     setPostQuery((prevQuery) => ({
       ...prevQuery,
       filter: filter,
-      userName: nextUserName.toLowerCase(),
+      userName: nextUserName.toLowerCase ? nextUserName.toLowerCase() : nextUserName,
       page: 1,
     }));
     if (filter === "saved") {
