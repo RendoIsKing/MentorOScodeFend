@@ -106,7 +106,7 @@ const Home = () => {
             RightOverlay={({ post }) => {
               const original = byId.get(post.id);
               if (!original) return null as any;
-              return <PostInteraction postDetails={original as any} />;
+              return <PostInteraction postDetails={original as any} currentUserId={user?._id || null} />;
             }}
           />
         </main>

@@ -102,6 +102,7 @@ export const RadioButtonGroup = ({ label = "Tip Amount" }) => {
 
 interface IPostInteractionProps {
   postDetails: IPostObjectResponse;
+  currentUserId?: string | null;
 }
 interface IMyUserDataProps {
   userData?: {
@@ -115,7 +116,7 @@ interface IMyUserDataProps {
   };
 }
 
-const PostInteraction: React.FC<IPostInteractionProps> = ({ postDetails }) => {
+const PostInteraction: React.FC<IPostInteractionProps> = ({ postDetails, currentUserId }) => {
   const directPath = postDetails?.userPhoto?.[0]?.path || postDetails?.userInfo?.[0]?.photo?.path;
   const photoId = postDetails?.userInfo?.[0]?.photoId;
   const { data: userPhotoData } = useGetUserProfilePhotoQuery(photoId, { skip: !photoId });
@@ -133,7 +134,7 @@ const PostInteraction: React.FC<IPostInteractionProps> = ({ postDetails }) => {
               <MobileFeed feedData={postDetails} />
             </div>
           ) : (
-            <DesktopFeed feedData={postDetails} />
+            <DesktopFeed feedData={postDetails} currentUserId={currentUserId} />
           )}
         </div>
       </div>

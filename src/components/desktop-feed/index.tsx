@@ -39,11 +39,15 @@ const fontItalic = ABeeZee({
 
 interface IMyUserDataProps {
   feedData: IPostObjectResponse;
+  currentUserId?: string | null;
 }
 
-const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
+import DeleteModal from "@/components/delete-modal";
+
+const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) => {
   const [selectBookmark, setSelectBookmark] = useState(false);
   const [isReportUserOpen, setIsReportUserOpen] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
 
   // like heart state
   const [heartStates, setHeartStates] = useState<boolean>(feedData?.isLiked);
@@ -94,6 +98,7 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
     ? `${baseServerUrl}/v1/user/files/${String(avatarFileId)}`
     : (rawPath ? (String(rawPath).startsWith('http') ? String(rawPath) : `${baseServerUrl}/${rawPath}`) : "/assets/images/search/small-profile-img.svg");
   const authorUserName = ((author?.userName) || ((Array.isArray((feedData as any)?.userInfo) ? (feedData as any).userInfo[0]?.userName : (feedData as any).userInfo?.userName)) || '').toString();
+  const isOwner = Boolean(currentUserId && String(currentUserId) === String(author?._id || author?.id));
 
   return (
     <div className="flex flex-col gap-y-4">
@@ -151,6 +156,13 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
           className="p-2 border-[#0B0F14] light:bg-secondary dark:bg-[#0B0F14]"
           side="top"
         >
+          {isOwner ? (
+            <DropdownMenuItem onClick={() => setOpenDelete(true)}>
+              <div className="flex justify-between">
+                <div className="flex text-destructive gap-2 cursor-pointer">Delete post</div>
+              </div>
+            </DropdownMenuItem>
+          ) : (
           <DropdownMenuItem>
             <div
               className="flex justify-between"
@@ -162,6 +174,7 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
               </div>
             </div>
           </DropdownMenuItem>
+          )}
           <DropdownMenuItem>
             <div className="flex justify-between">
               <div className="flex gap-2 cursor-pointer">
@@ -173,6 +186,10 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {isOwner && (
+        <DeleteModal openPopup={openDelete} setOpenPopup={setOpenDelete} postDetails={feedData as any} />
+      )}
 
       {/* Flip media button removed */}
 
