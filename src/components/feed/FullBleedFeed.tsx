@@ -166,7 +166,7 @@ export default function FullBleedFeed({
                       href={`/${active.user?.username || active.user?.id || ""}`}
                       className="flex items-center gap-2 rounded-full bg-black/35 px-2 py-1"
                     >
-                      <img src={(active as any).user?.avatarUrl || (active as any).user?.photo?.path || "/assets/images/Home/small-profile-img.svg"} alt="" className="h-10 w-10 rounded-full object-cover" />
+                      <img src={(active as any).user?.avatarUrl || "/assets/images/Home/small-profile-img.svg"} alt="" className="h-10 w-10 rounded-full object-cover" />
                       <div className="flex min-w-0 flex-col">
                         <span className="truncate text-sm font-semibold text-white leading-tight">{active.user.displayName || active.user.username || ""}</span>
                         {active?.createdAt ? (

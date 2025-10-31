@@ -74,15 +74,16 @@ const Home = () => {
 
     // Avatar: prefer id-based file endpoint
     const avatarFileId = (p?.userInfo?.[0]?.photoId) || (p?.userPhoto?.[0]?._id) || (p?.userInfo?.[0]?.photo?._id);
-    const avatarPath = p?.userInfo?.[0]?.photo?.path || p?.userPhoto?.[0]?.path;
+    const avatarPathRaw = p?.userInfo?.[0]?.photo?.path || p?.userPhoto?.[0]?.path;
+    const safeAvatarPath = (avatarPathRaw && avatarPathRaw !== 'undefined' && avatarPathRaw !== 'null') ? avatarPathRaw : undefined;
     const avatarUrl = avatarFileId
       ? `${base}/v1/user/files/${String(avatarFileId)}`
-      : (avatarPath ? (String(avatarPath).startsWith('http') ? avatarPath : `${base}/${avatarPath}`) : undefined);
+      : (safeAvatarPath ? (String(safeAvatarPath).startsWith('http') ? safeAvatarPath : `${base}/${safeAvatarPath}`) : undefined);
     const user = {
       id: String(p?.userInfo?.[0]?._id || ""),
       username: String(p?.userInfo?.[0]?.userName || ""),
       displayName: String(p?.userInfo?.[0]?.fullName || ""),
-      avatarUrl,
+      avatarUrl: avatarUrl && avatarUrl.includes('undefined') ? undefined : avatarUrl,
       viewerFollows: Boolean(p?.isFollowing),
     };
     const privacy: string | undefined = typeof p?.privacy === 'string' ? p.privacy.toLowerCase() : undefined;
