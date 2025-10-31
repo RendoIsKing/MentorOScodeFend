@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "./ui/separator";
 import { useUserOnboardingContext } from "@/context/UserOnboarding";
 import { useUpdateMeMutation } from "@/redux/services/haveme/user";
-import { useLazyCheckUsernameQuery } from "@/redux/services/haveme";
+import { useGetUserDetailsQuery, useLazyCheckUsernameQuery } from "@/redux/services/haveme";
 import { useDebounce } from "@/hooks/use-debounce";
 
 // min shouldbe added when api call is done
@@ -57,6 +57,7 @@ const FormSchema = z.object({
 
 const EditProfile = () => {
   const { user } = useUserOnboardingContext();
+  const { data: meData } = useGetUserDetailsQuery();
   const [updateMeTrigger] = useUpdateMeMutation();
   const [usernameText, setUsernameText] = useState("");
   const [usernameAvailability, setUsernameAvailability] = useState(null);
@@ -88,6 +89,21 @@ const EditProfile = () => {
       });
     }
   }, [user, form]);
+
+  // Also hydrate from /auth/me so the form pre-fills even if context is not ready
+  useEffect(() => {
+    const d: any = (meData as any)?.data;
+    if (!d) return;
+    form.reset({
+      fullName: d.fullName || "",
+      userName: d.userName || "",
+      bio: d.bio || "",
+      instagramLink: d.instagramLink || "",
+      link: d.userName ? `Mentorio.com/@${d.userName}` : "",
+      tiktokLink: d.tiktokLink || "",
+      youtubeLink: d.youtubeLink || "",
+    });
+  }, [meData, form]);
 
   const debouncedValue = useDebounce(usernameText, 500);
 
