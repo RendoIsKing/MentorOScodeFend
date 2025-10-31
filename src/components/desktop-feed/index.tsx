@@ -98,7 +98,12 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
     ? `${baseServerUrl}/v1/user/files/${String(avatarFileId)}`
     : (rawPath ? (String(rawPath).startsWith('http') ? String(rawPath) : `${baseServerUrl}/${rawPath}`) : "/assets/images/search/small-profile-img.svg");
   const authorUserName = ((author?.userName) || ((Array.isArray((feedData as any)?.userInfo) ? (feedData as any).userInfo[0]?.userName : (feedData as any).userInfo?.userName)) || '').toString();
-  const isOwner = Boolean(currentUserId && String(currentUserId) === String(author?._id || author?.id));
+  const isOwner = Boolean(
+    currentUserId && (
+      String(currentUserId) === String(author?._id || author?.id) ||
+      String(currentUserId) === String((feedData as any)?.user)
+    )
+  );
 
   return (
     <div className="flex flex-col gap-y-4">
