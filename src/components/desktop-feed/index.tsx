@@ -184,15 +184,17 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
             </div>
           </DropdownMenuItem>
           )}
-          <DropdownMenuItem>
-            <div className="flex justify-between">
-              <div className="flex gap-2 cursor-pointer">
-                {/* <ThumbsDown />
-                Not Interested */}
-                <NotInterestedComp postId={feedData?._id} />
+          {!isOwner && (
+            <DropdownMenuItem>
+              <div className="flex justify-between">
+                <div className="flex gap-2 cursor-pointer">
+                  {/* <ThumbsDown />
+                  Not Interested */}
+                  <NotInterestedComp postId={feedData?._id} />
+                </div>
               </div>
-            </div>
-          </DropdownMenuItem>
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
