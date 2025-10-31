@@ -4,7 +4,7 @@ import Image from "next/image";
 import React from "react";
 
 interface IAvatarWithDescriptionProps {
-  imageUrl: string;
+  imageUrl?: string;
   ImageFallBackText: string;
   userName: string;
   userNameTag: string;
@@ -23,7 +23,9 @@ const AvatarWithDescription: React.FC<IAvatarWithDescriptionProps> = ({
   return (
     <div className="flex items-center">
       <Avatar>
-        <AvatarImage className="object-cover" src={imageUrl} alt="@shadcn" />
+        {imageUrl && !String(imageUrl).includes('undefined') ? (
+          <AvatarImage className="object-cover" src={imageUrl} alt="@user" />
+        ) : null}
 
         {/* <img
           className="aspect-automax-w-fit	w-max"
