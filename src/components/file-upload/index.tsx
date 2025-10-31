@@ -119,7 +119,7 @@ const FileUploadForm: React.FC<IFileUploadFormProps> = ({
               data-test="file-input"
               style={{ display: "none" }}
               type="file"
-              accept="image/jpeg,image/png"
+              accept="image/*"
               onChange={handleFileChange}
             />
           </div>
