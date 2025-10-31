@@ -199,7 +199,7 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
       </DropdownMenu>
 
       {isOwner && (
-        <DeleteModal openPopup={openDelete} setOpenPopup={setOpenDelete} postDetails={feedData as any} />
+        <DeleteModal openPopup={openDelete} setOpenPopup={setOpenDelete} postDetails={feedData as any} showTrigger={false} />
       )}
 
       {/* Flip media button removed */}

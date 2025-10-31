@@ -24,12 +24,14 @@ interface IPostModalProps {
   openPopup: boolean;
   setOpenPopup: (a1: boolean) => void;
   postDetails?: IPostContentObject;
+  showTrigger?: boolean;
 }
 
 const DeleteModal: React.FC<IPostModalProps> = ({
   setOpenPopup,
   openPopup,
   postDetails,
+  showTrigger = true,
 }) => {
   const dialogRef = useRef<HTMLDivElement>(null);
   const [deletePostTrigger] = useDeletePostMutation();
@@ -121,10 +123,12 @@ const DeleteModal: React.FC<IPostModalProps> = ({
   return (
     <div>
       <AlertDialog open={openPopup}>
-        <Ellipsis
-          className="dark:fill-foreground dark:text-white text-muted-foreground w-10 self-start cursor-pointer"
-          onClick={() => setOpenPopup(true)}
-        />
+        {showTrigger && (
+          <Ellipsis
+            className="dark:fill-foreground dark:text-white text-muted-foreground w-10 self-start cursor-pointer"
+            onClick={() => setOpenPopup(true)}
+          />
+        )}
         <AlertDialogContent
           className={
             "py-10 p-0 bg-[#171a1f] w-full max-w-[12rem] border-none gap-0 bg-background"
