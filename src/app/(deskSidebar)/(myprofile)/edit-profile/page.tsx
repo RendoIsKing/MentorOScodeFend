@@ -16,6 +16,7 @@ import {
   useUpdateUserPhotoMutation,
 } from "@/redux/services/haveme/user";
 import { baseServerUrl } from "@/lib/utils";
+import { useGetUserDetailsQuery } from "@/redux/services/haveme";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -35,6 +36,7 @@ export default function EditProfilePage() {
   const { isMobile } = useClientHardwareInfo();
   const router = useRouter();
   const { user } = useUserOnboardingContext();
+  const { refetch: refetchMe } = useGetUserDetailsQuery();
   const { data: userPhotoData } = useGetUserProfilePhotoQuery(user?.photoId, {
     skip: !user?.photoId,
   });
@@ -54,7 +56,7 @@ export default function EditProfilePage() {
         .unwrap()
         .then((res) => {
          // console.log("result:", res);
-      
+         try { refetchMe(); } catch {}
         })
         .catch((err) => {
           console.log("error:", err);
@@ -68,6 +70,7 @@ export default function EditProfilePage() {
         .unwrap()
         .then((res) => {
          // console.log("result:", res);
+         try { refetchMe(); } catch {}
         })
         .catch((err) => {
           console.log("error:", err);
@@ -91,29 +94,29 @@ export default function EditProfilePage() {
       {!isMobile ? (
         <div>
           <div className="relative">
-            <img
-              className="w-full h-72"
-              src={
-                user?.coverPhoto?._id
-                  ? `${baseServerUrl}/${user?.coverPhoto?.path}`
-                  : "https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-              }
-              alt="Fallback Text"
-            />
+            {(() => {
+              const base = '/api/backend';
+              const coverId = user?.coverPhoto?._id || (user as any)?.coverPhotoId;
+              const coverPath = user?.coverPhoto?.path;
+              const url = coverId ? `${base}/v1/user/files/${String(coverId)}` : (coverPath ? `${base}/${coverPath}` : "https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
+              return (
+                <img className="w-full h-72" src={url} alt="Fallback Text" />
+              );
+            })()}
             <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40"></div>
           </div>
           <div className="flex px-4 -mt-24">
             <div className="flex justify-center relative">
               <Avatar className="size-52 ">
-                <img
-                  alt="Fallback Text"
-                  src={
-                    user?.photoId
-                      ? `${baseServerUrl}/${userPhotoData?.path}`
-                      : "assets/images/Signup/carbon_user-avatar-filled.svg"
-                  }
-                  className="mx-auto relative block object-cover size-52 rounded-full p-1"
-                />
+                {(() => {
+                  const base = '/api/backend';
+                  const avatarId = user?.photoId || user?.photo?._id;
+                  const avatarPath = userPhotoData?.path || user?.photo?.path;
+                  const url = avatarId ? `${base}/v1/user/files/${String(avatarId)}` : (avatarPath ? `${base}/${avatarPath}` : "/assets/images/Signup/carbon_user-avatar-filled.svg");
+                  return (
+                    <img alt="Fallback Text" src={url} className="mx-auto relative block object-cover size-52 rounded-full p-1" />
+                  );
+                })()}
                 {/* <AvatarFallback>CJ</AvatarFallback> */}
               </Avatar>
               <span className="absolute rounded-full bottom-24 -right-4 top-20">
@@ -198,24 +201,20 @@ export default function EditProfilePage() {
       ) : (
         <div>
           <article className="relative isolate flex flex-col justify-end overflow-hidden pt-24 mx-auto">
-            <img
-              src={
-                user?.coverPhoto?._id
-                  ? `${baseServerUrl}/${user?.coverPhoto?.path}`
-                  : "https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-              }
-              alt="Cover"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
+            {(() => {
+              const base = '/api/backend';
+              const coverId = user?.coverPhoto?._id || (user as any)?.coverPhotoId;
+              const coverPath = user?.coverPhoto?.path;
+              const url = coverId ? `${base}/v1/user/files/${String(coverId)}` : (coverPath ? `${base}/${coverPath}` : "https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
+              return (
+                <img src={url} alt="Cover" className="absolute inset-0 h-full w-full object-cover" />
+              );
+            })()}
             <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40"></div>
             <div className="flex items-center px-4 py-2 z-10 justify-between">
               <AvatarWithDescription
                 isTextWhite={true}
-                imageUrl={
-                  user?.photoId
-                    ? `${baseServerUrl}/${userPhotoData?.path}`
-                    : "/assets/images/Home/small-profile-img.svg"
-                }
+                imageUrl={(user?.photoId || user?.photo?._id) ? `/api/backend/v1/user/files/${String(user?.photoId || (user?.photo as any)?._id)}` : "/assets/images/Home/small-profile-img.svg"}
                 ImageFallBackText={"AK"}
                 userName={`${user?.userName}`}
                 userNameTag={`@${user?.userName}`}
