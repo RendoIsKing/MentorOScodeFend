@@ -107,10 +107,11 @@ function ProfileHeaderDesktop() {
           const coverUrl = coverId
             ? `${base}/v1/user/files/${String(coverId)}`
             : (coverPath ? `${base}/${coverPath}` : undefined);
+          const fallback = 'https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
           return (
             <img
               className="w-full h-64 object-cover"
-              src={coverUrl || '/assets/images/Signup/cover-placeholder.jpg'}
+              src={coverUrl || fallback}
               alt="cover"
             />
           );
