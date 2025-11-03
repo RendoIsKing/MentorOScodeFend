@@ -154,16 +154,17 @@ function ProfileHeaderDesktop() {
         <Avatar className="block relative w-56">
           {(() => {
             const owner = isOwnerRendered ? (data as any)?.data : (userDetailsData as any);
-            const base = '/api/backend';
-            const avatarId = owner?.photo?._id || owner?.photoId;
-            const avatarPath = owner?.photo?.path;
-            const avatarUrl = avatarId
-              ? `${base}/v1/user/files/${String(avatarId)}`
-              : (avatarPath ? `${base}/${avatarPath}` : undefined);
+          const base = '/api/backend';
+          const avatarId = owner?.photo?._id || owner?.photoId;
+          const rawPath = owner?.photo?.path;
+          const avatarPath = (rawPath && rawPath !== 'undefined' && rawPath !== 'null') ? rawPath : undefined;
+          const avatarUrl = avatarId
+            ? `${base}/v1/user/files/${String(avatarId)}`
+            : (avatarPath ? `${base}/${avatarPath}` : undefined);
             return (
               <img
                 alt="profile image"
-                src={avatarUrl || '/assets/images/Home/small-profile-img.svg'}
+              src={avatarUrl || '/assets/images/Home/small-profile-img.svg'}
                 className="rounded-full mx-2 lg:h-40 lg:w-40 object-cover"
               />
             );

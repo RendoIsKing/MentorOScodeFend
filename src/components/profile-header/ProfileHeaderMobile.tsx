@@ -289,10 +289,11 @@ const ProfileHeaderMobile = () => {
               isTextWhite={true}
               imageUrl={(() => {
                 const photoId = isOwnerRendered ? (data as any)?.data?.photo?._id : (userDetailsData as any)?.photo?._id;
-                const photoPath = isOwnerRendered ? (data as any)?.data?.photo?.path : (userDetailsData as any)?.photo?.path;
+                const rawPath = isOwnerRendered ? (data as any)?.data?.photo?.path : (userDetailsData as any)?.photo?.path;
+                const photoPath = (rawPath && rawPath !== 'undefined' && rawPath !== 'null') ? rawPath : undefined;
                 if (photoId) return `${baseServerUrl}/v1/user/files/${photoId}`;
                 if (photoPath && !String(photoPath).includes('undefined')) return `${baseServerUrl}/${photoPath}`;
-                return undefined;
+                return '/assets/images/Home/small-profile-img.svg';
               })()}
               ImageFallBackText={isOwnerRendered ? data?.data?.userName : userDetailsData?.userName}
               userName={isOwnerRendered ? data?.data?.fullName : userDetailsData?.fullName}
