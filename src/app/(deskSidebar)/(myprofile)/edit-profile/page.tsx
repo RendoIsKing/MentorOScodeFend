@@ -36,7 +36,7 @@ export default function EditProfilePage() {
   const { isMobile } = useClientHardwareInfo();
   const router = useRouter();
   const { user } = useUserOnboardingContext();
-  const { refetch: refetchMe } = useGetUserDetailsQuery();
+  const { data: meData, refetch: refetchMe } = useGetUserDetailsQuery();
   const { data: userPhotoData } = useGetUserProfilePhotoQuery(user?.photoId, {
     skip: !user?.photoId,
   });
@@ -44,6 +44,9 @@ export default function EditProfilePage() {
   const [updateCoverPhotoTrigger] = useUpdateMeMutation();
   const [openUploadProfilePopup, setOpenUploadProfilePopup] = useState(false);
   const [openUploadCoverPopup, setOpenUploadCoverPopup] = useState(false);
+  // Immediate local preview after successful upload
+  const [localAvatarUrl, setLocalAvatarUrl] = useState<string | undefined>(undefined);
+  const [localCoverUrl, setLocalCoverUrl] = useState<string | undefined>(undefined);
 
   const updatePhotoInfo = async (photoInfo) => {
     let photoInfoObject = {
@@ -55,8 +58,8 @@ export default function EditProfilePage() {
       await updateCoverPhotoTrigger(photoInfoObject)
         .unwrap()
         .then((res) => {
-         // console.log("result:", res);
          try { refetchMe(); } catch {}
+         try { setLocalCoverUrl(`/api/backend/v1/user/files/${String(photoInfo.file?.data?.id)}?v=${Date.now()}`); } catch {}
         })
         .catch((err) => {
           console.log("error:", err);
@@ -69,8 +72,8 @@ export default function EditProfilePage() {
       await updateUserPhotoInfoTrigger(photoInfoObject)
         .unwrap()
         .then((res) => {
-         // console.log("result:", res);
          try { refetchMe(); } catch {}
+         try { setLocalAvatarUrl(`/api/backend/v1/user/files/${String(photoInfo.file?.data?.id)}?v=${Date.now()}`); } catch {}
         })
         .catch((err) => {
           console.log("error:", err);
@@ -95,12 +98,13 @@ export default function EditProfilePage() {
         <div>
           <div className="relative">
             {(() => {
+              if (localCoverUrl) return (<img className="w-full h-72" src={localCoverUrl} alt="Cover" />);
               const base = '/api/backend';
-              const coverId = user?.coverPhoto?._id || (user as any)?.coverPhotoId;
-              const coverPath = user?.coverPhoto?.path;
-              const url = coverId ? `${base}/v1/user/files/${String(coverId)}` : (coverPath ? `${base}/${coverPath}` : "https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
+              const coverId = (meData as any)?.data?.coverPhoto?._id || (user as any)?.coverPhotoId;
+              const coverPath = (meData as any)?.data?.coverPhoto?.path || user?.coverPhoto?.path;
+              const url = coverId ? `${base}/v1/user/files/${String(coverId)}?v=${Date.now()}` : (coverPath ? `${base}/${coverPath}?v=${Date.now()}` : "https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
               return (
-                <img className="w-full h-72" src={url} alt="Fallback Text" />
+                <img className="w-full h-72" src={url} alt="Cover" />
               );
             })()}
             <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40"></div>
@@ -109,12 +113,13 @@ export default function EditProfilePage() {
             <div className="flex justify-center relative">
               <Avatar className="size-52 ">
                 {(() => {
+                  if (localAvatarUrl) return (<img alt="Profile" src={localAvatarUrl} className="mx-auto relative block object-cover size-52 rounded-full p-1" />);
                   const base = '/api/backend';
-                  const avatarId = user?.photoId || user?.photo?._id;
-                  const avatarPath = userPhotoData?.path || user?.photo?.path;
-                  const url = avatarId ? `${base}/v1/user/files/${String(avatarId)}` : (avatarPath ? `${base}/${avatarPath}` : "/assets/images/Signup/carbon_user-avatar-filled.svg");
+                  const avatarId = (meData as any)?.data?.photo?._id || (meData as any)?.data?.photoId || user?.photoId || user?.photo?._id;
+                  const avatarPath = (meData as any)?.data?.photo?.path || userPhotoData?.path || user?.photo?.path;
+                  const url = avatarId ? `${base}/v1/user/files/${String(avatarId)}?v=${Date.now()}` : (avatarPath ? `${base}/${avatarPath}?v=${Date.now()}` : "/assets/images/Signup/carbon_user-avatar-filled.svg");
                   return (
-                    <img alt="Fallback Text" src={url} className="mx-auto relative block object-cover size-52 rounded-full p-1" />
+                    <img alt="Profile" src={url} className="mx-auto relative block object-cover size-52 rounded-full p-1" />
                   );
                 })()}
                 {/* <AvatarFallback>CJ</AvatarFallback> */}
@@ -202,10 +207,11 @@ export default function EditProfilePage() {
         <div>
           <article className="relative isolate flex flex-col justify-end overflow-hidden pt-24 mx-auto">
             {(() => {
+              if (localCoverUrl) return (<img src={localCoverUrl} alt="Cover" className="absolute inset-0 h-full w-full object-cover" />);
               const base = '/api/backend';
-              const coverId = user?.coverPhoto?._id || (user as any)?.coverPhotoId;
-              const coverPath = user?.coverPhoto?.path;
-              const url = coverId ? `${base}/v1/user/files/${String(coverId)}` : (coverPath ? `${base}/${coverPath}` : "https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
+              const coverId = (meData as any)?.data?.coverPhoto?._id || (user as any)?.coverPhotoId;
+              const coverPath = (meData as any)?.data?.coverPhoto?.path || user?.coverPhoto?.path;
+              const url = coverId ? `${base}/v1/user/files/${String(coverId)}?v=${Date.now()}` : (coverPath ? `${base}/${coverPath}?v=${Date.now()}` : "https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
               return (
                 <img src={url} alt="Cover" className="absolute inset-0 h-full w-full object-cover" />
               );
