@@ -92,7 +92,7 @@ const Home = () => {
         else if (mePhotoPath && !String(mePhotoPath).includes('undefined')) avatarUrl = `${base}/${mePhotoPath}`;
       }
     } catch {}
-    const user = {
+    const author = {
       id: String(p?.userInfo?.[0]?._id || ""),
       username: String(p?.userInfo?.[0]?.userName || ""),
       displayName: String(p?.userInfo?.[0]?.fullName || ""),
@@ -101,7 +101,7 @@ const Home = () => {
     };
     const privacy: string | undefined = typeof p?.privacy === 'string' ? p.privacy.toLowerCase() : undefined;
     const visibility = privacy === 'followers' ? 'followers' : (privacy === 'subscriber' ? 'subscribers' : (privacy === 'public' ? 'public' : undefined));
-    return [{ id: String(p._id ?? p.id), type: isVideo ? 'video' : 'image', src, user, caption: String(p?.content || ""), createdAt: p?.createdAt, visibility }];
+    return [{ id: String(p._id ?? p.id), type: isVideo ? 'video' : 'image', src, user: author, caption: String(p?.content || ""), createdAt: p?.createdAt, visibility }];
   });
   return (
     <div className="min-h-[100dvh] bg-background">
