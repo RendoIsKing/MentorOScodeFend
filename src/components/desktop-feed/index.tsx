@@ -92,12 +92,12 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
   // Prefer top-level userPhoto (Home API often provides this), then userInfo fallbacks
   const upTop = (feedData as any)?.userPhoto;
   let rawPath = (Array.isArray(upTop) && upTop[0]?.path) ? upTop[0].path : undefined;
-  // Prefer id-based file endpoint whenever we have a photoId or file _id
   const avatarFileId = author?.photoId || (Array.isArray(upTop) ? upTop?.[0]?._id : undefined) || author?.photo?._id || (Array.isArray(author?.userPhoto) ? author?.userPhoto?.[0]?._id : undefined);
   if (!rawPath) rawPath = author?.photoPath || author?.photo?.path || (Array.isArray(author?.userPhoto) ? author?.userPhoto?.[0]?.path : author?.userPhoto?.path);
-  const authorAvatar = avatarFileId
-    ? `${baseServerUrl}/v1/user/files/${String(avatarFileId)}`
-    : (rawPath ? (String(rawPath).startsWith('http') ? String(rawPath) : `${baseServerUrl}/${rawPath}`) : "/assets/images/search/small-profile-img.svg");
+  // Prefer path (actual image) over id endpoint (JSON metadata)
+  const authorAvatar = rawPath
+    ? (String(rawPath).startsWith('http') ? String(rawPath) : `${baseServerUrl}/${rawPath}`)
+    : (avatarFileId ? `${baseServerUrl}/v1/user/files/${String(avatarFileId)}` : "/assets/images/search/small-profile-img.svg");
   const authorUserName = ((author?.userName) || ((Array.isArray((feedData as any)?.userInfo) ? (feedData as any).userInfo[0]?.userName : (feedData as any).userInfo?.userName)) || '').toString();
   // Resolve current user id robustly from props or /auth/me
   const { data: me } = useGetUserDetailsQuery();

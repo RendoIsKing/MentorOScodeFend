@@ -75,12 +75,13 @@ const Home = () => {
       : (m?.path?.startsWith('http') ? m.path : (m?.path ? `${base}/${m.path}` : ''));
 
     // Avatar: prefer id-based file endpoint
-    const avatarFileId = (p?.userInfo?.[0]?.photoId) || (p?.userPhoto?.[0]?._id) || (p?.userInfo?.[0]?.photo?._id);
     const avatarPathRaw = p?.userInfo?.[0]?.photo?.path || p?.userPhoto?.[0]?.path;
     const safeAvatarPath = (avatarPathRaw && avatarPathRaw !== 'undefined' && avatarPathRaw !== 'null') ? avatarPathRaw : undefined;
-    let avatarUrl = avatarFileId
-      ? `${base}/v1/user/files/${String(avatarFileId)}`
-      : (safeAvatarPath ? (String(safeAvatarPath).startsWith('http') ? safeAvatarPath : `${base}/${safeAvatarPath}`) : undefined);
+    const avatarFileId = (p?.userInfo?.[0]?.photoId) || (p?.userPhoto?.[0]?._id) || (p?.userInfo?.[0]?.photo?._id);
+    // Prefer path (actual image) over id endpoint (JSON metadata)
+    let avatarUrl = safeAvatarPath
+      ? (String(safeAvatarPath).startsWith('http') ? safeAvatarPath : `${base}/${safeAvatarPath}`)
+      : (avatarFileId ? `${base}/v1/user/files/${String(avatarFileId)}` : undefined);
     // If this post belongs to the current user and avatar is still missing, fall back to /auth/me
     try {
       const postUserId = String(p?.userInfo?.[0]?._id || "");
