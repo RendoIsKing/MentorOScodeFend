@@ -110,7 +110,8 @@ const FileUploadForm: React.FC<IFileUploadFormProps> = ({
               <p
                 className={`text-center mt-2 leading-4 pb-4 ${fontItalic.className}`}
               >
-                Support jpg, jpeg, Png formats <br /> up to 5mb
+                Supports all image formats (JPEG, PNG, WebP, GIF, SVG, BMP, TIFF, HEIC/HEIF, ICO)
+                <br /> up to 50 MB
               </p>
             </div>
             <Input
