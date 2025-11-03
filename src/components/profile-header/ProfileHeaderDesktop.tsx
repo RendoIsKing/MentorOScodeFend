@@ -104,9 +104,9 @@ function ProfileHeaderDesktop() {
           const base = '/api/backend';
           const coverId = owner?.coverPhoto?._id || owner?.coverPhotoId;
           const coverPath = owner?.coverPhoto?.path;
-          const coverUrl = coverId
-            ? `${base}/v1/user/files/${String(coverId)}`
-            : (coverPath ? `${base}/${coverPath}` : undefined);
+          // Prefer static file path (actual image) over id endpoint (JSON metadata)
+          const baseCover = coverPath ? `${base}/${coverPath}` : (coverId ? `${base}/v1/user/files/${String(coverId)}` : undefined);
+          const coverUrl = baseCover ? `${baseCover}?v=${encodeURIComponent(String(coverPath || coverId || ''))}` : undefined;
           const fallback = 'https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
           return (
             <img

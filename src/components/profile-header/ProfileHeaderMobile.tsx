@@ -275,10 +275,11 @@ const ProfileHeaderMobile = () => {
           <img
             className="absolute inset-0 h-full w-full object-cover"
             src={(() => {
-              const ownerCoverId = isOwnerRendered ? (data as any)?.data?.coverPhoto?._id : (userDetailsData as any)?.coverPhoto?._id;
               const ownerCoverPath = isOwnerRendered ? (data as any)?.data?.coverPhoto?.path : (userDetailsData as any)?.coverPhoto?.path;
-              if (ownerCoverId) return `${baseServerUrl}/v1/user/files/${ownerCoverId}`;
-              if (ownerCoverPath && !String(ownerCoverPath).includes('undefined')) return `${baseServerUrl}/${ownerCoverPath}`;
+              const ownerCoverId = isOwnerRendered ? (data as any)?.data?.coverPhoto?._id : (userDetailsData as any)?.coverPhoto?._id;
+              // Prefer path with cache-busting
+              if (ownerCoverPath && !String(ownerCoverPath).includes('undefined')) return `${baseServerUrl}/${ownerCoverPath}?v=${encodeURIComponent(String(ownerCoverPath))}`;
+              if (ownerCoverId) return `${baseServerUrl}/v1/user/files/${ownerCoverId}?v=${encodeURIComponent(String(ownerCoverId))}`;
               return "";
             })()}
             alt="cover"
