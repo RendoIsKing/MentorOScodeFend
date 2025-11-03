@@ -10,6 +10,7 @@ import PostInteraction from "@/components/postInteraction";
 import { useGetPostsQuery } from "@/redux/services/haveme/posts";
 import useFCM from "@/utils/hooks/useFCM";
 import { useUpdateFCMTokenMutation } from "@/redux/services/haveme/notifications";
+import { useGetUserDetailsQuery } from "@/redux/services/haveme";
 import { useUserOnboardingContext } from "@/context/UserOnboarding";
 import RealtimeBootstrap from '@/components/realtime/RealtimeBootstrap';
 
@@ -18,6 +19,7 @@ const Home = () => {
   useBottomNavVar();
   const { fcmToken } = useFCM();
   const { user } = useUserOnboardingContext();
+  const { data: me } = useGetUserDetailsQuery();
 
   const [updateFCMTokenTrigger] = useUpdateFCMTokenMutation();
 
@@ -76,9 +78,20 @@ const Home = () => {
     const avatarFileId = (p?.userInfo?.[0]?.photoId) || (p?.userPhoto?.[0]?._id) || (p?.userInfo?.[0]?.photo?._id);
     const avatarPathRaw = p?.userInfo?.[0]?.photo?.path || p?.userPhoto?.[0]?.path;
     const safeAvatarPath = (avatarPathRaw && avatarPathRaw !== 'undefined' && avatarPathRaw !== 'null') ? avatarPathRaw : undefined;
-    const avatarUrl = avatarFileId
+    let avatarUrl = avatarFileId
       ? `${base}/v1/user/files/${String(avatarFileId)}`
       : (safeAvatarPath ? (String(safeAvatarPath).startsWith('http') ? safeAvatarPath : `${base}/${safeAvatarPath}`) : undefined);
+    // If this post belongs to the current user and avatar is still missing, fall back to /auth/me
+    try {
+      const postUserId = String(p?.userInfo?.[0]?._id || "");
+      const selfId = String((me as any)?.data?._id || user?._id || "");
+      if (!avatarUrl && selfId && postUserId && selfId === postUserId) {
+        const mePhotoId = (me as any)?.data?.photo?._id || (me as any)?.data?.photoId;
+        const mePhotoPath = (me as any)?.data?.photo?.path;
+        if (mePhotoId) avatarUrl = `${base}/v1/user/files/${String(mePhotoId)}`;
+        else if (mePhotoPath && !String(mePhotoPath).includes('undefined')) avatarUrl = `${base}/${mePhotoPath}`;
+      }
+    } catch {}
     const user = {
       id: String(p?.userInfo?.[0]?._id || ""),
       username: String(p?.userInfo?.[0]?.userName || ""),
