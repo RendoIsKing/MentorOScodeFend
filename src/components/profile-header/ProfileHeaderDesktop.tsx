@@ -161,10 +161,11 @@ function ProfileHeaderDesktop() {
           const avatarUrl = avatarId
             ? `${base}/v1/user/files/${String(avatarId)}`
             : (avatarPath ? `${base}/${avatarPath}` : undefined);
+          const bust = (avatarId || avatarPath) ? `?v=${encodeURIComponent(String(avatarId || avatarPath))}` : '';
             return (
               <img
                 alt="profile image"
-              src={avatarUrl || '/assets/images/Home/small-profile-img.svg'}
+              src={(avatarUrl ? (avatarUrl + bust) : '/assets/images/Home/small-profile-img.svg')}
                 className="rounded-full mx-2 lg:h-40 lg:w-40 object-cover"
               />
             );
