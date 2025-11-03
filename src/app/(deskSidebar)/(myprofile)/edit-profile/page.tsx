@@ -102,7 +102,7 @@ export default function EditProfilePage() {
               const base = '/api/backend';
               const coverId = (meData as any)?.data?.coverPhoto?._id || (user as any)?.coverPhotoId;
               const coverPath = (meData as any)?.data?.coverPhoto?.path || user?.coverPhoto?.path;
-              const url = coverId ? `${base}/v1/user/files/${String(coverId)}?v=${Date.now()}` : (coverPath ? `${base}/${coverPath}?v=${Date.now()}` : "https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
+              const url = coverPath ? `${base}/${coverPath}?v=${Date.now()}` : (coverId ? `${base}/v1/user/files/${String(coverId)}?v=${Date.now()}` : "https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
               return (
                 <img className="w-full h-72" src={url} alt="Cover" />
               );
@@ -115,9 +115,9 @@ export default function EditProfilePage() {
                 {(() => {
                   if (localAvatarUrl) return (<img alt="Profile" src={localAvatarUrl} className="mx-auto relative block object-cover size-52 rounded-full p-1" />);
                   const base = '/api/backend';
-                  const avatarId = (meData as any)?.data?.photo?._id || (meData as any)?.data?.photoId || user?.photoId || user?.photo?._id;
                   const avatarPath = (meData as any)?.data?.photo?.path || userPhotoData?.path || user?.photo?.path;
-                  const url = avatarId ? `${base}/v1/user/files/${String(avatarId)}?v=${Date.now()}` : (avatarPath ? `${base}/${avatarPath}?v=${Date.now()}` : "/assets/images/Signup/carbon_user-avatar-filled.svg");
+                  const avatarId = (meData as any)?.data?.photo?._id || (meData as any)?.data?.photoId || user?.photoId || user?.photo?._id;
+                  const url = avatarPath ? `${base}/${avatarPath}?v=${Date.now()}` : (avatarId ? `${base}/v1/user/files/${String(avatarId)}?v=${Date.now()}` : "/assets/images/Signup/carbon_user-avatar-filled.svg");
                   return (
                     <img alt="Profile" src={url} className="mx-auto relative block object-cover size-52 rounded-full p-1" />
                   );
@@ -211,7 +211,7 @@ export default function EditProfilePage() {
               const base = '/api/backend';
               const coverId = (meData as any)?.data?.coverPhoto?._id || (user as any)?.coverPhotoId;
               const coverPath = (meData as any)?.data?.coverPhoto?.path || user?.coverPhoto?.path;
-              const url = coverId ? `${base}/v1/user/files/${String(coverId)}?v=${Date.now()}` : (coverPath ? `${base}/${coverPath}?v=${Date.now()}` : "https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
+              const url = coverPath ? `${base}/${coverPath}?v=${Date.now()}` : (coverId ? `${base}/v1/user/files/${String(coverId)}?v=${Date.now()}` : "https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
               return (
                 <img src={url} alt="Cover" className="absolute inset-0 h-full w-full object-cover" />
               );
@@ -220,7 +220,7 @@ export default function EditProfilePage() {
             <div className="flex items-center px-4 py-2 z-10 justify-between">
               <AvatarWithDescription
                 isTextWhite={true}
-                imageUrl={(user?.photoId || user?.photo?._id) ? `/api/backend/v1/user/files/${String(user?.photoId || (user?.photo as any)?._id)}` : "/assets/images/Home/small-profile-img.svg"}
+                imageUrl={(user?.photo?.path) ? `/api/backend/${String(user?.photo?.path)}` : ((user?.photoId || (user?.photo as any)?._id) ? `/api/backend/v1/user/files/${String(user?.photoId || (user?.photo as any)?._id)}` : "/assets/images/Home/small-profile-img.svg")}
                 ImageFallBackText={"AK"}
                 userName={`${user?.userName}`}
                 userNameTag={`@${user?.userName}`}

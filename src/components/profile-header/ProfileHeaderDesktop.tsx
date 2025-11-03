@@ -155,17 +155,16 @@ function ProfileHeaderDesktop() {
           {(() => {
             const owner = isOwnerRendered ? (data as any)?.data : (userDetailsData as any);
           const base = '/api/backend';
-          const avatarId = owner?.photo?._id || owner?.photoId;
           const rawPath = owner?.photo?.path;
           const avatarPath = (rawPath && rawPath !== 'undefined' && rawPath !== 'null') ? rawPath : undefined;
-          const avatarUrl = avatarId
-            ? `${base}/v1/user/files/${String(avatarId)}`
-            : (avatarPath ? `${base}/${avatarPath}` : undefined);
-          const bust = (avatarId || avatarPath) ? `?v=${encodeURIComponent(String(avatarId || avatarPath))}` : '';
+          const avatarId = owner?.photo?._id || owner?.photoId;
+          // Prefer static file path (actual image) over id endpoint (JSON metadata)
+          const baseUrl = avatarPath ? `${base}/${avatarPath}` : (avatarId ? `${base}/v1/user/files/${String(avatarId)}` : undefined);
+          const bust = (avatarPath || avatarId) ? `?v=${encodeURIComponent(String(avatarPath || avatarId))}` : '';
             return (
               <img
                 alt="profile image"
-              src={(avatarUrl ? (avatarUrl + bust) : '/assets/images/Home/small-profile-img.svg')}
+              src={(baseUrl ? (baseUrl + bust) : '/assets/images/Home/small-profile-img.svg')}
                 className="rounded-full mx-2 lg:h-40 lg:w-40 object-cover"
               />
             );
