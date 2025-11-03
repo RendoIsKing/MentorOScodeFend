@@ -68,11 +68,11 @@ const Home = () => {
     const isVideo = (m?.mimeType && m.mimeType.startsWith('video/')) || /\.(mp4|webm|mov)$/i.test(m?.path || '');
     // Always use same-origin proxy for media so responses aren't blocked by cross-origin policies
     const base = '/api/backend';
-    // Prefer stable id-based endpoint: use file doc id OR original mediaId from post object
+    // Prefer static path (actual image) over metadata endpoint
     const fileId = (m && ((m as any)._id || (m as any).id)) || (p?.media?.[0]?.mediaId);
-    const src = fileId
-      ? `${base}/v1/user/files/${String(fileId)}`
-      : (m?.path?.startsWith('http') ? m.path : (m?.path ? `${base}/${m.path}` : ''));
+    const src = m?.path
+      ? (m.path.startsWith('http') ? m.path : `${base}/${m.path}`)
+      : (fileId ? `${base}/v1/user/files/${String(fileId)}` : '');
 
     // Avatar: prefer id-based file endpoint
     const avatarPathRaw = p?.userInfo?.[0]?.photo?.path || p?.userPhoto?.[0]?.path;
