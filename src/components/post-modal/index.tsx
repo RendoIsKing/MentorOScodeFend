@@ -84,7 +84,7 @@ interface IPostModalProps {
   postId: string | string[];
 }
 
-const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
+export default function PostModal({ postId }: IPostModalProps) {
   const [showTaggedPeople, setShowTaggedPeople] = useState(false);
   const [isDeleteModal, setIsDeleteModal] = useState(false);
   const [tipMessage, setTipMessage] = useState("");
@@ -732,6 +732,4 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
   );
 
   return modalBody;
-};
-
-export default PostModal;
+}
