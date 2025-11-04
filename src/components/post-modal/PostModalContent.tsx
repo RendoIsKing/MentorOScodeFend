@@ -96,11 +96,9 @@ export default function PostModalContent({ postId }: any) {
           <button className="text-white/90 hover:text-white" onClick={onSave}>✭ Save</button>
           <span className="text-white/60 text-sm">{saveCount}</span>
           {isOwner && (
-            <>
-              <button className="ml-auto text-red-400 hover:text-red-300" onClick={() => setDeleteOpen(true)}>
-                Delete post
-              </button>
-            </>
+            <button className="ml-6 text-red-400 hover:text-red-300" onClick={() => setDeleteOpen(true)}>
+              Delete post
+            </button>
           )}
         </div>
 
