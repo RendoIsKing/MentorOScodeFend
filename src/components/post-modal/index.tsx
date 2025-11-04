@@ -373,7 +373,7 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
           <div className="relative">
             {mediaPath ? (
               <img
-                onLoad={(e)=>{ logView(); try{ (e.target as HTMLImageElement).classList.remove('blur-sm'); }catch{} }}
+                onLoad={(e)=>{ logView(); try{ (e.target as HTMLImageElement).classList.remove('blur-sm'); }catch (err) {} }}
                 src={mediaPath}
                 alt="post details"
                 loading="lazy"
