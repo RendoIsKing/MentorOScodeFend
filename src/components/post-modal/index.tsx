@@ -311,7 +311,7 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
         logViewTrigger({ postId: postDetails?._id });
       }, 5000);
     }
-  }, [postDetails?._id]);
+  }, [postDetails && (postDetails as any)._id]);
 
   const logView = () => {
     if (postDetails?._id) {
