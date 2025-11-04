@@ -60,7 +60,7 @@ export default function PostModalContent({ postId }: any) {
   };
 
   return (
-    <div className="w-full h-[85vh] max-w-6xl bg-[#0B0F14] rounded-lg shadow relative grid grid-cols-1 lg:grid-cols-2 overflow-hidden">
+    <div className="w-full h-[85vh] max-w-6xl bg-[#0B0F14] rounded-lg shadow relative grid grid-cols-1 lg:grid-cols-[60%_40%] overflow-hidden">
       {/* Close */}
       <button
         aria-label="Close"
@@ -71,15 +71,15 @@ export default function PostModalContent({ postId }: any) {
       </button>
 
       {/* Media */}
-      <div className="flex items-center justify-center bg-black/20 p-2">
+      <div className="flex items-center justify-center bg-black/20 p-0 overflow-hidden">
         {isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
         {error && <div className="text-sm text-muted-foreground">Failed to load post.</div>}
         {!isLoading && !error && (
           mediaSrc ? (
             isVideo ? (
-              <video className="max-h-[78vh] w-auto" src={mediaSrc} controls autoPlay />
+              <video className="h-full w-full" src={mediaSrc} controls autoPlay />
             ) : (
-              <img className="max-h-[78vh] w-auto object-contain" src={mediaSrc} alt="post media" />
+              <img className="h-full w-full object-contain" src={mediaSrc} alt="post media" />
             )
           ) : (
             <div className="text-sm text-muted-foreground">No media</div>
@@ -88,7 +88,7 @@ export default function PostModalContent({ postId }: any) {
       </div>
 
       {/* Right pane: actions + comments */}
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full min-h-0">
         {/* Actions */}
         <div className="flex items-center gap-4 px-4 py-3 border-b border-white/10">
           <button className="text-white/90 hover:text-white" onClick={onLike}>♥ Like</button>
@@ -103,7 +103,7 @@ export default function PostModalContent({ postId }: any) {
         </div>
 
         {/* Comments */}
-        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 py-3 space-y-3">
           {comments && comments.length > 0 ? (
             comments.map((c: any) => (
               <div key={String(c?._id || Math.random())} className="text-white/90 text-sm">
