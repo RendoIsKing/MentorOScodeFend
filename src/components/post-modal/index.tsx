@@ -124,6 +124,7 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
 
   const { data: getPostDetails } = useGetPostByIdQuery(postId);
   const { data: me } = useGetUserDetailsQuery();
+  const isLoggedIn = Boolean((me as any)?.data?._id || user?._id);
   //console.log("gggggg", getPostDetails);
   const { data: userPhotoData } = useGetUserProfilePhotoQuery(
     postDetails?.userInfo[0]?.photoId,
@@ -290,7 +291,7 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
         const map = raw ? JSON.parse(raw) : {};
         map[String(postId)] = !saveStates;
         if (typeof window !== 'undefined') window.localStorage.setItem('savedPosts', JSON.stringify(map));
-      } catch {}
+      } catch (e) {}
       await savePost(postId);
       // No invalidation here to avoid media reload
     } catch (e) {
@@ -349,12 +350,12 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
         // reflect instantly in this modal UI
         try {
           setPostDetails((prev) => ({ ...(prev as any), isPinned: !postDetails?.isPinned }));
-        } catch {}
+        } catch (e) {}
         try {
           appDispatch(havemeApi.util.invalidateTags([TAG_GET_USER_INFO] as any));
           appDispatch(postsApi.util.invalidateTags([TAG_GET_FILE_INFO_BY_ID, TAG_GET_USER_POSTS_BY_USERNAME] as any));
           appDispatch(usersApi.util.invalidateTags([TAG_GET_USER_DETAILS_BY_USER_NAME] as any));
-        } catch {}
+        } catch (e) {}
       })
       .catch((err) => {
         console.log(err);
