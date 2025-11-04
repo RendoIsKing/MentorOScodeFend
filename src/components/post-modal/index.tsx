@@ -153,7 +153,7 @@ export default function PostModal({ postId }: IPostModalProps) {
     }
   }, [getPostDetails]);
 
-  const form = useForm<z.infer<typeof tipAmountSchema>>({
+  const form = useForm<any>({
     resolver: zodResolver(tipAmountSchema),
     defaultValues: {
       amount: 1,
@@ -161,7 +161,7 @@ export default function PostModal({ postId }: IPostModalProps) {
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof tipAmountSchema>) => {
+  const onSubmit = async (data: any) => {
     setOpen(false);
   };
 
@@ -366,7 +366,7 @@ export default function PostModal({ postId }: IPostModalProps) {
       });
   };
 
-  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+  const handleImageLoad = (e: any) => {
     logView();
     try {
       (e.currentTarget as HTMLImageElement).classList.remove("blur-sm");
