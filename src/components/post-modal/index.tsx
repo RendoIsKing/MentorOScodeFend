@@ -78,6 +78,7 @@ import {
 } from "@/redux/services/haveme/interactions";
 import NotInterestedComp from "../shared/not-interested";
 import { resetUserPosts, updatePost } from "@/redux/slices/adapters";
+import { useGetUserDetailsQuery } from "@/redux/services/haveme";
 
 interface IPostModalProps {
   postId: string | string[];
@@ -119,9 +120,10 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
   const [updatePostCommentTrigger] = useUpdatePostCommentMutation();
 
   const pathname = usePathname();
-  let isLoggedIn = pathname === "/view-other-profile" ? true : false;
+  // Always render the action menu; we'll gate items by ownership instead
 
   const { data: getPostDetails } = useGetPostByIdQuery(postId);
+  const { data: me } = useGetUserDetailsQuery();
   //console.log("gggggg", getPostDetails);
   const { data: userPhotoData } = useGetUserProfilePhotoQuery(
     postDetails?.userInfo[0]?.photoId,
@@ -298,7 +300,8 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
     }
   };
 
-  const isOwnProfile = postDetails?.userInfo[0]?._id === user?._id;
+  const myId = (me as any)?.data?._id || user?._id;
+  const isOwnProfile = String(postDetails?.userInfo?.[0]?._id || "") === String(myId || "");
 
   const createImpression = useCallback(() => {
     if (postDetails?._id) {
@@ -529,8 +532,7 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
             <div className="ml-3 mt-0.5 ">{saveLikecount}</div>
           </div>
 
-          {isLoggedIn && (
-            <DropdownMenu>
+          <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="flex flex-col items-center gap-2 lg:gap-0 justify-center cursor-pointer">
                   <Ellipsis className="cursor-pointer fill-white stroke-white mt-2" />
@@ -556,29 +558,30 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
                     </div>
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuItem>
-                  <div
-                    className="flex justify-between"
-                    onClick={() => setIsReportUserOpen(true)}
-                  >
-                    <div className="flex text-destructive gap-2 cursor-pointer">
-                      <Info />
-                      Report User
-                    </div>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <div className="flex justify-between">
-                    <div className="flex gap-2 cursor-pointer">
-                      {/* <ThumbsDown />
-                      Not Interested */}
-                      <NotInterestedComp postId={postDetails?._id} />
-                    </div>
-                  </div>
-                </DropdownMenuItem>
+                {!isOwnProfile && (
+                  <>
+                    <DropdownMenuItem>
+                      <div
+                        className="flex justify-between"
+                        onClick={() => setIsReportUserOpen(true)}
+                      >
+                        <div className="flex text-destructive gap-2 cursor-pointer">
+                          <Info />
+                          Report User
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <div className="flex justify-between">
+                        <div className="flex gap-2 cursor-pointer">
+                          <NotInterestedComp postId={postDetails?._id} />
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
-          )}
 
           {isReportUserOpen && (
             <ReportProblemAlert
@@ -604,6 +607,7 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
                           userNameTag={postDetails?.userInfo[0]?.userName}
                         />
                       </div>
+                      {!postDetails?.isFollowing && (
                       <Button
                         size="sleek"
                         className="py-4 px-8 ml-3"
@@ -612,7 +616,7 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
                         }
                       >
                         {postDetails?.isFollowing ? "Unfollow" : "Follow"}
-                      </Button>
+                      </Button>)
                     </>
                   )}
                 </div>
