@@ -60,7 +60,7 @@ export default function PostModalContent({ postId }: any) {
   };
 
   return (
-    <div className="w-[96vw] h-[90vh] max-w-[1400px] bg-[#0B0F14] rounded-lg shadow relative grid grid-cols-1 lg:grid-cols-[65%_35%] overflow-hidden">
+    <div className="w-[96vw] h-[90vh] max-w-[1400px] bg-[#0B0F14] rounded-lg shadow relative grid grid-cols-1 lg:grid-cols-[65%_35%] overflow-hidden mx-auto">
       {/* Close */}
       <button
         aria-label="Close"
@@ -90,7 +90,7 @@ export default function PostModalContent({ postId }: any) {
       {/* Right pane: actions + comments */}
       <div className="flex flex-col h-full min-h-0">
         {/* Actions */}
-        <div className="flex items-center gap-4 px-4 py-3 border-b border-white/10">
+        <div className="flex items-center gap-4 px-4 lg:pl-6 pr-14 py-3 border-b border-white/10">
           <button className="text-white/90 hover:text-white" onClick={onLike}>♥ Like</button>
           <span className="text-white/60 text-sm">{likeCount}</span>
           <button className="text-white/90 hover:text-white" onClick={onSave}>✭ Save</button>
