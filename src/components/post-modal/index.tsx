@@ -541,6 +541,13 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
                 side="top"
               >
                 {isOwnProfile && (
+                  <DropdownMenuItem onClick={() => setIsDeleteModal(true)}>
+                    <div className="flex justify-between">
+                      <div className="flex text-destructive gap-2 cursor-pointer">Delete post</div>
+                    </div>
+                  </DropdownMenuItem>
+                )}
+                {isOwnProfile && (
                   <DropdownMenuItem>
                     <div className="flex justify-between" onClick={() => togglePinStatus()}>
                       <div className="flex gap-2 cursor-pointer">
@@ -638,6 +645,7 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
                   postDetails={postDetails}
                   openPopup={isDeleteModal}
                   setOpenPopup={setIsDeleteModal}
+                  showTrigger={false}
                 />
               )}
             </div>
