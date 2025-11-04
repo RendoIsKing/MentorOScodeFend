@@ -373,7 +373,7 @@ export default function PostModal({ postId }: IPostModalProps) {
     } catch (err) {}
   };
 
-  const modalBody = (
+  return (
     <div className="flex">
       <div className="relative min-w-96 lg:w-1/2">
         {fileType === "image" ? (
@@ -730,6 +730,4 @@ export default function PostModal({ postId }: IPostModalProps) {
       </div>
     </div>
   );
-
-  return modalBody;
 }
