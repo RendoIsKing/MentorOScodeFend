@@ -60,7 +60,7 @@ export default function PostModalContent({ postId }: any) {
   };
 
   return (
-    <div className="w-full h-[85vh] max-w-6xl bg-[#0B0F14] rounded-lg shadow relative grid grid-cols-1 lg:grid-cols-[60%_40%] overflow-hidden">
+    <div className="w-[96vw] h-[90vh] max-w-[1400px] bg-[#0B0F14] rounded-lg shadow relative grid grid-cols-1 lg:grid-cols-[65%_35%] overflow-hidden">
       {/* Close */}
       <button
         aria-label="Close"
@@ -77,9 +77,9 @@ export default function PostModalContent({ postId }: any) {
         {!isLoading && !error && (
           mediaSrc ? (
             isVideo ? (
-              <video className="h-full w-full" src={mediaSrc} controls autoPlay />
+              <video className="h-full w-full object-cover lg:object-cover sm:object-contain" src={mediaSrc} controls autoPlay />
             ) : (
-              <img className="h-full w-full object-contain" src={mediaSrc} alt="post media" />
+              <img className="h-full w-full object-contain lg:object-cover" src={mediaSrc} alt="post media" />
             )
           ) : (
             <div className="text-sm text-muted-foreground">No media</div>
