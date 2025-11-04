@@ -366,6 +366,13 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
       });
   };
 
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    logView();
+    try {
+      (e.currentTarget as HTMLImageElement).classList.remove("blur-sm");
+    } catch (err) {}
+  };
+
   return (
     <div className="flex">
       <div className="relative min-w-96 lg:w-1/2">
@@ -373,7 +380,7 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
           <div className="relative">
             {mediaPath ? (
               <img
-                onLoad={(e)=>{ logView(); try{ (e.target as HTMLImageElement).classList.remove('blur-sm'); }catch (err) {} }}
+                onLoad={handleImageLoad}
                 src={mediaPath}
                 alt="post details"
                 loading="lazy"
