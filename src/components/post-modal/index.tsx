@@ -373,7 +373,7 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
     } catch (err) {}
   };
 
-  return (
+  const modalBody = (
     <div className="flex">
       <div className="relative min-w-96 lg:w-1/2">
         {fileType === "image" ? (
@@ -730,6 +730,8 @@ const PostModal: React.FC<IPostModalProps> = ({ postId }) => {
       </div>
     </div>
   );
+
+  return modalBody;
 };
 
 export default PostModal;
