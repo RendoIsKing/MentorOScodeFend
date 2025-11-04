@@ -93,11 +93,11 @@ export default function PostModalContent({ postId }: any) {
   const [parentCommentId, setParentCommentId] = useState(null);
 
   // like heart state
-  const [heartStates, setHeartStates] = useState<boolean>();
-  const [heartLikecount, setHeartLikecount] = useState<number>();
+  const [heartStates, setHeartStates] = useState<any>();
+  const [heartLikecount, setHeartLikecount] = useState<any>();
   //save post state
-  const [saveStates, setSaveState] = useState<boolean>();
-  const [saveLikecount, setSaveLikecount] = useState<number>(
+  const [saveStates, setSaveState] = useState<any>();
+  const [saveLikecount, setSaveLikecount] = useState<any>(
     postDetails?.savedCount
   );
   const timeoutIdRef = useRef(null);
@@ -244,7 +244,7 @@ export default function PostModalContent({ postId }: any) {
     [followUser]
   );
 
-  const handleSelectHeart = (postId: string) => {
+  const handleSelectHeart = (postId: any) => {
     if (heartStates) {
       likePostTrigger(postId);
       setHeartStates(() => false);
@@ -261,7 +261,7 @@ export default function PostModalContent({ postId }: any) {
     );
   };
 
-  const handleSavePost = async (postId: string) => {
+  const handleSavePost = async (postId: any) => {
     try {
       if (saveStates) {
         setSaveState(() => false);
