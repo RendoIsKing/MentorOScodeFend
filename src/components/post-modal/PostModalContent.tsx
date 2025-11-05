@@ -109,14 +109,7 @@ export default function PostModalContent({ postId }: any) {
     <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4">
       <div className="w-[92vw] h-[90vh] max-w-[1280px] bg-[#0B0F14] rounded-xl shadow-2xl border border-white/10 relative grid grid-cols-1 lg:grid-cols-[62%_38%] overflow-hidden">
       {/* Close */}
-        {/* Close button - single, large, top-right INSIDE the popup */}
-        <button
-          aria-label="Close"
-          className="absolute right-3 top-3 text-white/80 hover:text-white z-30 text-2xl leading-none"
-          onClick={handleClose}
-        >
-          ×
-        </button>
+        {/* close button is rendered in header on the right via the header bar */}
 
       {/* Media */}
       <div className="flex items-center justify-center bg-black/20 p-0 overflow-hidden">
@@ -144,15 +137,16 @@ export default function PostModalContent({ postId }: any) {
       <div className="flex flex-col h-full min-h-0">
         {/* Sticky top area */}
         <div className="sticky top-0 z-10 bg-[#0B0F14]">
-          <div className="px-4 lg:pl-6 pr-14 py-3 border-b border-white/10 flex items-center gap-3">
+          <div className="px-4 lg:pl-6 pr-4 py-3 border-b border-white/10 flex items-center gap-3">
             <img src={avatarUrl} alt="author avatar" className="h-8 w-8 rounded-full object-cover" />
             <div className="flex flex-col">
               <span className="text-white/90 text-sm leading-tight">{post?.userInfo?.[0]?.fullName || "User"}</span>
               <span className="text-white/50 text-xs leading-tight">@{post?.userInfo?.[0]?.userName || "user"}</span>
             </div>
             {/* Header actions (kebab) */}
-            <div className="ml-auto relative">
+            <div className="ml-auto flex items-center gap-3 relative">
               <button className="text-white/70 hover:text-white" onClick={(e) => { e.stopPropagation(); setMoreOpen((v) => !v); }}>⋯</button>
+              <button aria-label="Close" className="text-white/80 hover:text-white text-2xl leading-none" onClick={handleClose}>×</button>
               {moreOpen && (
                 <div className="absolute right-0 mt-2 bg-[#11161c] border border-white/10 rounded shadow p-2 text-sm min-w-40 z-30" onClick={(e)=>e.stopPropagation()}>
                   {isOwner ? (
