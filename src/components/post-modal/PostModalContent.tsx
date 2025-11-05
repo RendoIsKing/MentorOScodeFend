@@ -93,20 +93,12 @@ export default function PostModalContent({ postId }: any) {
 
   const handleClose = useCallback(() => {
     try {
-      const params = new URLSearchParams(window.location.search);
-      const fromProfile = params.get('fromProfile');
-      if (fromProfile) {
-        router.replace('/profile');
+      if (typeof window !== 'undefined' && window.history.length > 1) {
+        router.back();
         return;
       }
-      if (document.referrer && new URL(document.referrer).origin === window.location.origin) {
-        router.back();
-      } else {
-        router.replace('/');
-      }
-    } catch {
-      router.replace('/');
-    }
+    } catch {}
+    router.push('/');
   }, [router]);
 
   return (
