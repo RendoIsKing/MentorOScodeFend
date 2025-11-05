@@ -228,6 +228,7 @@ export default function PostModalContent({ postId }: any) {
       `}</style>
     </div>
   );
+  // return null when closed
   ) : null;
 }
 
