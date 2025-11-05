@@ -10,6 +10,8 @@ import {
   useUpdatePostMutation,
 } from "@/redux/services/haveme/posts";
 import { useGetUserDetailsQuery } from "@/redux/services/haveme";
+import { useFollowUserMutation } from "@/redux/services/haveme/user";
+import NotInterestedComp from "../shared/not-interested";
 import DeleteModal from "../delete-modal";
 import { baseServerUrl } from "@/lib/utils";
 
@@ -29,6 +31,7 @@ export default function PostModalContent({ postId }: any) {
   const [savePost] = useSavePostMutation();
   const [addComment] = useUpdatePostCommentMutation();
   const [updatePost] = useUpdatePostMutation();
+  const [followUser] = useFollowUserMutation();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [moreOpen, setMoreOpen] = useState(false);
@@ -53,6 +56,7 @@ export default function PostModalContent({ postId }: any) {
 
   const likeCount = Number(post?.likeInteractions?.length || post?.likesCount || 0);
   const saveCount = Number(post?.savedInteractions?.length || 0);
+  const isFollowing = Boolean(post?.isFollowing);
 
   const onLike = useCallback(() => {
     if (post?._id) likePost(post._id);
@@ -106,8 +110,8 @@ export default function PostModalContent({ postId }: any) {
   }, [router]);
 
   return (
-    <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4">
-      <div className="w-[92vw] h-[90vh] max-w-[1280px] bg-[#0B0F14] rounded-xl shadow-2xl border border-white/10 relative grid grid-cols-1 lg:grid-cols-[62%_38%] overflow-hidden">
+    <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4" onClick={handleClose}>
+      <div className="w-[92vw] h-[90vh] max-w-[1280px] bg-[#0B0F14] rounded-xl shadow-2xl border border-white/10 relative grid grid-cols-1 lg:grid-cols-[62%_38%] overflow-hidden" onClick={(e)=>e.stopPropagation()}>
       {/* Close */}
         {/* close button is rendered in header on the right via the header bar */}
 
@@ -160,9 +164,9 @@ export default function PostModalContent({ postId }: any) {
                     </>
                   ) : (
                     <>
-                      <button className="block w-full text-left text-white/90 hover:text-white">Follow</button>
+                      <button className="block w-full text-left text-white/90 hover:text-white" onClick={async ()=>{ try{ await followUser({ followingTo: post?.userInfo?.[0]?._id }).unwrap(); setMoreOpen(false);}catch{}}}>{isFollowing ? "Unfollow" : "Follow"}</button>
                       <button className="block w-full text-left text-white/90 hover:text-white">Report</button>
-                      <button className="block w-full text-left text-white/90 hover:text-white">Not interested</button>
+                      <div className="block w-full text-left text-white/90 hover:text-white"><NotInterestedComp postId={post?._id} /></div>
                     </>
                   )}
                 </div>
