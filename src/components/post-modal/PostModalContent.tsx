@@ -105,15 +105,7 @@ export default function PostModalContent({ postId }: any) {
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
-    try {
-      // Fallback: if overlay remains due to state not repainting in some cases, navigate back.
-      if (typeof window !== 'undefined' && window.history.length > 1) {
-        setTimeout(() => {
-          try { router.back(); } catch {}
-        }, 0);
-      }
-    } catch {}
-  }, [router]);
+  }, []);
 
   if (!isOpen) return null;
 
