@@ -99,12 +99,12 @@ export default function PostModalContent({ postId }: any) {
         return;
       }
     } catch {}
-    router.push('/home');
+    router.push('/');
   }, [router]);
 
   return (
     <div className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
-      <div className="w-[92vw] h-[90vh] max-w-[1280px] bg-[#0B0F14] rounded-xl shadow-2xl border border-white/10 relative grid grid-cols-1 lg:grid-cols-[62%_38%] overflow-hidden" onClick={(e)=>e.stopPropagation()}>
+      <div className="modal-root w-[92vw] h-[90vh] max-w-[1280px] bg-[#0B0F14] rounded-xl shadow-2xl border border-white/10 relative grid grid-cols-1 lg:grid-cols-[62%_38%] overflow-hidden" onClick={(e)=>e.stopPropagation()}>
       {/* Close */}
         {/* close button is rendered in header on the right via the header bar */}
 
@@ -143,7 +143,7 @@ export default function PostModalContent({ postId }: any) {
             {/* Header actions (kebab) */}
             <div className="ml-auto flex items-center gap-3 relative">
               <button className="text-white/70 hover:text-white" onClick={(e) => { e.stopPropagation(); setMoreOpen((v) => !v); }}>⋯</button>
-              <button aria-label="Close" className="text-white/80 hover:text-white p-1" onClick={handleClose}>
+              <button data-modal-close aria-label="Close" className="header-close text-white/80 hover:text-white p-1" onClick={handleClose}>
                 <IconX className="h-5 w-5" />
               </button>
               {moreOpen && (
@@ -224,6 +224,10 @@ export default function PostModalContent({ postId }: any) {
         />
       )}
       </div>
+      <style jsx>{`
+        .modal-root :global(svg[data-lucide="x"]) { display: none; }
+        .modal-root :global(.header-close svg[data-lucide="x"]) { display: inline-block; }
+      `}</style>
     </div>
   );
 }
