@@ -110,7 +110,7 @@ export default function PostModalContent({ postId }: any) {
   }, [router]);
 
   return (
-    <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4" onClick={handleClose}>
+    <div className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
       <div className="w-[92vw] h-[90vh] max-w-[1280px] bg-[#0B0F14] rounded-xl shadow-2xl border border-white/10 relative grid grid-cols-1 lg:grid-cols-[62%_38%] overflow-hidden" onClick={(e)=>e.stopPropagation()}>
       {/* Close */}
         {/* close button is rendered in header on the right via the header bar */}
