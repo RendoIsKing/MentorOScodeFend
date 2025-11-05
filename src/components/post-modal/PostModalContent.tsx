@@ -11,6 +11,7 @@ import {
 } from "@/redux/services/haveme/posts";
 import { useGetUserDetailsQuery } from "@/redux/services/haveme";
 import { useFollowUserMutation } from "@/redux/services/haveme/user";
+import { X as IconX } from "lucide-react";
 import NotInterestedComp from "../shared/not-interested";
 import DeleteModal from "../delete-modal";
 import { baseServerUrl } from "@/lib/utils";
@@ -98,7 +99,7 @@ export default function PostModalContent({ postId }: any) {
         return;
       }
     } catch {}
-    router.push('/');
+    router.push('/home');
   }, [router]);
 
   return (
@@ -142,7 +143,9 @@ export default function PostModalContent({ postId }: any) {
             {/* Header actions (kebab) */}
             <div className="ml-auto flex items-center gap-3 relative">
               <button className="text-white/70 hover:text-white" onClick={(e) => { e.stopPropagation(); setMoreOpen((v) => !v); }}>⋯</button>
-              <button aria-label="Close" className="text-white/80 hover:text-white text-2xl leading-none" onClick={handleClose}>×</button>
+              <button aria-label="Close" className="text-white/80 hover:text-white p-1" onClick={handleClose}>
+                <IconX className="h-5 w-5" />
+              </button>
               {moreOpen && (
                 <div className="absolute right-0 mt-2 bg-[#11161c] border border-white/10 rounded shadow p-2 text-sm min-w-40 z-30" onClick={(e)=>e.stopPropagation()}>
                   {isOwner ? (
