@@ -24,6 +24,19 @@ export default function PhotoModal({
   const { isMobile } = useClientHardwareInfo();
   const { isPostModalOpen, togglePostModalOpen } = usePostModalContext();
 
+  // Close the Radix Dialog when inner content signals a close
+  useEffect(() => {
+    const onClose = () => togglePostModalOpen(false);
+    if (typeof window !== "undefined") {
+      window.addEventListener("post-modal-close", onClose);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("post-modal-close", onClose);
+      }
+    };
+  }, [togglePostModalOpen]);
+
   return (
     <>
       {isMobile ? (
