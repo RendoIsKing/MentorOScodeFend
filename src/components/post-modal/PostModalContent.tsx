@@ -104,8 +104,25 @@ export default function PostModalContent({ postId }: any) {
   }, []);
 
   const handleClose = useCallback(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('fromProfile') === '1') {
+          router.push('/profile');
+          return;
+        }
+        if (
+          window.history.length > 1 &&
+          document.referrer &&
+          new URL(document.referrer).origin === window.location.origin
+        ) {
+          router.back();
+          return;
+        }
+      }
+    } catch {}
     setIsOpen(false);
-  }, []);
+  }, [router]);
 
   if (!isOpen) return null;
 
