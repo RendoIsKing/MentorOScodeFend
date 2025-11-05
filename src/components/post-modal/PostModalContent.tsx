@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   useGetPostByIdQuery,
@@ -7,6 +7,7 @@ import {
   useLikePostMutation,
   useSavePostMutation,
   useUpdatePostCommentMutation,
+  useUpdatePostMutation,
 } from "@/redux/services/haveme/posts";
 import { useGetUserDetailsQuery } from "@/redux/services/haveme";
 import DeleteModal from "../delete-modal";
@@ -19,6 +20,7 @@ export default function PostModalContent({ postId }: any) {
   const { data: meData } = useGetUserDetailsQuery();
   const myId: any = (meData as any)?.data?._id;
   const isOwner = Boolean(myId && String(post?.user) === String(myId) || String(post?.userInfo?.[0]?._id || "") === String(myId || ""));
+  const base = (baseServerUrl as any) || "/api/backend";
 
   const { data: commentsRes } = useGetCommentsByPostIdQuery(postId);
   const comments: any[] = (commentsRes as any)?.data || [];
@@ -26,17 +28,26 @@ export default function PostModalContent({ postId }: any) {
   const [likePost] = useLikePostMutation();
   const [savePost] = useSavePostMutation();
   const [addComment] = useUpdatePostCommentMutation();
+  const [updatePost] = useUpdatePostMutation();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [zoom, setZoom] = useState(false);
 
   const mediaSrc = useMemo(() => {
     if (!post) return undefined;
-    const base = baseServerUrl || "/api/backend";
     const fileId = (post?.mediaFiles?.[0] && (post?.mediaFiles?.[0]?._id || post?.mediaFiles?.[0]?.id)) || post?.media?.[0]?.mediaId;
     if (fileId) return `${base}/v1/user/files/${String(fileId)}`;
     const path = post?.mediaFiles?.[0]?.path;
     return path ? `${base}/${path}` : undefined;
   }, [post]);
+
+  const avatarUrl = useMemo(() => {
+    const avatarId = post?.userInfo?.[0]?.photoId || post?.userInfo?.[0]?.photo?._id;
+    if (avatarId) return `${base}/v1/user/files/${String(avatarId)}`;
+    const p = post?.userInfo?.[0]?.photo?.path;
+    return p ? `${base}/${p}` : "/assets/images/Home/small-profile-img.svg";
+  }, [post, base]);
 
   const isVideo = Boolean(post?.media?.[0]?.mediaType === "video" || post?.mediaFiles?.[0]?.mediaType === "video");
 
@@ -59,6 +70,23 @@ export default function PostModalContent({ postId }: any) {
     } catch {}
   };
 
+  // Pin / Unpin toggle
+  const onTogglePin = async () => {
+    if (!post?._id) return;
+    try {
+      await updatePost({ id: post._id, isPinned: !post?.isPinned }).unwrap();
+    } catch {}
+  };
+
+  // Keyboard: Esc to close
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") router.back();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [router]);
+
   return (
     <div className="w-[96vw] h-[90vh] max-w-[1400px] bg-[#0B0F14] rounded-lg shadow relative grid grid-cols-1 lg:grid-cols-[65%_35%] overflow-hidden mx-auto">
       {/* Close */}
@@ -79,7 +107,12 @@ export default function PostModalContent({ postId }: any) {
             isVideo ? (
               <video className="h-full w-full object-cover lg:object-cover sm:object-contain" src={mediaSrc} controls autoPlay />
             ) : (
-              <img className="h-full w-full object-contain lg:object-cover" src={mediaSrc} alt="post media" />
+              <img
+                className={`h-full w-full ${zoom ? "object-cover" : "object-contain"} transition-all duration-200 cursor-zoom-in`}
+                src={mediaSrc}
+                alt="post media"
+                onClick={() => setZoom((z) => !z)}
+              />
             )
           ) : (
             <div className="text-sm text-muted-foreground">No media</div>
@@ -87,20 +120,64 @@ export default function PostModalContent({ postId }: any) {
         )}
       </div>
 
-      {/* Right pane: actions + comments */}
+      {/* Right pane: author header + actions + comments */}
       <div className="flex flex-col h-full min-h-0">
-        {/* Actions */}
-        <div className="flex items-center gap-4 px-4 lg:pl-6 pr-14 py-3 border-b border-white/10">
-          <button className="text-white/90 hover:text-white" onClick={onLike}>♥ Like</button>
-          <span className="text-white/60 text-sm">{likeCount}</span>
-          <button className="text-white/90 hover:text-white" onClick={onSave}>✭ Save</button>
-          <span className="text-white/60 text-sm">{saveCount}</span>
-          {isOwner && (
-            <button className="ml-6 text-red-400 hover:text-red-300" onClick={() => setDeleteOpen(true)}>
-              Delete post
-            </button>
-          )}
+        {/* Sticky top area */}
+        <div className="sticky top-0 z-10 bg-[#0B0F14]">
+          <div className="px-4 lg:pl-6 pr-14 py-3 border-b border-white/10 flex items-center gap-3">
+            <img src={avatarUrl} alt="author avatar" className="h-8 w-8 rounded-full object-cover" />
+            <div className="flex flex-col">
+              <span className="text-white/90 text-sm leading-tight">{post?.userInfo?.[0]?.fullName || "User"}</span>
+              <span className="text-white/50 text-xs leading-tight">@{post?.userInfo?.[0]?.userName || "user"}</span>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="relative flex items-center gap-4 px-4 lg:pl-6 pr-20 py-3 border-b border-white/10">
+            <button className="text-white/90 hover:text-white" onClick={onLike}>♥ Like</button>
+            <span className="text-white/60 text-sm">{likeCount}</span>
+            <button className="text-white/90 hover:text-white" onClick={onSave}>✭ Save</button>
+            <span className="text-white/60 text-sm">{saveCount}</span>
+            <button
+              className="text-white/90 hover:text-white"
+              onClick={() => { try { navigator.clipboard.writeText(window.location.href); } catch {} }}
+            >↗ Share</button>
+            {isOwner && (
+              <button className="ml-6 text-red-400 hover:text-red-300" onClick={() => setDeleteOpen(true)}>
+                Delete post
+              </button>
+            )}
+            {!isOwner && (
+              <button className="ml-auto text-white/90 hover:text-white" onClick={() => { /* follow logic hooked already in larger file, placeholder */ }}>
+                Follow
+              </button>
+            )}
+            <div className="ml-2">
+              <button className="text-white/70 hover:text-white" onClick={() => setMoreOpen((v) => !v)}>⋯</button>
+              {moreOpen && (
+                <div className="absolute right-4 top-12 bg-[#11161c] border border-white/10 rounded shadow p-2 text-sm">
+                  {isOwner ? (
+                    <button className="block w-full text-left text-white/90 hover:text-white" onClick={onTogglePin}>
+                      {post?.isPinned ? "Unpin post" : "Pin post"}
+                    </button>
+                  ) : (
+                    <>
+                      <button className="block w-full text-left text-white/90 hover:text-white">Report</button>
+                      <button className="block w-full text-left text-white/90 hover:text-white">Not interested</button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
+
+        {/* Caption */}
+        {post?.content && (
+          <div className="px-4 lg:px-6 py-3 text-white/90 border-b border-white/10 text-sm">
+            {post.content}
+          </div>
+        )}
 
         {/* Comments */}
         <div className="flex-1 min-h-0 overflow-y-auto px-4 py-3 space-y-3">
