@@ -66,16 +66,26 @@ export default function PostModalContent({ postId }: any) {
       post?.mediaFiles?.[0]?.mediaType === "video"
   );
 
-  const likeCount = Number(post?.likeInteractions?.length || post?.likesCount || 0);
-  const saveCount = Number(post?.savedInteractions?.length || 0);
+  const [liked, setLiked] = useState<boolean>(Boolean(post?.isLiked));
+  const [likedCount, setLikedCount] = useState<number>(Number(post?.likeInteractions?.length || post?.likesCount || 0));
+  const [saved, setSaved] = useState<boolean>(Boolean(post?.isSaved));
+  const [savedCount, setSavedCount] = useState<number>(Number(post?.savedInteractions?.length || 0));
   const isFollowing = Boolean(post?.isFollowing);
 
-  const onLike = useCallback(() => {
-    if (post?._id) likePost(post._id);
-  }, [post?._id]);
-  const onSave = useCallback(() => {
-    if (post?._id) savePost(post._id);
-  }, [post?._id]);
+  const onLike = useCallback(async () => {
+    if (!post?._id) return;
+    // optimistic toggle
+    setLiked((v) => !v);
+    setLikedCount((n) => (liked ? Math.max(0, n - 1) : n + 1));
+    try { await likePost(post._id); } catch { /* revert on error */ setLiked((v)=>!v); setLikedCount((n)=> (liked ? n+1 : Math.max(0, n-1))); }
+  }, [post?._id, liked]);
+
+  const onSave = useCallback(async () => {
+    if (!post?._id) return;
+    setSaved((v) => !v);
+    setSavedCount((n) => (saved ? Math.max(0, n - 1) : n + 1));
+    try { await savePost(post._id); } catch { setSaved((v)=>!v); setSavedCount((n)=> (saved ? n+1 : Math.max(0, n-1))); }
+  }, [post?._id, saved]);
 
   const onAddComment = async () => {
     const msg = String(commentText || "").trim();
@@ -242,24 +252,27 @@ export default function PostModalContent({ postId }: any) {
 
             {/* Actions */}
             <div className="relative flex items-center gap-4 px-4 lg:pl-6 pr-20 py-3 border-b border-white/10">
-              <button className="text-white/90 hover:text-white" onClick={onLike}>
+              <button className={`hover:text-white ${liked ? 'text-primary' : 'text-white/90'}`} onClick={onLike}>
                 ♥ Like
               </button>
-              <span className="text-white/60 text-sm">{likeCount}</span>
-              <button className="text-white/90 hover:text-white" onClick={onSave}>
+              <span className="text-white/60 text-sm">{likedCount}</span>
+              <button className={`hover:text-white ${saved ? 'text-primary' : 'text-white/90'}`} onClick={onSave}>
                 ✭ Save
               </button>
-              <span className="text-white/60 text-sm">{saveCount}</span>
+              <span className="text-white/60 text-sm">{savedCount}</span>
               <button
                 className="text-white/90 hover:text-white"
-                onClick={() => {
+                onClick={async () => {
                   try {
-                    navigator.clipboard.writeText(window.location.href);
+                    const url = window.location.href;
+                    if ((navigator as any).share) {
+                      await (navigator as any).share({ title: document.title, url });
+                    } else {
+                      await navigator.clipboard.writeText(url);
+                    }
                   } catch {}
                 }}
-              >
-                ↗ Share
-              </button>
+              >↗ Share</button>
             </div>
           </div>
 
