@@ -87,13 +87,32 @@ export default function PostModalContent({ postId }: any) {
     return () => window.removeEventListener("keydown", onKey);
   }, [router]);
 
+  const handleClose = useCallback(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const fromProfile = params.get('fromProfile');
+      if (fromProfile) {
+        router.replace('/profile');
+        return;
+      }
+      if (document.referrer && new URL(document.referrer).origin === window.location.origin) {
+        router.back();
+      } else {
+        router.replace('/');
+      }
+    } catch {
+      router.replace('/');
+    }
+  }, [router]);
+
   return (
-    <div className="w-[92vw] h-[90vh] max-w-[1280px] bg-[#0B0F14] rounded-xl shadow-2xl border border-white/10 relative grid grid-cols-1 lg:grid-cols-[62%_38%] overflow-hidden mx-auto my-6">
+    <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4">
+      <div className="w-[92vw] h-[90vh] max-w-[1280px] bg-[#0B0F14] rounded-xl shadow-2xl border border-white/10 relative grid grid-cols-1 lg:grid-cols-[62%_38%] overflow-hidden">
       {/* Close */}
       <button
         aria-label="Close"
         className="absolute right-2 top-2 text-white/70 hover:text-white z-20"
-        onClick={() => router.back()}
+        onClick={handleClose}
       >
         ×
       </button>
@@ -132,9 +151,9 @@ export default function PostModalContent({ postId }: any) {
             </div>
             {/* Header actions (kebab) */}
             <div className="ml-auto relative">
-              <button className="text-white/70 hover:text-white" onClick={() => setMoreOpen((v) => !v)}>⋯</button>
+              <button className="text-white/70 hover:text-white" onClick={(e) => { e.stopPropagation(); setMoreOpen((v) => !v); }}>⋯</button>
               {moreOpen && (
-                <div className="absolute right-0 mt-2 bg-[#11161c] border border-white/10 rounded shadow p-2 text-sm min-w-40">
+                <div className="absolute right-0 mt-2 bg-[#11161c] border border-white/10 rounded shadow p-2 text-sm min-w-40 z-30" onClick={(e)=>e.stopPropagation()}>
                   {isOwner ? (
                     <>
                       <button className="block w-full text-left text-white/90 hover:text-white" onClick={onTogglePin}>
@@ -210,6 +229,7 @@ export default function PostModalContent({ postId }: any) {
           showTrigger={false}
         />
       )}
+      </div>
     </div>
   );
 }
