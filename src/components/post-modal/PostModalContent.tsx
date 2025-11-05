@@ -105,7 +105,15 @@ export default function PostModalContent({ postId }: any) {
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
-  }, []);
+    try {
+      // Fallback: if overlay remains due to state not repainting in some cases, navigate back.
+      if (typeof window !== 'undefined' && window.history.length > 1) {
+        setTimeout(() => {
+          try { router.back(); } catch {}
+        }, 0);
+      }
+    } catch {}
+  }, [router]);
 
   if (!isOpen) return null;
 
@@ -176,6 +184,7 @@ export default function PostModalContent({ postId }: any) {
                 <button
                   data-modal-close
                   aria-label="Close"
+                  type="button"
                   className="header-close text-white/80 hover:text-white p-1"
                   onClick={handleClose}
                 >
