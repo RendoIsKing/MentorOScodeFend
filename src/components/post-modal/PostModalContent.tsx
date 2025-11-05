@@ -101,6 +101,7 @@ export default function PostModalContent({ postId }: any) {
     if (!post?._id) return;
     try {
       await updatePost({ id: post._id, isPinned: !post?.isPinned }).unwrap();
+      setMoreOpen(false);
     } catch {}
   };
 
@@ -126,6 +127,14 @@ export default function PostModalContent({ postId }: any) {
     } catch {}
     setIsOpen(false);
   }, []);
+
+  // Close kebab menu on outside click
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onDocClick = () => setMoreOpen(false);
+    window.addEventListener('click', onDocClick);
+    return () => window.removeEventListener('click', onDocClick);
+  }, [moreOpen]);
 
   if (!isOpen) return null;
 
@@ -217,7 +226,7 @@ export default function PostModalContent({ postId }: any) {
                         </button>
                         <button
                           className="block w-full text-left text-red-400 hover:text-red-300"
-                          onClick={() => setDeleteOpen(true)}
+                          onClick={() => { setMoreOpen(false); setDeleteOpen(true); }}
                         >
                           Delete post
                         </button>
