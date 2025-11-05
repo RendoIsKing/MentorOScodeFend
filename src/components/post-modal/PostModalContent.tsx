@@ -97,7 +97,13 @@ export default function PostModalContent({ postId }: any) {
   // Esc closes overlay
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsOpen(false);
+      if (e.key === "Escape") {
+        try {
+          const evt = new CustomEvent('post-modal-close');
+          window.dispatchEvent(evt);
+        } catch {}
+        setIsOpen(false);
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -105,24 +111,11 @@ export default function PostModalContent({ postId }: any) {
 
   const handleClose = useCallback(() => {
     try {
-      if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('fromProfile') === '1') {
-          router.push('/profile');
-          return;
-        }
-        if (
-          window.history.length > 1 &&
-          document.referrer &&
-          new URL(document.referrer).origin === window.location.origin
-        ) {
-          router.back();
-          return;
-        }
-      }
+      const evt = new CustomEvent('post-modal-close');
+      window.dispatchEvent(evt);
     } catch {}
     setIsOpen(false);
-  }, [router]);
+  }, []);
 
   if (!isOpen) return null;
 
