@@ -88,11 +88,11 @@ export default function PostModalContent({ postId }: any) {
   }, [router]);
 
   return (
-    <div className="w-[96vw] h-[90vh] max-w-[1400px] bg-[#0B0F14] rounded-lg shadow relative grid grid-cols-1 lg:grid-cols-[65%_35%] overflow-hidden mx-auto">
+    <div className="w-[92vw] h-[90vh] max-w-[1280px] bg-[#0B0F14] rounded-xl shadow-2xl border border-white/10 relative grid grid-cols-1 lg:grid-cols-[62%_38%] overflow-hidden mx-auto my-6">
       {/* Close */}
       <button
         aria-label="Close"
-        className="absolute right-3 top-3 text-white/70 hover:text-white z-10"
+        className="absolute right-2 top-2 text-white/70 hover:text-white z-20"
         onClick={() => router.back()}
       >
         ×
@@ -130,6 +130,30 @@ export default function PostModalContent({ postId }: any) {
               <span className="text-white/90 text-sm leading-tight">{post?.userInfo?.[0]?.fullName || "User"}</span>
               <span className="text-white/50 text-xs leading-tight">@{post?.userInfo?.[0]?.userName || "user"}</span>
             </div>
+            {/* Header actions (kebab) */}
+            <div className="ml-auto relative">
+              <button className="text-white/70 hover:text-white" onClick={() => setMoreOpen((v) => !v)}>⋯</button>
+              {moreOpen && (
+                <div className="absolute right-0 mt-2 bg-[#11161c] border border-white/10 rounded shadow p-2 text-sm min-w-40">
+                  {isOwner ? (
+                    <>
+                      <button className="block w-full text-left text-white/90 hover:text-white" onClick={onTogglePin}>
+                        {post?.isPinned ? "Unpin post" : "Pin post"}
+                      </button>
+                      <button className="block w-full text-left text-red-400 hover:text-red-300" onClick={() => setDeleteOpen(true)}>
+                        Delete post
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button className="block w-full text-left text-white/90 hover:text-white">Follow</button>
+                      <button className="block w-full text-left text-white/90 hover:text-white">Report</button>
+                      <button className="block w-full text-left text-white/90 hover:text-white">Not interested</button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Actions */}
@@ -142,33 +166,7 @@ export default function PostModalContent({ postId }: any) {
               className="text-white/90 hover:text-white"
               onClick={() => { try { navigator.clipboard.writeText(window.location.href); } catch {} }}
             >↗ Share</button>
-            {isOwner && (
-              <button className="ml-6 text-red-400 hover:text-red-300" onClick={() => setDeleteOpen(true)}>
-                Delete post
-              </button>
-            )}
-            {!isOwner && (
-              <button className="ml-auto text-white/90 hover:text-white" onClick={() => { /* follow logic hooked already in larger file, placeholder */ }}>
-                Follow
-              </button>
-            )}
-            <div className="ml-2">
-              <button className="text-white/70 hover:text-white" onClick={() => setMoreOpen((v) => !v)}>⋯</button>
-              {moreOpen && (
-                <div className="absolute right-4 top-12 bg-[#11161c] border border-white/10 rounded shadow p-2 text-sm">
-                  {isOwner ? (
-                    <button className="block w-full text-left text-white/90 hover:text-white" onClick={onTogglePin}>
-                      {post?.isPinned ? "Unpin post" : "Pin post"}
-                    </button>
-                  ) : (
-                    <>
-                      <button className="block w-full text-left text-white/90 hover:text-white">Report</button>
-                      <button className="block w-full text-left text-white/90 hover:text-white">Not interested</button>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
+            {/* actions row is intentionally minimal; destructive in header kebab */}
           </div>
         </div>
 
