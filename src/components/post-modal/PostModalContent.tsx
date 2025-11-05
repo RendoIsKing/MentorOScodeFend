@@ -109,13 +109,14 @@ export default function PostModalContent({ postId }: any) {
     <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4">
       <div className="w-[92vw] h-[90vh] max-w-[1280px] bg-[#0B0F14] rounded-xl shadow-2xl border border-white/10 relative grid grid-cols-1 lg:grid-cols-[62%_38%] overflow-hidden">
       {/* Close */}
-      <button
-        aria-label="Close"
-        className="absolute right-2 top-2 text-white/70 hover:text-white z-20"
-        onClick={handleClose}
-      >
-        ×
-      </button>
+        {/* Close button - single, large, top-right INSIDE the popup */}
+        <button
+          aria-label="Close"
+          className="absolute right-3 top-3 text-white/80 hover:text-white z-30 text-2xl leading-none"
+          onClick={handleClose}
+        >
+          ×
+        </button>
 
       {/* Media */}
       <div className="flex items-center justify-center bg-black/20 p-0 overflow-hidden">
