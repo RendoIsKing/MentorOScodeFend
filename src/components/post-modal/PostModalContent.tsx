@@ -222,8 +222,8 @@ export default function PostModalContent({ postId }: any) {
       <style jsx>{`
         /* Hide any lucide X that may be injected by generic Dialogs inside the modal,
            but keep our header close icon visible */
-        :global(.modal-root .lucide-x) { display: none !important; }
-        :global(.modal-root .header-close .lucide-x) { display: inline-block !important; }
+        :global(.modal-root .lucide-x) { display: none !important }
+        :global(.modal-root .header-close .lucide-x) { display: inline-block !important }
         :global(.modal-root button.absolute.right-4.top-4) { display: none !important }
       `}</style>
     </div>
