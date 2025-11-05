@@ -37,6 +37,7 @@ export default function PostModalContent({ postId }: any) {
   const [commentText, setCommentText] = useState("");
   const [moreOpen, setMoreOpen] = useState(false);
   const [zoom, setZoom] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const mediaSrc = useMemo(() => {
     if (!post) return undefined;
@@ -83,26 +84,20 @@ export default function PostModalContent({ postId }: any) {
     } catch {}
   };
 
-  // Keyboard: Esc to close
+  // Keyboard: Esc to close overlay
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") router.back();
+      if (e.key === "Escape") setIsOpen(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [router]);
+  }, []);
 
   const handleClose = useCallback(() => {
-    try {
-      if (typeof window !== 'undefined' && window.history.length > 1) {
-        router.back();
-        return;
-      }
-    } catch {}
-    router.push('/');
-  }, [router]);
+    setIsOpen(false);
+  }, []);
 
-  return (
+  return isOpen ? (
     <div className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
       <div className="modal-root w-[92vw] h-[90vh] max-w-[1280px] bg-[#0B0F14] rounded-xl shadow-2xl border border-white/10 relative grid grid-cols-1 lg:grid-cols-[62%_38%] overflow-hidden" onClick={(e)=>e.stopPropagation()}>
       {/* Close */}
@@ -233,6 +228,7 @@ export default function PostModalContent({ postId }: any) {
       `}</style>
     </div>
   );
+  ) : null;
 }
 
 
