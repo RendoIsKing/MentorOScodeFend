@@ -44,10 +44,9 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity outline-none disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground z-[1000]">
-        <X className="h-8 w-8 " />
-        <span className="sr-only">Close</span>
-      </DialogPrimitive.Close>
+      {/* Default dialog close button hidden to avoid overlayed X inside composed popups.
+          Consumers should render an explicit close where needed. */}
+      <DialogPrimitive.Close className="hidden" />
     </DialogPrimitive.Content>
   </DialogPortal>
 ));
