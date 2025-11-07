@@ -7,7 +7,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { ChevronRight, Info, Tags, ThumbsDown } from "lucide-react";
+import { ChevronRight, Info, Tags, ThumbsDown, Star } from "lucide-react";
 import { baseServerUrl, cn, getInitials } from "@/lib/utils";
 import CommentsComp from "@/components/comments-comp";
 import { Separator } from "@/components/ui/separator";
@@ -202,20 +202,15 @@ const MobileFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
       <CommentsComp feedData={feedData} />
       <div
         className={cn("flex flex-col items-center gap-2 justify-center", {
-          "text-amber-300": selectBookmark,
+          "text-amber-300": saveStates,
         })}
         onClick={() => handleSavePost(feedData?._id)}
       >
-        <img
-          src={
-            !saveStates
-              ? "/assets/images/Home/archive.svg"
-              : "/assets/images/Home/bookmark-active.svg"
-          }
-          alt="bookmark"
+        <Star
+          className="cursor-pointer"
+          fill={saveStates ? "currentColor" : "none"}
         />
-        <p className={cn("text-white", { "text-amber-300": selectBookmark })}>
-          {/* {saveLikecount} */}
+        <p className={cn("text-white", { "text-amber-300": saveStates })}>
           {saveStates ? 1 : 0}
         </p>
       </div>

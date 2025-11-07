@@ -16,6 +16,7 @@ import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { useGetUserDetailsByUserNameQuery } from "@/redux/services/haveme/user";
 import { useGetUserDetailsQuery } from "@/redux/services/haveme";
+import { Star } from "lucide-react";
 
 const ADD_POSTS = "ADD_POSTS";
 
@@ -227,11 +228,10 @@ export default function ProfileBody() {
                 currentTab === "saved",
             })}
           >
-            <Image
-              height={28}
-              width={28}
-              alt="navicon"
-              src="/assets/images/my-Profile/bookmark.svg"
+            <Star
+              className="mr-0"
+              size={28}
+              fill={currentTab === "saved" ? "currentColor" : "none"}
             />
             {!isMobile && <h1 className="ml-4 text-base">Saved</h1>}
           </Button>

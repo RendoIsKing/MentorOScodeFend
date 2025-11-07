@@ -2,11 +2,10 @@
 import React, { useState } from "react";
 import Heart from "@/assets/images/Home/heart.svg";
 import HeartActive from "@/assets/images/Home/heart-active.svg";
-import Bookmark from "@/assets/images/Home/archive.svg";
-import BookmarkActive from "@/assets/images/Home/bookmark-active.svg";
+// Replace bookmark icons with star
 import More from "@/assets/images/Home/more.svg";
 
-import { Info, ThumbsDown } from "lucide-react";
+import { Info, ThumbsDown, Star } from "lucide-react";
 import CommentsComp from "@/components/comments-comp";
 import Link from "next/link";
 import { baseServerUrl } from "@/lib/utils";
@@ -139,16 +138,16 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
         className={cn(
           "flex flex-col items-center gap-2 justify-center cursor-pointer",
           {
-            "text-amber-300": selectBookmark,
+            "text-amber-300": saveStates,
           }
         )}
         onClick={() => handleSavePost(feedData?._id)}
       >
-        {saveStates ? (
-          <BookmarkActive className="fill-foreground cursor-pointer" />
-        ) : (
-          <Bookmark className="fill-foreground cursor-pointer" />
-        )}
+        <Star
+          className="cursor-pointer"
+          // fill star when saved, outline when not
+          fill={saveStates ? "currentColor" : "none"}
+        />
         {saveLikecount}
       </div>
       {feedData?.userTags?.length > 0 && (
