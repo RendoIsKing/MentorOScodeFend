@@ -70,8 +70,8 @@ export default function RootLayout({
           <Provider store={store}>
             <ThemeProvider
               attribute="class"
-              defaultTheme="system"
-              enableSystem
+              defaultTheme="dark"
+              enableSystem={false}
               disableTransitionOnChange
             >
               {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
