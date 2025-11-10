@@ -99,7 +99,9 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
       if (val._id) return String(val._id);
       if ((val as any).$oid) return String((val as any).$oid);
       const s = typeof val.toString === "function" ? val.toString() : "";
-      return /^[a-f0-9]{24}$/i.test(s) ? s : "";
+      // Supports strings like ObjectId("...") or new ObjectId("...")
+      const m = s.match(/[a-f0-9]{24}/i);
+      return m ? m[0] : "";
     }
     return "";
   };
@@ -108,6 +110,8 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
     extractId(author?._id || author?.id),
     extractId((feedData as any)?.user),
     extractId((feedData as any)?.userId),
+    extractId((feedData as any)?.owner),
+    extractId((feedData as any)?.createdBy),
   ].filter(Boolean);
   const isOwner = Boolean(resolvedCurrentUserId && ownerCandidates.some((id)=> id && String(id) === String(resolvedCurrentUserId)));
 

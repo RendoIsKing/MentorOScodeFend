@@ -30,7 +30,8 @@ export default function PostModalContent({ postId }: any) {
       if (val._id) return String(val._id);
       if ((val as any).$oid) return String((val as any).$oid);
       const s = typeof val.toString === "function" ? val.toString() : "";
-      return /^[a-f0-9]{24}$/i.test(s) ? s : "";
+      const m = s.match(/[a-f0-9]{24}/i);
+      return m ? m[0] : "";
     }
     return "";
   };
@@ -38,6 +39,8 @@ export default function PostModalContent({ postId }: any) {
     extractId(post?.userInfo?.[0]?._id),
     extractId((post as any)?.user),
     extractId((post as any)?.userId),
+    extractId((post as any)?.owner),
+    extractId((post as any)?.createdBy),
   ].filter(Boolean);
   const isOwner = Boolean(myId && ownerCandidates.some((id) => id && String(id) === myId));
   const base = (baseServerUrl as any) || "/api/backend";
