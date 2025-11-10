@@ -20,7 +20,7 @@ export const FixedFormSchema = z.object({
       feature: z.string(),
       // Some API payloads omit this; default to false if missing
       isAvailable: z.boolean().optional().default(false),
-      description: z.string(),
+      description: z.string().optional().default(""),
     })
   ),
 });
@@ -49,7 +49,7 @@ export const CustomFormSchema = z.object({
         feature: z.string(),
         // Optional in payload; treat missing as false, and refine below will ensure at least one true
         isAvailable: z.boolean().optional().default(false),
-        description: z.string(),
+        description: z.string().optional().default(""),
       })
     )
     .refine((value) => value.some((item) => item.isAvailable), {
