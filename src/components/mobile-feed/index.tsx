@@ -27,6 +27,7 @@ import { Button } from "../ui/button";
 import { toast } from "../ui/use-toast";
 import { useFollowUserMutation, usersApi } from "@/redux/services/haveme/user";
 import { useSendNotificationMutation } from "@/redux/services/haveme/notifications";
+import { useMeNormalized } from "@/hooks/useMeNormalized";
 import { useAppDispatch } from "@/redux/store";
 import {
   TAG_GET_FILE_INFO_BY_ID,
@@ -82,13 +83,19 @@ const MobileFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
   const [likePost] = useLikePostMutation();
   const [savePost] = useSavePostMutation();
   const { user } = useUserOnboardingContext();
+  const { me: meNormalized } = useMeNormalized();
   const [isDeleteModal, setIsDeleteModal] = useState(false);
   const safeBase = (baseServerUrl as any) || (typeof window !== 'undefined' && (window as any).NEXT_PUBLIC_API_SERVER) || '/api/backend';
   const path = feedData?.mediaFiles?.[0]?.path;
   const postUrl = path ? `${safeBase}/${path}` : '';
   const isVideo = feedData?.media?.[0]?.mediaType === 'video';
 
-  const isOwnProfile = feedData?.userInfo[0]?._id === user?._id;
+  const isOwnProfile = (() => {
+    const postOwnerId = String(feedData?.userInfo?.[0]?._id || (feedData as any)?.user || "");
+    const ctxId = user?._id ? String(user._id) : "";
+    const meId = meNormalized?._id ? String(meNormalized._id) : "";
+    return Boolean(postOwnerId && (postOwnerId === ctxId || postOwnerId === meId));
+  })();
 
   const handleSelectHeart = (postId: string) => {
     if (heartStates) {

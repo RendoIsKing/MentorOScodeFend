@@ -93,12 +93,12 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
   // Resolve current user id robustly from props or normalized hook
   const { me: meNormalized } = useMeNormalized();
   const resolvedCurrentUserId = (currentUserId as any) || meNormalized?._id || null;
-  const isOwner = Boolean(
-    resolvedCurrentUserId && (
-      String(resolvedCurrentUserId) === String(author?._id || author?.id) ||
-      String(resolvedCurrentUserId) === String((feedData as any)?.user)
-    )
-  );
+  const ownerCandidates = [
+    String(author?._id || author?.id || ""),
+    String((feedData as any)?.user || ""),
+    String((feedData as any)?.userId || ""),
+  ].filter(Boolean);
+  const isOwner = Boolean(resolvedCurrentUserId && ownerCandidates.some((id)=> id && String(id) === String(resolvedCurrentUserId)));
 
   return (
     <div className="flex flex-col gap-y-4">

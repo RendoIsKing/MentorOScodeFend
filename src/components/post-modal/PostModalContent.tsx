@@ -22,11 +22,13 @@ export default function PostModalContent({ postId }: any) {
   const { data, isLoading, error } = useGetPostByIdQuery(postId);
   const post: any = (data as any)?.data || data;
   const { me: meNormalized } = useMeNormalized();
-  const myId: any = meNormalized?._id;
-  const isOwner = Boolean(
-    (myId && String(post?.user) === String(myId)) ||
-      String(post?.userInfo?.[0]?._id || "") === String(myId || "")
-  );
+  const myId: string = (meNormalized?._id ? String(meNormalized._id) : "");
+  const ownerCandidates = [
+    String(post?.userInfo?.[0]?._id || ""),
+    String((post as any)?.user || ""),
+    String((post as any)?.userId || ""),
+  ].filter(Boolean);
+  const isOwner = Boolean(myId && ownerCandidates.some((id) => id && String(id) === myId));
   const base = (baseServerUrl as any) || "/api/backend";
 
   const { data: commentsRes } = useGetCommentsByPostIdQuery(postId);
