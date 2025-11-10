@@ -15,14 +15,18 @@ export const FixedFormSchema = z.object({
         .max(99)
         .multipleOf(0.01)
     ),
-  permissions: z.array(
-    z.object({
-      feature: z.string(),
-      // Some API payloads omit this; default to false if missing
-      isAvailable: z.boolean().optional().default(false),
-      description: z.string().optional().default(""),
-    })
-  ),
+  // Permissions may not be loaded yet; default to empty array and allow submit
+  permissions: z
+    .array(
+      z.object({
+        feature: z.string(),
+        // Some API payloads omit this; default to false if missing
+        isAvailable: z.boolean().optional().default(false),
+        description: z.string().optional().default(""),
+      })
+    )
+    .optional()
+    .default([]),
 });
 
 export const CustomFormSchema = z.object({
