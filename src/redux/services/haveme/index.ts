@@ -76,13 +76,19 @@ export const havemeApi = createApi({
     TAG_GET_SEARCH_USERS,
   ],
   baseQuery: fetchBaseQuery({
-    baseUrl: `${process.env.NEXT_PUBLIC_API_SERVER || defaultBase}/v1`,
+    // Force same-origin proxy to avoid CORS/CSRF issues
+    baseUrl: `${defaultBase}/v1`,
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
-      // Avoid Authorization header to prevent CORS preflight; rely on cookie session
-      // const token = (getState() as RootState).auth.token;
-      // if (token) headers.set("authorization", `Bearer ${token}`);
-      // Do not set any custom headers; they trigger CORS preflight on GET
+      // Double-submit CSRF: send csrf_token cookie as x-csrf-token
+      try {
+        if (typeof document !== "undefined") {
+          const m = document.cookie.match(/(?:^|;\\s*)csrf_token=([^;]+)/);
+          const csrf = m ? decodeURIComponent(m[1]) : "";
+          if (csrf) headers.set("x-csrf-token", csrf);
+        }
+      } catch {}
+      // Rely on cookies for session; no Authorization header needed
       return headers;
     },
   }),
