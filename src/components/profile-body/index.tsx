@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { useGetUserDetailsByUserNameQuery } from "@/redux/services/haveme/user";
 import { useGetUserDetailsQuery } from "@/redux/services/haveme";
 import { Star } from "lucide-react";
+import { Flame } from "lucide-react";
 
 const ADD_POSTS = "ADD_POSTS";
 
@@ -245,11 +246,11 @@ export default function ProfileBody() {
               currentTab === "subscribed",
           })}
         >
-          <Image
-            height={32}
-            width={32}
-            alt="navicon"
-            src="/assets/images/search-user-profile/subscribed.svg"
+          <Flame
+            className={cn("mr-0 transition-colors", { "flame-lit": currentTab === "subscribed" })}
+            size={28}
+            strokeWidth={2}
+            fill={currentTab === "subscribed" ? "currentColor" : "none"}
           />
           {!isMobile && <h1 className="ml-4 text-base">Subscribed</h1>}
         </Button>

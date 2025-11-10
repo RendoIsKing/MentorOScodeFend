@@ -25,7 +25,7 @@ import SubscriptionPlanModalDesktop from "@/components/subscription-plan-modal/s
 import { useCreateSubscriptionMutation } from "@/redux/services/haveme/subscription";
 import { toast } from "@/components/ui/use-toast";
 import { useStripe } from "@stripe/react-stripe-js";
-import { Loader2 } from "lucide-react";
+import { Loader2, Flame } from "lucide-react";
 import { useAppDispatch } from "@/redux/store";
 import { havemeApi } from "@/redux/services/haveme";
 import { TAG_GET_USER_DETAILS_BY_USER_NAME } from "@/contracts/haveme/haveMeApiTags";
@@ -64,7 +64,8 @@ const SubscribePlan: React.FC<SubscribePlanProps> = ({
   const [userDetailsData, setUserDetailsData] = useState(null);
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
   const [hasFixedPlan, setHasFixedPlan] = useState(false);
-  const [fixedPlan, setFixedPlan] = useState(null);
+  const [fixedPlan, setFixedPlan] = useState<any>(null);
+  const [isJoinedLocal, setIsJoinedLocal] = useState<boolean>(false);
 
   const getUserDetailsToSubscribe = () => {
     getUserDetailsTrigger({
@@ -75,11 +76,13 @@ const SubscribePlan: React.FC<SubscribePlanProps> = ({
         setUserDetailsData(data?.data);
         setSubscriptionPlans(data?.data?.subscriptionPlans || []);
         setHasFixedPlan(checkFixedPlanExists(data?.data?.subscriptionPlans));
-        setFixedPlan(
+        const fixed = 
           data?.data?.subscriptionPlans?.find(
             (plan) => plan.planType === "fixed"
           )
-        );
+        ) as any;
+        setFixedPlan(fixed);
+        setIsJoinedLocal(Boolean(fixed?.isJoined));
       })
       .catch((error) => {
         console.error("Failed to fetch user details:", error);
@@ -118,6 +121,7 @@ const SubscribePlan: React.FC<SubscribePlanProps> = ({
           );
           setIsConfirmPaymentLoading(false);
           setIsDialogOpen(false);
+          setIsJoinedLocal(true);
         }
       })
       .catch((err) => {
@@ -134,23 +138,20 @@ const SubscribePlan: React.FC<SubscribePlanProps> = ({
       <DialogTrigger onClick={() => getUserDetailsToSubscribe()} asChild>
         <div>
           {isMobile ? (
-            <img
-              src="/assets/images/search/serach-profile-icon.svg"
-              className="cursor-pointer"
-              alt="verfiedUser"
-            />
+            <button
+              aria-label={isJoinedLocal ? "Subscribed" : "Subscribe"}
+              className={`inline-flex items-center justify-center rounded-full p-2 transition-all active:scale-95 ${isJoinedLocal ? "text-primary flame-lit" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              <Flame size={22} strokeWidth={2} fill={isJoinedLocal ? "currentColor" : "none"} />
+            </button>
           ) : (
             <Button
               variant={"secondary"}
               size="sleek"
-              className="ml-4 py-1 px-4 italic font-medium lg: rounded-3xl bg-[#40A7EB]"
+              className={`ml-4 py-1 px-4 font-medium rounded-3xl transition-colors ${isJoinedLocal ? "text-primary flame-lit" : ""}`}
             >
-              <img
-                src="/assets/images/ShareIcons/subscribe.svg"
-                alt="verified-user"
-                className="w-6 h-5 mr-2 "
-              />
-              Subscribe
+              <Flame size={18} strokeWidth={2} className="mr-2" fill={isJoinedLocal ? "currentColor" : "none"} />
+              <span>{isJoinedLocal ? "Subscribed" : "Subscribe"}</span>
             </Button>
           )}
         </div>
@@ -198,7 +199,7 @@ const SubscribePlan: React.FC<SubscribePlanProps> = ({
               ) : null}
               {`${
                 fixedPlan?.isJoined
-                  ? `You've already subscribed.`
+                  ? `You're subscribed.`
                   : `Join for $${formatSubscriptionPrice(fixedPlan?.price)}`
               }`}
             </Button>

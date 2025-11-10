@@ -9,7 +9,7 @@ import Tag from "@/assets/images/popup/tag-user.svg";
 import Music from "@/assets/images/popup/music.svg";
 import Eye from "@/assets/images/popup/eye.svg";
 import EyePerView from "@/assets/images/popup/eye-per-view.svg";
-import Sub from "@/assets/images/search-user-profile/subscribed.svg";
+import { Flame } from "lucide-react";
 
 import {
   Dialog,
@@ -334,7 +334,7 @@ const EditPostModal: React.FC<IEditPostModalProps> = ({
                             {menuItem === "Pay-per-view" ? (
                               <EyePerView className="fill-foreground" />
                             ) : menuItem === "Subscriber" ? (
-                              <Sub className="fill-foreground ml-[-3px]" />
+                              <Flame className="ml-[-3px]" />
                             ) : (
                               <Eye className="fill-foreground" />
                             )}
@@ -364,7 +364,7 @@ const EditPostModal: React.FC<IEditPostModalProps> = ({
                               </Button>
                             </div>
                             <div className="flex items-center">
-                              <Sub className="fill-foreground ml-[-3px]" />
+                              <Flame />
                               <Button
                                 variant={"link"}
                                 className="text-foreground"
