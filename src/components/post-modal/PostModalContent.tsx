@@ -46,7 +46,8 @@ export default function PostModalContent({ postId }: any) {
   const authorUserNameLc = String(post?.userInfo?.[0]?.userName || "").toLowerCase();
   const myUserNameLc = String(meNormalized?.userName || "").toLowerCase();
   const isOwnerByUserName = Boolean(authorUserNameLc && myUserNameLc && authorUserNameLc === myUserNameLc);
-  const isOwner = isOwnerById || isOwnerByUserName;
+  const isOwnerApi = Boolean((post as any)?.isOwner);
+  const isOwner = isOwnerApi || isOwnerById || isOwnerByUserName;
   const base = (baseServerUrl as any) || "/api/backend";
 
   const { data: commentsRes } = useGetCommentsByPostIdQuery(postId);

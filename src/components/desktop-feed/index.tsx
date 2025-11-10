@@ -117,7 +117,8 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
   ].filter(Boolean);
   const isOwnerById = Boolean(resolvedCurrentUserId && ownerCandidates.some((id)=> id && String(id) === String(resolvedCurrentUserId)));
   const isOwnerByUserName = Boolean(myUserNameLc && authorUserNameLc && myUserNameLc === authorUserNameLc);
-  const isOwner = isOwnerById || isOwnerByUserName;
+  const isOwnerApi = Boolean((feedData as any)?.isOwner);
+  const isOwner = isOwnerApi || isOwnerById || isOwnerByUserName;
 
   return (
     <div className="flex flex-col gap-y-4">
