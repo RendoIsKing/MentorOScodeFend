@@ -184,10 +184,11 @@ const ProfileHeaderMobile = () => {
   // Inline bio editing
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [bioDraft, setBioDraft] = useState("");
+  const [localBio, setLocalBio] = useState<string | undefined>(undefined);
   const [updateMe, { isLoading: isSavingBio }] = useUpdateMeMutation();
 
   const startEditBio = () => {
-    const currentBio = data?.data?.bio || "";
+    const currentBio = (localBio !== undefined ? localBio : (data?.data?.bio || ""));
     setBioDraft(currentBio);
     setIsEditingBio(true);
   };
@@ -195,7 +196,9 @@ const ProfileHeaderMobile = () => {
   const saveBio = async () => {
     try {
       await updateMe({ bio: bioDraft }).unwrap();
+      setLocalBio(bioDraft);
       setIsEditingBio(false);
+      try { await (refetch as any)?.(); } catch {}
     } catch (e) {
       setIsEditingBio(false);
     }
@@ -206,7 +209,7 @@ const ProfileHeaderMobile = () => {
   const { user } = useUserOnboardingContext();
   const [isSeeMoreOption, setIsSeeMoreOption] = useState(false);
 
-  const bioText = isOwnerRendered ? data?.data?.bio || "" : "";
+  const bioText = isOwnerRendered ? (localBio !== undefined ? localBio : (data?.data?.bio || "")) : "";
   const maxLength = 150;
 
   const toggleVisibility = () => {

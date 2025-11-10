@@ -40,7 +40,7 @@ function ProfileHeaderDesktop() {
   const router = useRouter();
   const userName = useParams();
 
-  const { data, isLoading, isError } = useGetUserDetailsQuery();
+  const { data, isLoading, isError, refetch } = useGetUserDetailsQuery();
 
   const { userDetailsData } = useGetUserDetailsByUserNameQuery(
     { userName: userName.uid as string },
@@ -71,10 +71,11 @@ function ProfileHeaderDesktop() {
   // Inline bio editing
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [bioDraft, setBioDraft] = useState("");
+  const [localBio, setLocalBio] = useState<string | undefined>(undefined);
   const [updateMe, { isLoading: isSavingBio }] = useUpdateMeMutation();
 
   const startEditBio = () => {
-    const currentBio = data?.data?.bio || "";
+    const currentBio = (localBio !== undefined ? localBio : (data?.data?.bio || ""));
     setBioDraft(currentBio);
     setIsEditingBio(true);
   };
@@ -82,7 +83,9 @@ function ProfileHeaderDesktop() {
   const saveBio = async () => {
     try {
       await updateMe({ bio: bioDraft }).unwrap();
+      setLocalBio(bioDraft);
       setIsEditingBio(false);
+      try { await refetch(); } catch {}
     } catch (e) {
       setIsEditingBio(false);
     }
@@ -243,7 +246,7 @@ function ProfileHeaderDesktop() {
                     </div>
                   </div>
                 ) : (
-                  <p className="pb-2 w-[75%]">{(isOwnerRendered ? data?.data?.bio : "") || ""}</p>
+                  <p className="pb-2 w-[75%]">{(isOwnerRendered ? (localBio !== undefined ? localBio : (data?.data?.bio || "")) : "") || ""}</p>
                 )}
                 <Separator />
               </div>
