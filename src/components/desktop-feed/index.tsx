@@ -106,6 +106,8 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
     return "";
   };
   const resolvedCurrentUserId = (currentUserId as any) || meNormalized?._id || null;
+  const myUserNameLc = (meNormalized?.userName ? String(meNormalized.userName).toLowerCase() : "");
+  const authorUserNameLc = (authorUserName ? String(authorUserName).toLowerCase() : "");
   const ownerCandidates = [
     extractId(author?._id || author?.id),
     extractId((feedData as any)?.user),
@@ -113,7 +115,9 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
     extractId((feedData as any)?.owner),
     extractId((feedData as any)?.createdBy),
   ].filter(Boolean);
-  const isOwner = Boolean(resolvedCurrentUserId && ownerCandidates.some((id)=> id && String(id) === String(resolvedCurrentUserId)));
+  const isOwnerById = Boolean(resolvedCurrentUserId && ownerCandidates.some((id)=> id && String(id) === String(resolvedCurrentUserId)));
+  const isOwnerByUserName = Boolean(myUserNameLc && authorUserNameLc && myUserNameLc === authorUserNameLc);
+  const isOwner = isOwnerById || isOwnerByUserName;
 
   return (
     <div className="flex flex-col gap-y-4">
