@@ -171,10 +171,23 @@ const EditSubscription = () => {
   }
 
   const handleSaveClick = useCallback(() => {
+    const showErrors = (errs: any) => {
+      try {
+        const first = errs && Object.values(errs)[0] as any;
+        const msg =
+          first?.message ||
+          first?.root?.message ||
+          first?.type ||
+          "Please fix the highlighted fields.";
+        toast({ variant: "destructive", description: String(msg) });
+      } catch {
+        toast({ variant: "destructive", description: "Please check the form fields." });
+      }
+    };
     if (value === "fixed") {
-      fixedSubForm.handleSubmit(onSubmit)();
+      fixedSubForm.handleSubmit(onSubmit, showErrors)();
     } else {
-      customSubForm.handleSubmit(onCustomSubmit)();
+      customSubForm.handleSubmit(onCustomSubmit, showErrors)();
     }
   }, [value, fixedSubForm, customSubForm]);
 
@@ -281,6 +294,8 @@ const EditSubscription = () => {
                             <Input
                               placeholder="$20"
                               className="border-muted-foreground text-xl h-14"
+                              inputMode="decimal"
+                              step="0.01"
                               {...field}
                             />
                             <FormMessage />
