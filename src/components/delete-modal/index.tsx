@@ -131,7 +131,7 @@ const DeleteModal: React.FC<IPostModalProps> = ({
         )}
         <AlertDialogContent
           className={
-            "py-10 p-0 bg-[#171a1f] w-full max-w-[12rem] border-none gap-0 bg-background"
+            "py-10 p-0 bg-background w-full max-w-[12rem] border-none gap-0"
           }
           // ref={dialogRef}
         >
@@ -180,7 +180,7 @@ const DeleteModal: React.FC<IPostModalProps> = ({
         </AlertDialogContent>
       </AlertDialog>
       <AlertDialog open={confirmDelete}>
-        <AlertDialogContent className="py-4 bg-[#171a1f] w-full max-w-[20rem] border-none gap-0 bg-background">
+        <AlertDialogContent className="py-4 bg-background w-full max-w-[20rem] border-none gap-0">
           <AlertDialogHeader className="text-start px-3 py-2">
             <p className="text-xl text-destructive">
               Are you sure you want to delete this post?

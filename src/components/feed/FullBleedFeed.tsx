@@ -158,19 +158,19 @@ export default function FullBleedFeed({
             if (hasOpenUi) return null;
             return (
               <div data-test="author-bar" className="fixed left-3 right-3 top-[calc(env(safe-area-inset-top)+8px)] z-[2147483647] pointer-events-auto">
-                <div className="absolute -inset-x-3 -top-3 h-24 bg-gradient-to-b from-black/60 to-transparent pointer-events-none" />
+                <div className="absolute -inset-x-3 -top-3 h-24 bg-gradient-to-b from-background/60 to-transparent pointer-events-none" />
                 <div className="relative flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <Link
                       data-test="author-link"
                       href={`/${active.user?.username || active.user?.id || ""}`}
-                      className="flex items-center gap-2 rounded-full bg-black/35 px-2 py-1"
+                      className="flex items-center gap-2 rounded-full bg-background/40 px-2 py-1"
                     >
-                      <img src={(active as any).user?.avatarUrl || "/assets/images/Home/small-profile-img.svg"} alt="" className="h-10 w-10 rounded-full object-cover" />
+                      <img src={(active as any).user?.avatarUrl || "/assets/images/Home/small-profile-img.svg"} alt="" className="h-10 w-10 rounded-full object-cover" loading="lazy" decoding="async" />
                       <div className="flex min-w-0 flex-col">
-                        <span className="truncate text-sm font-semibold text-white leading-tight">{active.user.displayName || active.user.username || ""}</span>
+                        <span className="truncate text-sm font-semibold text-foreground leading-tight">{active.user.displayName || active.user.username || ""}</span>
                         {active?.createdAt ? (
-                          <span className="text-xs text-white/80 leading-tight">{formatRelativeTime(active.createdAt)}</span>
+                          <span className="text-xs text-muted-foreground leading-tight">{formatRelativeTime(active.createdAt)}</span>
                         ) : null}
                       </div>
                     </Link>
@@ -239,7 +239,7 @@ const FullBleedItem = memo(function FullBleedItem({
   return (
     <article className="relative h-full min-h-full snap-start">
       {/* Gradient for readability */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/60 to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-background/60 to-transparent z-10" />
 
       {/* Visibility badge */}
       <div className="absolute left-3 top-3 z-30 pointer-events-none">
@@ -248,9 +248,9 @@ const FullBleedItem = memo(function FullBleedItem({
             data-test="visibility-badge"
             className={cn(
               "pointer-events-auto select-none rounded-full px-2 py-1 text-xs font-semibold",
-              post.visibility === 'public' ? 'bg-white/85 text-black' :
-              post.visibility === 'followers' ? 'bg-amber-400 text-black' :
-              'bg-emerald-400 text-black'
+              post.visibility === 'public' ? 'bg-background/90 text-foreground' :
+              post.visibility === 'followers' ? 'bg-amber-400 text-foreground' :
+              'bg-emerald-400 text-foreground'
             )}
             aria-label={`Visibility: ${post.visibility}`}
             title={`Visibility: ${post.visibility}`}
@@ -274,8 +274,8 @@ const FullBleedItem = memo(function FullBleedItem({
         <img src={post.src} alt="" className="absolute inset-0 h-full w-full object-cover pointer-events-none" loading="lazy" />
       )}
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/50 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-background/50 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background/60 to-transparent" />
 
       {RightOverlay ? (
         <div data-test="right-rail" className="absolute right-3 bottom-[calc(env(safe-area-inset-bottom)+var(--bottom-nav-h)+8px)] z-30">
@@ -294,8 +294,8 @@ const FullBleedItem = memo(function FullBleedItem({
           data-test="caption-bar"
           className="absolute left-3 right-3 bottom-[calc(env(safe-area-inset-bottom)+var(--bottom-nav-h)+8px)] z-20 pointer-events-none"
         >
-          <div className="bg-black/45 rounded-xl px-3 py-2 pointer-events-auto">
-            <p className="text-white text-[15px] leading-snug clamp-2">{post.caption}</p>
+          <div className="bg-background/45 rounded-xl px-3 py-2 pointer-events-auto">
+            <p className="text-foreground text-[15px] leading-snug clamp-2">{post.caption}</p>
           </div>
         </div>
       ) : null}
@@ -386,11 +386,11 @@ function FeedSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="rounded-full bg-black/35 px-3 py-1 text-sm font-semibold text-white">
+        <button className="rounded-full bg-background/40 px-3 py-1 text-sm font-semibold text-foreground">
           {label}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="p-1 border-[#0B0F14] light:bg-secondary dark:bg-[#0B0F14]">
+      <DropdownMenuContent className="p-1 border-border bg-card">
         <DropdownMenuItem onClick={() => onSelect('feed')}>Feed</DropdownMenuItem>
         <DropdownMenuItem onClick={() => onSelect('subscribed')}>Subscribed</DropdownMenuItem>
         <DropdownMenuItem onClick={() => onSelect('following')}>Following</DropdownMenuItem>
@@ -436,14 +436,14 @@ function ReportButton({ postId }: { postId: string }) {
     }
   };
   if (done) return (
-    <span className="rounded-full bg-black/40 px-2 py-1 text-xs font-semibold text-white">Reported</span>
+    <span className="rounded-full bg-background/40 px-2 py-1 text-xs font-semibold text-foreground">Reported</span>
   );
   return (
     <button
       data-test="report-button"
       onClick={(e) => { e.preventDefault(); e.stopPropagation(); onReport(); }}
       disabled={busy}
-      className="rounded-full bg-black/40 px-2 py-1 text-xs font-semibold text-white hover:bg-black/60"
+      className="rounded-full bg-background/40 px-2 py-1 text-xs font-semibold text-foreground hover:bg-background/60"
       aria-label="Report post"
       title="Report post"
     >

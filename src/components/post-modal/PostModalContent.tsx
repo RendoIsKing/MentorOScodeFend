@@ -10,8 +10,9 @@ import {
   useUpdatePostMutation,
 } from "@/redux/services/haveme/posts";
 import { useGetUserDetailsQuery } from "@/redux/services/haveme";
+import { useMeNormalized } from "@/hooks/useMeNormalized";
 import { useFollowUserMutation } from "@/redux/services/haveme/user";
-import { X as IconX } from "lucide-react";
+import { X as IconX, Heart, Star } from "lucide-react";
 import NotInterestedComp from "../shared/not-interested";
 import DeleteModal from "../delete-modal";
 import { baseServerUrl } from "@/lib/utils";
@@ -20,8 +21,8 @@ export default function PostModalContent({ postId }: any) {
   const router = useRouter();
   const { data, isLoading, error } = useGetPostByIdQuery(postId);
   const post: any = (data as any)?.data || data;
-  const { data: meData } = useGetUserDetailsQuery();
-  const myId: any = (meData as any)?.data?._id;
+  const { me: meNormalized } = useMeNormalized();
+  const myId: any = meNormalized?._id;
   const isOwner = Boolean(
     (myId && String(post?.user) === String(myId)) ||
       String(post?.userInfo?.[0]?._id || "") === String(myId || "")
@@ -139,9 +140,9 @@ export default function PostModalContent({ postId }: any) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[60] bg-background/80 flex items-center justify-center p-4">
       <div
-        className="modal-root w-[92vw] h-[90vh] max-w-[1280px] bg-[#0B0F14] rounded-xl shadow-2xl border border-white/10 relative grid grid-cols-1 lg:grid-cols-[62%_38%] overflow-hidden"
+        className="modal-root w-[92vw] h-[90vh] max-w-[1280px] bg-card rounded-xl shadow-2xl border border-border relative grid grid-cols-1 lg:grid-cols-[62%_38%] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Media */}
@@ -176,29 +177,30 @@ export default function PostModalContent({ postId }: any) {
         {/* Right pane: author header + actions + comments */}
         <div className="flex flex-col h-full min-h-0">
           {/* Sticky top area */}
-          <div className="sticky top-0 z-10 bg-[#0B0F14]">
-            <div className="px-4 lg:pl-6 pr-4 py-3 border-b border-white/10 flex items-center gap-3">
+          <div className="sticky top-0 z-10 bg-card">
+            <div className="px-4 lg:pl-6 pr-4 py-3 border-b border-border flex items-center gap-3">
               <img
                 src={avatarUrl}
                 alt="author avatar"
                 className="h-8 w-8 rounded-full object-cover"
               />
               <div className="flex flex-col">
-                <span className="text-white/90 text-sm leading-tight">
+                <span className="text-foreground text-sm leading-tight">
                   {post?.userInfo?.[0]?.fullName || "User"}
                 </span>
-                <span className="text-white/50 text-xs leading-tight">
+                <span className="text-muted-foreground text-xs leading-tight">
                   @{post?.userInfo?.[0]?.userName || "user"}
                 </span>
               </div>
               {/* Header actions (kebab + close) */}
               <div className="ml-auto flex items-center gap-3 relative">
                 <button
-                  className="text-white/70 hover:text-white"
+                  className="text-muted-foreground hover:text-foreground"
                   onClick={(e) => {
                     e.stopPropagation();
                     setMoreOpen((v) => !v);
                   }}
+                  aria-label="More actions"
                 >
                   ⋯
                 </button>
@@ -206,26 +208,26 @@ export default function PostModalContent({ postId }: any) {
                   data-modal-close
                   aria-label="Close"
                   type="button"
-                  className="header-close text-white/80 hover:text-white p-1"
+                  className="header-close text-muted-foreground hover:text-foreground p-1"
                   onClick={handleClose}
                 >
                   <IconX className="h-5 w-5" />
                 </button>
                 {moreOpen && (
                   <div
-                    className="absolute right-0 mt-2 bg-[#11161c] border border-white/10 rounded shadow p-2 text-sm min-w-40 z-30"
+                    className="absolute right-0 mt-2 bg-popover border border-border rounded shadow p-2 text-sm min-w-40 z-30"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {isOwner ? (
                       <>
                         <button
-                          className="block w-full text-left text-white/90 hover:text-white"
+                          className="block w-full text-left text-foreground hover:text-foreground"
                           onClick={onTogglePin}
                         >
                           {post?.isPinned ? "Unpin post" : "Pin post"}
                         </button>
                         <button
-                          className="block w-full text-left text-red-400 hover:text-red-300"
+                          className="block w-full text-left text-destructive hover:opacity-90"
                           onClick={() => { setMoreOpen(false); setDeleteOpen(true); }}
                         >
                           Delete post
@@ -234,7 +236,7 @@ export default function PostModalContent({ postId }: any) {
                     ) : (
                       <>
                         <button
-                          className="block w-full text-left text-white/90 hover:text-white"
+                          className="block w-full text-left text-foreground hover:text-foreground"
                           onClick={async () => {
                             try {
                               await followUser({
@@ -246,10 +248,10 @@ export default function PostModalContent({ postId }: any) {
                         >
                           {isFollowing ? "Unfollow" : "Follow"}
                         </button>
-                        <button className="block w-full text-left text-white/90 hover:text-white">
+                        <button className="block w-full text-left text-foreground hover:text-foreground">
                           Report
                         </button>
-                        <div className="block w-full text-left text-white/90 hover:text-white">
+                        <div className="block w-full text-left text-foreground hover:text-foreground">
                           <NotInterestedComp postId={post?._id} />
                         </div>
                       </>
@@ -260,17 +262,27 @@ export default function PostModalContent({ postId }: any) {
             </div>
 
             {/* Actions */}
-            <div className="relative flex items-center gap-4 px-4 lg:pl-6 pr-20 py-3 border-b border-white/10">
-              <button className={`hover:text-white ${liked ? 'text-primary' : 'text-white/90'}`} onClick={onLike}>
-                ♥ Like
-              </button>
-              <span className="text-white/60 text-sm">{likedCount}</span>
-              <button className={`hover:text-white ${saved ? 'text-primary' : 'text-white/90'}`} onClick={onSave}>
-                ✭ Save
-              </button>
-              <span className="text-white/60 text-sm">{savedCount}</span>
+            <div className="relative flex items-center gap-4 px-4 lg:pl-6 pr-20 py-3 border-b border-border">
               <button
-                className="text-white/90 hover:text-white"
+                aria-label={liked ? "Unlike post" : "Like post"}
+                className={`hover:text-foreground ${liked ? 'text-primary' : 'text-muted-foreground'}`}
+                onClick={onLike}
+              >
+                <Heart className="inline align-middle mr-1" fill={liked ? "currentColor" : "none"} />
+                Like
+              </button>
+              <span className="text-muted-foreground text-sm">{likedCount}</span>
+              <button
+                aria-label={saved ? "Unsave post" : "Save post"}
+                className={`hover:text-foreground ${saved ? 'text-primary' : 'text-muted-foreground'}`}
+                onClick={onSave}
+              >
+                <Star className="inline align-middle mr-1" fill={saved ? "currentColor" : "none"} />
+                Save
+              </button>
+              <span className="text-muted-foreground text-sm">{savedCount}</span>
+              <button
+                className="text-muted-foreground hover:text-foreground"
                 onClick={async () => {
                   try {
                     const url = window.location.href;
@@ -281,13 +293,14 @@ export default function PostModalContent({ postId }: any) {
                     }
                   } catch {}
                 }}
+                aria-label="Share post"
               >↗ Share</button>
             </div>
           </div>
 
           {/* Caption */}
           {post?.content && (
-            <div className="px-4 lg:px-6 py-3 text-white/90 border-b border-white/10 text-sm">
+            <div className="px-4 lg:px-6 py-3 text-foreground border-b border-border text-sm">
               {post.content}
             </div>
           )}
@@ -296,25 +309,25 @@ export default function PostModalContent({ postId }: any) {
           <div className="flex-1 min-h-0 overflow-y-auto px-4 py-3 space-y-3">
             {comments && comments.length > 0 ? (
               comments.map((c: any) => (
-                <div key={String(c?._id || Math.random())} className="text-white/90 text-sm">
-                  <span className="text-white/60">
+                <div key={String(c?._id || Math.random())} className="text-foreground text-sm">
+                  <span className="text-muted-foreground">
                     @{c?.userName || c?.user?.userName || "user"}
                   </span>
                   : {c?.comment}
                 </div>
               ))
             ) : (
-              <div className="text-white/60 text-sm">No comments yet</div>
+              <div className="text-muted-foreground text-sm">No comments yet</div>
             )}
           </div>
 
           {/* Add comment */}
-          <div className="px-4 py-3 border-t border-white/10 flex gap-2">
+          <div className="px-4 py-3 border-t border-border flex gap-2">
             <input
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
               placeholder="Write a comment…"
-              className="flex-1 bg-black/20 text-white placeholder-white/40 rounded px-3 py-2 outline-none"
+              className="flex-1 bg-muted/20 text-foreground placeholder-muted-foreground rounded px-3 py-2 outline-none"
             />
             <button onClick={onAddComment} className="bg-primary text-black px-4 py-2 rounded">
               Send

@@ -9,6 +9,7 @@ import { Info, ThumbsDown, Star } from "lucide-react";
 import CommentsComp from "@/components/comments-comp";
 import Link from "next/link";
 import { baseServerUrl } from "@/lib/utils";
+import { getUserAvatarUrl } from "@/lib/media";
 
 import {
   DropdownMenu,
@@ -18,7 +19,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import ReportProblemAlert from "@/components/report-problem";
 import { cn } from "@/lib/utils";
-import { ABeeZee } from "next/font/google";
 // Removed TipDialogComponent per request
 import {
   useLikePostMutation,
@@ -29,12 +29,7 @@ import { IPostObjectResponse } from "@/contracts/responses/IPostObjectResponse";
 import TaggedUserPopup from "../tagged-user-popup";
 import NotInterestedComp from "../shared/not-interested";
 
-// TODO: Make this font definition dynamic
-const fontItalic = ABeeZee({
-  subsets: ["latin"],
-  weight: ["400"],
-  style: "italic",
-});
+// Italic font removed per design (no italics platform-wide)
 
 interface IMyUserDataProps {
   feedData: IPostObjectResponse;
@@ -43,9 +38,9 @@ interface IMyUserDataProps {
 
 import DeleteModal from "@/components/delete-modal";
 import { useGetUserDetailsQuery } from "@/redux/services/haveme";
+import { useMeNormalized } from "@/hooks/useMeNormalized";
 
 const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) => {
-  const [selectBookmark, setSelectBookmark] = useState(false);
   const [isReportUserOpen, setIsReportUserOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
@@ -88,19 +83,16 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
   };
 
   const author = (Array.isArray((feedData as any)?.userInfo) ? (feedData as any).userInfo[0] : (feedData as any).userInfo) as any;
-  // Prefer top-level userPhoto (Home API often provides this), then userInfo fallbacks
-  const upTop = (feedData as any)?.userPhoto;
-  let rawPath = (Array.isArray(upTop) && upTop[0]?.path) ? upTop[0].path : undefined;
-  const avatarFileId = author?.photoId || (Array.isArray(upTop) ? upTop?.[0]?._id : undefined) || author?.photo?._id || (Array.isArray(author?.userPhoto) ? author?.userPhoto?.[0]?._id : undefined);
-  if (!rawPath) rawPath = author?.photoPath || author?.photo?.path || (Array.isArray(author?.userPhoto) ? author?.userPhoto?.[0]?.path : author?.userPhoto?.path);
-  // Prefer path (actual image) over id endpoint (JSON metadata)
-  const authorAvatar = rawPath
-    ? (String(rawPath).startsWith('http') ? String(rawPath) : `${baseServerUrl}/${rawPath}`)
-    : (avatarFileId ? `${baseServerUrl}/v1/user/files/${String(avatarFileId)}` : "/assets/images/search/small-profile-img.svg");
+  // Build a minimal user object compatible with media util
+  const authorForAvatar = {
+    photo: author?.photo || (Array.isArray(author?.userPhoto) ? author?.userPhoto?.[0] : author?.userPhoto) || null,
+    photoId: author?.photoId,
+  };
+  const authorAvatar = getUserAvatarUrl(authorForAvatar, "/assets/images/search/small-profile-img.svg");
   const authorUserName = ((author?.userName) || ((Array.isArray((feedData as any)?.userInfo) ? (feedData as any).userInfo[0]?.userName : (feedData as any).userInfo?.userName)) || '').toString();
-  // Resolve current user id robustly from props or /auth/me
-  const { data: me } = useGetUserDetailsQuery();
-  const resolvedCurrentUserId = (currentUserId as any) || (me as any)?.data?._id || (me as any)?.data?.user?._id || null;
+  // Resolve current user id robustly from props or normalized hook
+  const { me: meNormalized } = useMeNormalized();
+  const resolvedCurrentUserId = (currentUserId as any) || meNormalized?._id || null;
   const isOwner = Boolean(
     resolvedCurrentUserId && (
       String(resolvedCurrentUserId) === String(author?._id || author?.id) ||
@@ -113,7 +105,7 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
       {/* Author avatar (desktop only) */}
       <div className="flex justify-center">
         <Link href={`/${authorUserName.toLowerCase()}`} className="inline-block" aria-label="Open author profile">
-          <img src={authorAvatar} alt="author avatar" className="h-10 w-10 rounded-full object-cover shadow" />
+          <img src={authorAvatar} alt="author avatar" className="h-10 w-10 rounded-full object-cover shadow" loading="lazy" decoding="async" />
         </Link>
       </div>
 
@@ -138,14 +130,14 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
         className={cn(
           "flex flex-col items-center gap-2 justify-center cursor-pointer",
           {
-            "text-amber-300": saveStates,
+            "text-primary": saveStates,
           }
         )}
         onClick={() => handleSavePost(feedData?._id)}
+        aria-label={saveStates ? "Unsave post" : "Save post"}
       >
         <Star
           className="cursor-pointer"
-          // fill star when saved, outline when not
           fill={saveStates ? "currentColor" : "none"}
         />
         {saveLikecount}
@@ -161,7 +153,7 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent
-          className="p-2 border-[#0B0F14] light:bg-secondary dark:bg-[#0B0F14]"
+          className="p-2 border-border bg-card"
           side="top"
         >
           {isOwner ? (

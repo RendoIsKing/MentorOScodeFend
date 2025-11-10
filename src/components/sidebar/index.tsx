@@ -44,7 +44,7 @@ function SideBar() {
                 More
               </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-2 border-[#0B0F14] light:bg-secondary dark:bg-[#0B0F14]">
+            <DropdownMenuContent className="p-2 border-border bg-card">
               <DropdownMenuItem>
                 <div className="flex items-center gap-2">
                   <Settings className="fill-foreground" />

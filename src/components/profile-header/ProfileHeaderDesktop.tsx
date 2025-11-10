@@ -113,6 +113,8 @@ function ProfileHeaderDesktop() {
               className="w-full h-64 object-cover"
               src={coverUrl || fallback}
               alt="cover"
+              loading="lazy"
+              decoding="async"
             />
           );
         })()}
@@ -127,7 +129,7 @@ function ProfileHeaderDesktop() {
                     </Button>
                   </div>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="p-2 mx-10 -my-5 border-[#0B0F14] light:bg-secondary dark:bg-[#0B0F14] inline-block" side="bottom">
+                <DropdownMenuContent className="p-2 mx-10 -my-5 border-border bg-card inline-block" side="bottom">
                   <div className="flex items-center justify-between px-4 py-2 my-4">
                     <div className="flex items-center space-x-2 mr-4">
                       <BellOff />
@@ -166,6 +168,8 @@ function ProfileHeaderDesktop() {
                 alt="profile image"
               src={(baseUrl ? (baseUrl + bust) : '/assets/images/Home/small-profile-img.svg')}
                 className="rounded-full mx-2 lg:h-40 lg:w-40 object-cover"
+                loading="lazy"
+                decoding="async"
               />
             );
           })()}
@@ -178,7 +182,7 @@ function ProfileHeaderDesktop() {
                   {isOwnerRendered ? data?.data?.fullName : userDetailsData?.fullName}
                 </h1>
                 {isOwnerRendered ? (
-                  <img onClick={() => setOpenShareModel(true)} src="/assets/images/my-Profile/share.svg" className="cursor-pointer" alt="share" />
+                  <img onClick={() => setOpenShareModel(true)} src="/assets/images/my-Profile/share.svg" className="cursor-pointer" alt="share" loading="lazy" decoding="async" />
                 ) : (
                   <div className="flex w-[84px] justify-between">
                     <img onClick={() => {
@@ -187,8 +191,8 @@ function ProfileHeaderDesktop() {
                         return router.push('/coach-majen');
                       }
                       setOpenChatPopup(true);
-                    }} src="/assets/images/search-user-profile/inbox-message.svg" className="cursor-pointer" alt="message" />
-                    <img src="/assets/images/Sidebar/notification-bing.svg" className="cursor-pointer" alt="notification" onClick={() => setIsNotificationModal(true)} />
+                    }} src="/assets/images/search-user-profile/inbox-message.svg" className="cursor-pointer" alt="message" loading="lazy" decoding="async" />
+                    <img src="/assets/images/Sidebar/notification-bing.svg" className="cursor-pointer" alt="notification" onClick={() => setIsNotificationModal(true)} loading="lazy" decoding="async" />
                   </div>
                 )}
               </div>

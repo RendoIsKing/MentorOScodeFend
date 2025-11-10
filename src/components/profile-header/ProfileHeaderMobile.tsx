@@ -283,6 +283,8 @@ const ProfileHeaderMobile = () => {
               return "";
             })()}
             alt="cover"
+            loading="lazy"
+            decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40"></div>
           <div className="flex items-center px-4 py-2 z-10 justify-between">
@@ -325,7 +327,7 @@ const ProfileHeaderMobile = () => {
                 <Drawer>
                   <DrawerTrigger asChild>
                     <div className="rounded-full bg-white/10 p-2 backdrop-blur border cursor-pointer">
-                      <img src="/assets/images/my-Profile/share.svg" className="cursor-pointer" alt="share" />
+                      <img src="/assets/images/my-Profile/share.svg" className="cursor-pointer" alt="share" loading="lazy" decoding="async" />
                     </div>
                   </DrawerTrigger>
                   <DrawerContent className="z-[10050] pb-tabbar">

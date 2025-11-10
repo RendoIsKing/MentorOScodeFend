@@ -54,7 +54,6 @@ const MobileFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
   const appDispatch = useAppDispatch();
 
   const [selectHeart, setSelectHeart] = useState(false);
-  const [selectBookmark, setSelectBookmark] = useState(false);
   const { setSoftwareOrientation, orientation, hardwareOrientation } =
     useClientHardwareInfo();
   const isPortraitHardware = hardwareOrientation === "portrait-primary";
@@ -202,15 +201,16 @@ const MobileFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
       <CommentsComp feedData={feedData} />
       <div
         className={cn("flex flex-col items-center gap-2 justify-center", {
-          "text-amber-300": saveStates,
+          "text-primary": saveStates,
         })}
         onClick={() => handleSavePost(feedData?._id)}
+        aria-label={saveStates ? "Unsave post" : "Save post"}
       >
         <Star
           className="cursor-pointer"
           fill={saveStates ? "currentColor" : "none"}
         />
-        <p className={cn("text-white", { "text-amber-300": saveStates })}>
+        <p className={cn("text-white", { "text-primary": saveStates })}>
           {saveStates ? 1 : 0}
         </p>
       </div>
