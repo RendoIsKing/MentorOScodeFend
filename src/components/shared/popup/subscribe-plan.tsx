@@ -76,11 +76,9 @@ const SubscribePlan: React.FC<SubscribePlanProps> = ({
         setUserDetailsData(data?.data);
         setSubscriptionPlans(data?.data?.subscriptionPlans || []);
         setHasFixedPlan(checkFixedPlanExists(data?.data?.subscriptionPlans));
-        const fixed = 
-          data?.data?.subscriptionPlans?.find(
-            (plan) => plan.planType === "fixed"
-          )
-        ) as any;
+        const fixed = (data?.data?.subscriptionPlans?.find(
+          (plan) => plan.planType === "fixed"
+        ) as any);
         setFixedPlan(fixed);
         setIsJoinedLocal(Boolean(fixed?.isJoined));
       })
