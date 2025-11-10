@@ -92,11 +92,22 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
   const authorUserName = ((author?.userName) || ((Array.isArray((feedData as any)?.userInfo) ? (feedData as any).userInfo[0]?.userName : (feedData as any).userInfo?.userName)) || '').toString();
   // Resolve current user id robustly from props or normalized hook
   const { me: meNormalized } = useMeNormalized();
+  const extractId = (val: any): string => {
+    if (!val) return "";
+    if (typeof val === "string") return val;
+    if (typeof val === "object") {
+      if (val._id) return String(val._id);
+      if ((val as any).$oid) return String((val as any).$oid);
+      const s = typeof val.toString === "function" ? val.toString() : "";
+      return /^[a-f0-9]{24}$/i.test(s) ? s : "";
+    }
+    return "";
+  };
   const resolvedCurrentUserId = (currentUserId as any) || meNormalized?._id || null;
   const ownerCandidates = [
-    String(author?._id || author?.id || ""),
-    String((feedData as any)?.user || ""),
-    String((feedData as any)?.userId || ""),
+    extractId(author?._id || author?.id),
+    extractId((feedData as any)?.user),
+    extractId((feedData as any)?.userId),
   ].filter(Boolean);
   const isOwner = Boolean(resolvedCurrentUserId && ownerCandidates.some((id)=> id && String(id) === String(resolvedCurrentUserId)));
 

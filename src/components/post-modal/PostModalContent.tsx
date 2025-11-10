@@ -23,10 +23,21 @@ export default function PostModalContent({ postId }: any) {
   const post: any = (data as any)?.data || data;
   const { me: meNormalized } = useMeNormalized();
   const myId: string = (meNormalized?._id ? String(meNormalized._id) : "");
+  const extractId = (val: any): string => {
+    if (!val) return "";
+    if (typeof val === "string") return val;
+    if (typeof val === "object") {
+      if (val._id) return String(val._id);
+      if ((val as any).$oid) return String((val as any).$oid);
+      const s = typeof val.toString === "function" ? val.toString() : "";
+      return /^[a-f0-9]{24}$/i.test(s) ? s : "";
+    }
+    return "";
+  };
   const ownerCandidates = [
-    String(post?.userInfo?.[0]?._id || ""),
-    String((post as any)?.user || ""),
-    String((post as any)?.userId || ""),
+    extractId(post?.userInfo?.[0]?._id),
+    extractId((post as any)?.user),
+    extractId((post as any)?.userId),
   ].filter(Boolean);
   const isOwner = Boolean(myId && ownerCandidates.some((id) => id && String(id) === myId));
   const base = (baseServerUrl as any) || "/api/backend";
