@@ -18,7 +18,8 @@ export const FixedFormSchema = z.object({
   permissions: z.array(
     z.object({
       feature: z.string(),
-      isAvailable: z.boolean(),
+      // Some API payloads omit this; default to false if missing
+      isAvailable: z.boolean().optional().default(false),
       description: z.string(),
     })
   ),
@@ -46,7 +47,8 @@ export const CustomFormSchema = z.object({
     .array(
       z.object({
         feature: z.string(),
-        isAvailable: z.boolean(),
+        // Optional in payload; treat missing as false, and refine below will ensure at least one true
+        isAvailable: z.boolean().optional().default(false),
         description: z.string(),
       })
     )
