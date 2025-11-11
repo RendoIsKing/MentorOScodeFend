@@ -48,6 +48,7 @@ import {
   useDeletePlanMutation,
   useGetAllEntitlementsQuery,
   useGetPlanDetailsQuery,
+  useUpdatePlanMutation,
 } from "@/redux/services/haveme/subscription";
 import { toast } from "@/components/ui/use-toast";
 import PreviewFixedPlan from "../shared/popup/preview-fixed-plan";
@@ -73,6 +74,7 @@ const EditSubscription = () => {
   const [value, setValue] = React.useState("fixed");
   const { isMobile } = useClientHardwareInfo();
   const [createPlan] = useCreateProductPlanMutation();
+  const [updatePlan] = useUpdatePlanMutation();
   const { data: plansData, isLoading, isError } = useGetPlanDetailsQuery();
   const [deletePlan] = useDeletePlanMutation();
   const { permissions } = useGetAllEntitlementsQuery(undefined, {
@@ -123,6 +125,20 @@ const EditSubscription = () => {
           description: filteredPermission.description,
         })),
     };
+    // If a fixed plan already exists, update it; otherwise create one
+    const existingFixed = plansData?.data?.find((p) => p.planType === "fixed");
+    if (existingFixed?._id) {
+      await updatePlan({ id: existingFixed._id, price: fixedPlanData.price, title: existingFixed.title })
+        .unwrap()
+        .then(() => {
+          toast({ variant: "success", description: "Plan updated successfully." });
+        })
+        .catch((err) => {
+          console.log(err);
+          toast({ variant: "destructive", description: "Something went wrong." });
+        });
+      return;
+    }
     await createPlan(fixedPlanData)
       .unwrap()
       .then((res) => {

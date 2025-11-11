@@ -12,6 +12,14 @@ import {
 
 export const subscriptionApi = havemeApi.injectEndpoints({
   endpoints: (builder) => ({
+    updatePlan: builder.mutation<any, { id: string; title?: string; price?: number; entitlements?: any[]; description?: string }>({
+      invalidatesTags: [TAG_GET_USER_PLANS],
+      query: ({ id, ...body }) => ({
+        url: `/plans/${id}`,
+        method: "POST",
+        body,
+      }),
+    }),
     createProductPlan: builder.mutation<any, ICreateSubscriptionRequest>({
       invalidatesTags: [TAG_GET_USER_PLANS],
       query: (body) => ({
