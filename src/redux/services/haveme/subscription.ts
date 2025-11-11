@@ -91,4 +91,5 @@ export const {
   useGetAllEntitlementsQuery,
   useCreateSubscriptionMutation,
   useGiveTipMutation,
+  useUpdatePlanMutation,
 } = subscriptionApi;

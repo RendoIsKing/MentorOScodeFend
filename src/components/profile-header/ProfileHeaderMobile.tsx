@@ -78,7 +78,7 @@ const fontItalic = ABeeZee({
 const ProfileHeaderMobile = () => {
   const router = useRouter();
   const userName = useParams();
-  const { data, isLoading, isError } = useGetUserDetailsQuery();
+  const { data, isLoading, isError, refetch } = useGetUserDetailsQuery();
   const [followUser] = useFollowUserMutation();
   const [sendNotification] = useSendNotificationMutation();
   const appDispatch = useAppDispatch();
