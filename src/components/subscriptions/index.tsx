@@ -334,6 +334,68 @@ const EditSubscription = () => {
         )}
       </div>
 
+      {/* Temporary plan manager (visible while Creator Center is gated) */}
+      <div className="px-4 mt-8">
+        <h3 className="text-lg font-semibold mb-2">Your Plans</h3>
+        {plansData?.data?.length ? (
+          <div className="space-y-3">
+            {plansData.data.map((plan: any) => (
+              <div key={plan._id} className="flex flex-col gap-2 rounded-md border border-border p-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="text-sm px-2 py-0.5 rounded bg-secondary/40">{String(plan.planType).toUpperCase()}</span>
+                  <input
+                    defaultValue={plan.title}
+                    className="bg-background border rounded px-2 py-1 w-48"
+                    onChange={(e) => { (plan as any).__title = e.target.value; }}
+                  />
+                  <input
+                    defaultValue={(plan.price ?? 0) / 100}
+                    className="bg-background border rounded px-2 py-1 w-24"
+                    type="number"
+                    step="0.01"
+                    onChange={(e) => { (plan as any).__price = Number(e.target.value); }}
+                  />
+                  <div className="ml-auto flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          const body: any = {};
+                          if ((plan as any).__title !== undefined) body.title = (plan as any).__title;
+                          if ((plan as any).__price !== undefined) body.price = Math.round(((plan as any).__price || 0) * 100);
+                          await updatePlan({ id: plan._id, ...body }).unwrap();
+                          toast({ variant: "success", description: "Plan updated." });
+                        } catch (e) {
+                          toast({ variant: "destructive", description: "Could not update plan." });
+                        }
+                      }}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={async () => {
+                        try {
+                          await deletePlan(plan._id).unwrap();
+                          toast({ variant: "success", description: "Plan deleted." });
+                        } catch (e) {
+                          toast({ variant: "destructive", description: "Could not delete plan." });
+                        }
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-sm">No plans yet.</p>
+        )}
+      </div>
+
       <div className="p-4 flex flex-col gap-4 lg:flex-row-reverse items-center lg:justify-center mb-10 ">
         <Button className="lg:w-48 w-96" onClick={() => handleSaveClick()}>
           Save
