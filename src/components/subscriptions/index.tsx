@@ -63,6 +63,9 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import PreviewFixedPlan from "../shared/popup/preview-fixed-plan";
 import { Flame } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { baseServerUrl, getInitials } from "@/lib/utils";
+import { useUserOnboardingContext } from "@/context/UserOnboarding";
 
 const fontItalic = ABeeZee({
   subsets: ["latin"],
@@ -85,6 +88,7 @@ const EditSubscription = () => {
   const [value, setValue] = React.useState("fixed");
   const { isMobile } = useClientHardwareInfo();
   const [drafts, setDrafts] = useState<Record<string, { title?: string; price?: number; description?: string }>>({});
+  const { user } = useUserOnboardingContext();
   const [createPlan] = useCreateProductPlanMutation();
   const [updatePlan] = useUpdatePlanMutation();
   const { data: plansData, isLoading, isError, refetch } = useGetPlanDetailsQuery();
@@ -421,7 +425,20 @@ const EditSubscription = () => {
                       </DialogTrigger>
                       <DialogContent className="max-w-sm">
                         <DialogHeader>
-                          <DialogTitle>{`Subscribe to ${drafts[plan._id]?.title ?? plan.title ?? "this creator"}`}</DialogTitle>
+                          <div className="flex justify-center ">
+                            <Avatar className="mb-3 h-[4.5rem] w-[4.5rem]">
+                              <AvatarImage
+                                alt={user?.userName}
+                                src={user?.photo?.path ? `${baseServerUrl}/${user?.photo?.path}` : undefined}
+                              />
+                              <AvatarFallback>{getInitials(user?.fullName || user?.userName)}</AvatarFallback>
+                            </Avatar>
+                          </div>
+                          <div className="flex justify-center">
+                            <DialogTitle className={`font-normal text-2xl ${fontItalic.className}`}>
+                              {`Subscribe to ${user?.fullName || user?.userName || "this creator"}`}
+                            </DialogTitle>
+                          </div>
                           <DialogDescription>
                             {(drafts[plan._id]?.description ?? plan.description) ||
                               `Full access to this user's content, Direct message with this user. You can cancel your subscription at any time`}
