@@ -177,7 +177,8 @@ const SubscribePlan: React.FC<SubscribePlanProps> = ({
             </div>
 
             <DialogDescription className="p-3 text-center">
-              {`Full access to this user's content, Direct message with this user. You can cancel your subscription at any time`}
+              {fixedPlan?.description ||
+                `Full access to this user's content, Direct message with this user. You can cancel your subscription at any time`}
             </DialogDescription>
           </DialogHeader>
 

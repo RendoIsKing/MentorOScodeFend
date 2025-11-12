@@ -84,7 +84,7 @@ const subscriptionTypes = [
 const EditSubscription = () => {
   const [value, setValue] = React.useState("fixed");
   const { isMobile } = useClientHardwareInfo();
-  const [drafts, setDrafts] = useState<Record<string, { title?: string; price?: number }>>({});
+  const [drafts, setDrafts] = useState<Record<string, { title?: string; price?: number; description?: string }>>({});
   const [createPlan] = useCreateProductPlanMutation();
   const [updatePlan] = useUpdatePlanMutation();
   const { data: plansData, isLoading, isError, refetch } = useGetPlanDetailsQuery();
@@ -398,6 +398,21 @@ const EditSubscription = () => {
                       <span className="ml-2 text-sm text-muted-foreground">/mo</span>
                     </div>
                   </div>
+                  <div className="flex flex-wrap items-start gap-3">
+                    <label className="text-sm text-muted-foreground w-24 mt-2">Description</label>
+                    <textarea
+                      value={drafts[plan._id]?.description ?? plan.description ?? ""}
+                      placeholder="Describe what the plan includes…"
+                      className="bg-background border rounded px-3 py-2 w-full max-w-xl min-h-[72px]"
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setDrafts((prev) => ({
+                          ...prev,
+                          [plan._id]: { ...prev[plan._id], description: val },
+                        }));
+                      }}
+                    />
+                  </div>
                   <div className="flex items-center gap-2 justify-end">
                     {/* Preview with live values */}
                     <Dialog>
@@ -408,17 +423,18 @@ const EditSubscription = () => {
                         <DialogHeader>
                           <DialogTitle>{`Subscribe to ${drafts[plan._id]?.title ?? plan.title ?? "this creator"}`}</DialogTitle>
                           <DialogDescription>
-                            Full access to this creator&apos;s content. Cancel anytime.
+                            {(drafts[plan._id]?.description ?? plan.description) ||
+                              `Full access to this user's content, Direct message with this user. You can cancel your subscription at any time`}
                           </DialogDescription>
                         </DialogHeader>
                         <div className="flex justify-center">
                           <Button className="w-full bg-gradient-to-r from-[#6aaff0] to-[#7385dd]">
-                            {`$${(() => {
+                            {`${(() => {
                               const p = drafts[plan._id]?.price;
                               const base = (plan.price ?? 0) / 100;
                               const val = typeof p === "number" && !Number.isNaN(p) ? p : base;
-                              return (Math.max(val, 0)).toFixed(2);
-                            })()} Monthly`}
+                              return `Join for $${(Math.max(val, 0)).toFixed(2)}`;
+                            })()}`}
                           </Button>
                         </div>
                       </DialogContent>
@@ -430,23 +446,27 @@ const EditSubscription = () => {
                         const draft = drafts[plan._id] || {};
                         const newTitle = draft.title;
                         const priceInput = draft.price;
+                        const newDesc = draft.description;
                         const hasParsedPrice = typeof priceInput === "number" && !Number.isNaN(priceInput);
                         const changedTitle = newTitle !== undefined && newTitle !== plan.title;
                         const changedPrice = priceInput !== undefined && (hasParsedPrice ? Math.round(priceInput * 100) !== (plan.price ?? 0) : false);
+                        const changedDesc = newDesc !== undefined && newDesc !== (plan.description ?? "");
                         const validPrice = priceInput === undefined || (hasParsedPrice && priceInput >= 0.01);
-                        return !(changedTitle || changedPrice) || !validPrice;
+                        return !(changedTitle || changedPrice || changedDesc) || !validPrice;
                       })()}
                       onClick={async () => {
                         const draft = drafts[plan._id] || {};
                         const newTitle = draft.title;
                         const priceInput = draft.price;
+                        const newDesc = draft.description;
                         const hasParsedPrice = typeof priceInput === "number" && !Number.isNaN(priceInput);
                         const changedTitle = newTitle !== undefined && newTitle !== plan.title;
                         const changedPrice = priceInput !== undefined && (hasParsedPrice ? Math.round(priceInput * 100) !== (plan.price ?? 0) : false);
                         const body: any = {};
                         if (changedTitle) body.title = newTitle;
                         if (changedPrice && hasParsedPrice) body.price = Math.round(priceInput * 100);
-                        if (!body.title && !body.price) return;
+                        if (newDesc !== undefined && newDesc !== (plan.description ?? "")) body.description = newDesc;
+                        if (!body.title && !body.price && !body.description) return;
                         try {
                           await updatePlan({ id: plan._id, ...body }).unwrap();
                           toast({ variant: "success", description: "Plan updated." });

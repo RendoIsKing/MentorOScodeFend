@@ -108,7 +108,8 @@ const PreviewFixedPlan = ({}: IPreviewFixedPlanProps) => {
             </div>
 
             <DialogDescription className="p-3 text-center">
-              {`Full access to this user's content, Direct message with this user. You can cancel your subscription at any time`}
+              {(fixedPlanDetails?.description) ||
+                `Full access to this user's content, Direct message with this user. You can cancel your subscription at any time`}
             </DialogDescription>
           </DialogHeader>
 
@@ -119,7 +120,7 @@ const PreviewFixedPlan = ({}: IPreviewFixedPlanProps) => {
                 "bg-gradient-to-r from-[#6aaff0] to-[#7385dd]"
               )}
             >
-              {`$${formatSubscriptionPrice(fixedPlanDetails?.price)} Monthly`}
+              {`Join for $${formatSubscriptionPrice(fixedPlanDetails?.price)}`}
             </Button>
           </div>
           <div className="flex flex-col justify-center">
