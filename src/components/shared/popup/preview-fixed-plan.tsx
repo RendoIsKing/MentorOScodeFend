@@ -102,10 +102,8 @@ const PreviewFixedPlan = ({}: IPreviewFixedPlanProps) => {
               </Avatar>
             </div>
             <div className="flex justify-center">
-              <DialogTitle
-                className={` font-normal text-2xl ${fontItalic.className}`}
-              >
-                {`Subscribe to ${user?.fullName}`}
+              <DialogTitle className={` font-normal text-2xl ${fontItalic.className}`}>
+                {`Subscribe to ${user?.fullName || user?.userName || "this creator"}`}
               </DialogTitle>
             </div>
 

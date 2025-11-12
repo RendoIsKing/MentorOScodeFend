@@ -75,7 +75,7 @@ const EditSubscription = () => {
   const { isMobile } = useClientHardwareInfo();
   const [createPlan] = useCreateProductPlanMutation();
   const [updatePlan] = useUpdatePlanMutation();
-  const { data: plansData, isLoading, isError } = useGetPlanDetailsQuery();
+  const { data: plansData, isLoading, isError, refetch } = useGetPlanDetailsQuery();
   const [deletePlan] = useDeletePlanMutation();
   const { permissions } = useGetAllEntitlementsQuery(undefined, {
     selectFromResult: ({ data, isLoading, isError, isFetching }) => {
@@ -336,35 +336,57 @@ const EditSubscription = () => {
 
       {/* Temporary plan manager (visible while Creator Center is gated) */}
       <div className="px-4 mt-8">
-        <h3 className="text-lg font-semibold mb-2">Your Plans</h3>
+        <h3 className="text-lg font-semibold mb-3">Your Plans</h3>
         {plansData?.data?.length ? (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {plansData.data.map((plan: any) => (
-              <div key={plan._id} className="flex flex-col gap-2 rounded-md border border-border p-3">
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="text-sm px-2 py-0.5 rounded bg-secondary/40">{String(plan.planType).toUpperCase()}</span>
-                  <input
-                    defaultValue={plan.title}
-                    className="bg-background border rounded px-2 py-1 w-48"
-                    onChange={(e) => { (plan as any).__title = e.target.value; }}
-                  />
-                  <input
-                    defaultValue={(plan.price ?? 0) / 100}
-                    className="bg-background border rounded px-2 py-1 w-24"
-                    type="number"
-                    step="0.01"
-                    onChange={(e) => { (plan as any).__price = Number(e.target.value); }}
-                  />
-                  <div className="ml-auto flex items-center gap-2">
+              <div key={plan._id} className="rounded-xl border border-border p-4 bg-card/40">
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs tracking-wide px-2 py-1 rounded-full bg-secondary/30">{String(plan.planType).toUpperCase()}</span>
+                    <span className="text-xs text-muted-foreground">ID: {plan._id.slice(-6)}</span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <label className="text-sm text-muted-foreground w-24">Title</label>
+                    <input
+                      defaultValue={plan.title || ""}
+                      placeholder="Untitled plan"
+                      className="bg-background border rounded px-3 py-2 w-64"
+                      onChange={(e) => { (plan as any).__title = e.target.value; }}
+                    />
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <label className="text-sm text-muted-foreground w-24">Price</label>
+                    <div className="flex items-center">
+                      <span className="px-2 text-muted-foreground">$</span>
+                      <input
+                        defaultValue={((plan.price ?? 0) / 100).toFixed(2)}
+                        className="bg-background border rounded px-3 py-2 w-28 text-right"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        onChange={(e) => { (plan as any).__price = Number(e.target.value); }}
+                      />
+                      <span className="ml-2 text-sm text-muted-foreground">/mo</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 justify-end">
                     <Button
                       size="sm"
                       onClick={async () => {
+                        const changedTitle = (plan as any).__title !== undefined && (plan as any).__title !== plan.title;
+                        const changedPrice = (plan as any).__price !== undefined && (Math.round(((plan as any).__price || 0) * 100) !== (plan.price ?? 0));
+                        if (!changedTitle && !changedPrice) {
+                          toast({ description: "Nothing to save." });
+                          return;
+                        }
                         try {
                           const body: any = {};
-                          if ((plan as any).__title !== undefined) body.title = (plan as any).__title;
-                          if ((plan as any).__price !== undefined) body.price = Math.round(((plan as any).__price || 0) * 100);
+                          if (changedTitle) body.title = (plan as any).__title;
+                          if (changedPrice) body.price = Math.round(((plan as any).__price || 0) * 100);
                           await updatePlan({ id: plan._id, ...body }).unwrap();
                           toast({ variant: "success", description: "Plan updated." });
+                          try { await refetch(); } catch {}
                         } catch (e) {
                           toast({ variant: "destructive", description: "Could not update plan." });
                         }
@@ -379,6 +401,7 @@ const EditSubscription = () => {
                         try {
                           await deletePlan(plan._id).unwrap();
                           toast({ variant: "success", description: "Plan deleted." });
+                          try { await refetch(); } catch {}
                         } catch (e) {
                           toast({ variant: "destructive", description: "Could not delete plan." });
                         }
