@@ -84,6 +84,7 @@ const subscriptionTypes = [
 const EditSubscription = () => {
   const [value, setValue] = React.useState("fixed");
   const { isMobile } = useClientHardwareInfo();
+  const [drafts, setDrafts] = useState<Record<string, { title?: string; price?: number }>>({});
   const [createPlan] = useCreateProductPlanMutation();
   const [updatePlan] = useUpdatePlanMutation();
   const { data: plansData, isLoading, isError, refetch } = useGetPlanDetailsQuery();
@@ -356,10 +357,16 @@ const EditSubscription = () => {
                   <div className="flex flex-wrap items-center gap-3">
                     <label className="text-sm text-muted-foreground w-24">Title</label>
                     <input
-                      defaultValue={plan.title || ""}
+                      value={drafts[plan._id]?.title ?? plan.title ?? ""}
                       placeholder="Untitled plan"
                       className="bg-background border rounded px-3 py-2 w-64"
-                      onChange={(e) => { (plan as any).__title = e.target.value; }}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setDrafts((prev) => ({
+                          ...prev,
+                          [plan._id]: { ...prev[plan._id], title: val },
+                        }));
+                      }}
                     />
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
@@ -367,7 +374,12 @@ const EditSubscription = () => {
                     <div className="flex items-center">
                       <span className="px-2 text-muted-foreground">$</span>
                       <input
-                        defaultValue={((plan.price ?? 0) / 100).toFixed(2)}
+                        value={(() => {
+                          const p = drafts[plan._id]?.price;
+                          const base = (plan.price ?? 0) / 100;
+                          const shown = typeof p === "number" && !Number.isNaN(p) ? p : base;
+                          return String(shown);
+                        })()}
                         className="bg-background border rounded px-3 py-2 w-28 text-right"
                         type="number"
                         step="0.01"
@@ -376,7 +388,11 @@ const EditSubscription = () => {
                           const raw = e.target.value;
                           const normalized = raw.replace(/\s/g, "").replace(",", ".");
                           const parsed = parseFloat(normalized);
-                          (plan as any).__price = Number.isFinite(parsed) ? parsed : NaN;
+                          const val = Number.isFinite(parsed) ? parsed : NaN;
+                          setDrafts((prev) => ({
+                            ...prev,
+                            [plan._id]: { ...prev[plan._id], price: val },
+                          }));
                         }}
                       />
                       <span className="ml-2 text-sm text-muted-foreground">/mo</span>
@@ -390,14 +406,19 @@ const EditSubscription = () => {
                       </DialogTrigger>
                       <DialogContent className="max-w-sm">
                         <DialogHeader>
-                          <DialogTitle>{`Subscribe to ${(plan as any).__title ?? plan.title ?? "this creator"}`}</DialogTitle>
+                          <DialogTitle>{`Subscribe to ${drafts[plan._id]?.title ?? plan.title ?? "this creator"}`}</DialogTitle>
                           <DialogDescription>
                             Full access to this creator&apos;s content. Cancel anytime.
                           </DialogDescription>
                         </DialogHeader>
                         <div className="flex justify-center">
                           <Button className="w-full bg-gradient-to-r from-[#6aaff0] to-[#7385dd]">
-                            {`$${(((plan as any).__price ?? (plan.price ?? 0) / 100)).toFixed(2)} Monthly`}
+                            {`$${(() => {
+                              const p = drafts[plan._id]?.price;
+                              const base = (plan.price ?? 0) / 100;
+                              const val = typeof p === "number" && !Number.isNaN(p) ? p : base;
+                              return (Math.max(val, 0)).toFixed(2);
+                            })()} Monthly`}
                           </Button>
                         </div>
                       </DialogContent>
@@ -406,8 +427,9 @@ const EditSubscription = () => {
                     <Button
                       size="sm"
                       disabled={(() => {
-                        const newTitle = (plan as any).__title;
-                        const priceInput = (plan as any).__price;
+                        const draft = drafts[plan._id] || {};
+                        const newTitle = draft.title;
+                        const priceInput = draft.price;
                         const hasParsedPrice = typeof priceInput === "number" && !Number.isNaN(priceInput);
                         const changedTitle = newTitle !== undefined && newTitle !== plan.title;
                         const changedPrice = priceInput !== undefined && (hasParsedPrice ? Math.round(priceInput * 100) !== (plan.price ?? 0) : false);
@@ -415,8 +437,9 @@ const EditSubscription = () => {
                         return !(changedTitle || changedPrice) || !validPrice;
                       })()}
                       onClick={async () => {
-                        const newTitle = (plan as any).__title;
-                        const priceInput = (plan as any).__price;
+                        const draft = drafts[plan._id] || {};
+                        const newTitle = draft.title;
+                        const priceInput = draft.price;
                         const hasParsedPrice = typeof priceInput === "number" && !Number.isNaN(priceInput);
                         const changedTitle = newTitle !== undefined && newTitle !== plan.title;
                         const changedPrice = priceInput !== undefined && (hasParsedPrice ? Math.round(priceInput * 100) !== (plan.price ?? 0) : false);
@@ -427,6 +450,11 @@ const EditSubscription = () => {
                         try {
                           await updatePlan({ id: plan._id, ...body }).unwrap();
                           toast({ variant: "success", description: "Plan updated." });
+                          setDrafts((prev) => {
+                            const next = { ...prev };
+                            delete next[plan._id];
+                            return next;
+                          });
                           try { await refetch(); } catch {}
                         } catch (e) {
                           toast({ variant: "destructive", description: "Could not update plan." });
