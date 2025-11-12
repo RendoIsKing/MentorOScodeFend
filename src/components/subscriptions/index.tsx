@@ -436,7 +436,7 @@ const EditSubscription = () => {
                           </div>
                           <div className="flex justify-center">
                             <DialogTitle className={`font-normal text-2xl ${fontItalic.className}`}>
-                              {`Subscribe to ${user?.fullName || user?.userName || "this creator"}`}
+                              {`Subscribe to ${drafts[plan._id]?.title ?? plan.title ?? "this plan"}`}
                             </DialogTitle>
                           </div>
                           <DialogDescription>

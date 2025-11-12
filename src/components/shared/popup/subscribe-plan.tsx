@@ -172,7 +172,7 @@ const SubscribePlan: React.FC<SubscribePlanProps> = ({
               <DialogTitle
                 className={`font-normal text-2xl ${fontItalic.className}`}
               >
-                {`Subscribe to ${userDetailsData?.fullName}`}
+                {`Subscribe to ${fixedPlan?.title || "this plan"}`}
               </DialogTitle>
             </div>
 
