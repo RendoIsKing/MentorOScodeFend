@@ -425,7 +425,7 @@ const EditSubscription = () => {
                         if (changedPrice && hasParsedPrice) body.price = Math.round(priceInput * 100);
                         if (!body.title && !body.price) return;
                         try {
-                          await updatePlan({ id: plan._id, body }).unwrap();
+                          await updatePlan({ id: plan._id, ...body }).unwrap();
                           toast({ variant: "success", description: "Plan updated." });
                           try { await refetch(); } catch {}
                         } catch (e) {
