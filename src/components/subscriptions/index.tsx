@@ -62,6 +62,7 @@ import {
 } from "@/redux/services/haveme/subscription";
 import { toast } from "@/components/ui/use-toast";
 import PreviewFixedPlan from "../shared/popup/preview-fixed-plan";
+import { Flame } from "lucide-react";
 
 const fontItalic = ABeeZee({
   subsets: ["latin"],
@@ -234,11 +235,7 @@ const EditSubscription = () => {
     <div className="h-screen flex flex-col justify-between lg:justify-start lg:mt-8">
       <div className="flex flex-col  p-4  items-center">
         <div className="flex justify-center mb-8">
-          <img
-            src="/assets/images/search/serach-profile-icon.svg"
-            alt="search-profile"
-            className="h-24"
-          />
+          <Flame className="h-24 w-24 text-primary flame-lit" fill="currentColor" aria-label="Subscription icon" />
         </div>
         <div className="flex w-full max-w-md lg:max-w-lg">
           <p
@@ -375,7 +372,12 @@ const EditSubscription = () => {
                         type="number"
                         step="0.01"
                         min="0"
-                        onChange={(e) => { (plan as any).__price = Number(e.target.value); }}
+                        onChange={(e) => {
+                          const raw = e.target.value;
+                          const normalized = raw.replace(/\s/g, "").replace(",", ".");
+                          const parsed = parseFloat(normalized);
+                          (plan as any).__price = Number.isFinite(parsed) ? parsed : NaN;
+                        }}
                       />
                       <span className="ml-2 text-sm text-muted-foreground">/mo</span>
                     </div>
@@ -404,20 +406,26 @@ const EditSubscription = () => {
                     <Button
                       size="sm"
                       disabled={(() => {
-                        const changedTitle = (plan as any).__title !== undefined && (plan as any).__title !== plan.title;
-                        const changedPrice = (plan as any).__price !== undefined && (Math.round(((plan as any).__price || 0) * 100) !== (plan.price ?? 0));
-                        const validPrice = (plan as any).__price === undefined || Number((plan as any).__price) >= 0.01;
+                        const newTitle = (plan as any).__title;
+                        const priceInput = (plan as any).__price;
+                        const hasParsedPrice = typeof priceInput === "number" && !Number.isNaN(priceInput);
+                        const changedTitle = newTitle !== undefined && newTitle !== plan.title;
+                        const changedPrice = priceInput !== undefined && (hasParsedPrice ? Math.round(priceInput * 100) !== (plan.price ?? 0) : false);
+                        const validPrice = priceInput === undefined || (hasParsedPrice && priceInput >= 0.01);
                         return !(changedTitle || changedPrice) || !validPrice;
                       })()}
                       onClick={async () => {
-                        const changedTitle = (plan as any).__title !== undefined && (plan as any).__title !== plan.title;
-                        const changedPrice = (plan as any).__price !== undefined && (Math.round(((plan as any).__price || 0) * 100) !== (plan.price ?? 0));
+                        const newTitle = (plan as any).__title;
+                        const priceInput = (plan as any).__price;
+                        const hasParsedPrice = typeof priceInput === "number" && !Number.isNaN(priceInput);
+                        const changedTitle = newTitle !== undefined && newTitle !== plan.title;
+                        const changedPrice = priceInput !== undefined && (hasParsedPrice ? Math.round(priceInput * 100) !== (plan.price ?? 0) : false);
                         const body: any = {};
-                        if (changedTitle) body.title = (plan as any).__title;
-                        if (changedPrice) body.price = Math.round(((plan as any).__price || 0) * 100);
+                        if (changedTitle) body.title = newTitle;
+                        if (changedPrice && hasParsedPrice) body.price = Math.round(priceInput * 100);
                         if (!body.title && !body.price) return;
                         try {
-                          await updatePlan({ id: plan._id, ...body }).unwrap();
+                          await updatePlan({ id: plan._id, body }).unwrap();
                           toast({ variant: "success", description: "Plan updated." });
                           try { await refetch(); } catch {}
                         } catch (e) {
