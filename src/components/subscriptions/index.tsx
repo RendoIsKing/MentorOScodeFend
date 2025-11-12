@@ -390,7 +390,7 @@ const EditSubscription = () => {
                         <DialogHeader>
                           <DialogTitle>{`Subscribe to ${(plan as any).__title ?? plan.title ?? "this creator"}`}</DialogTitle>
                           <DialogDescription>
-                            Full access to this creator's content. Cancel anytime.
+                            Full access to this creator&apos;s content. Cancel anytime.
                           </DialogDescription>
                         </DialogHeader>
                         <div className="flex justify-center">
