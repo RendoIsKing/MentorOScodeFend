@@ -24,6 +24,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import SubscriptionPlanModalMobile from "@/components/subscription-plan-modal/subscription-plan-mobile";
 import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
 
@@ -371,19 +381,42 @@ const EditSubscription = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 justify-end">
+                    {/* Preview with live values */}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button size="sm" variant="outline">Preview</Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-sm">
+                        <DialogHeader>
+                          <DialogTitle>{`Subscribe to ${(plan as any).__title ?? plan.title ?? "this creator"}`}</DialogTitle>
+                          <DialogDescription>
+                            Full access to this creator's content. Cancel anytime.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex justify-center">
+                          <Button className="w-full bg-gradient-to-r from-[#6aaff0] to-[#7385dd]">
+                            {`$${(((plan as any).__price ?? (plan.price ?? 0) / 100)).toFixed(2)} Monthly`}
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                    {/* Save only when dirty & valid */}
                     <Button
                       size="sm"
+                      disabled={(() => {
+                        const changedTitle = (plan as any).__title !== undefined && (plan as any).__title !== plan.title;
+                        const changedPrice = (plan as any).__price !== undefined && (Math.round(((plan as any).__price || 0) * 100) !== (plan.price ?? 0));
+                        const validPrice = (plan as any).__price === undefined || Number((plan as any).__price) >= 0.01;
+                        return !(changedTitle || changedPrice) || !validPrice;
+                      })()}
                       onClick={async () => {
                         const changedTitle = (plan as any).__title !== undefined && (plan as any).__title !== plan.title;
                         const changedPrice = (plan as any).__price !== undefined && (Math.round(((plan as any).__price || 0) * 100) !== (plan.price ?? 0));
-                        if (!changedTitle && !changedPrice) {
-                          toast({ description: "Nothing to save." });
-                          return;
-                        }
+                        const body: any = {};
+                        if (changedTitle) body.title = (plan as any).__title;
+                        if (changedPrice) body.price = Math.round(((plan as any).__price || 0) * 100);
+                        if (!body.title && !body.price) return;
                         try {
-                          const body: any = {};
-                          if (changedTitle) body.title = (plan as any).__title;
-                          if (changedPrice) body.price = Math.round(((plan as any).__price || 0) * 100);
                           await updatePlan({ id: plan._id, ...body }).unwrap();
                           toast({ variant: "success", description: "Plan updated." });
                           try { await refetch(); } catch {}
@@ -394,21 +427,33 @@ const EditSubscription = () => {
                     >
                       Save
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={async () => {
-                        try {
-                          await deletePlan(plan._id).unwrap();
-                          toast({ variant: "success", description: "Plan deleted." });
-                          try { await refetch(); } catch {}
-                        } catch (e) {
-                          toast({ variant: "destructive", description: "Could not delete plan." });
-                        }
-                      }}
-                    >
-                      Delete
-                    </Button>
+                    {/* Confirm delete */}
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button size="sm" variant="destructive">Delete</Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete this plan?</AlertDialogTitle>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={async () => {
+                              try {
+                                await deletePlan(plan._id).unwrap();
+                                toast({ variant: "success", description: "Plan deleted." });
+                                try { await refetch(); } catch {}
+                              } catch (e) {
+                                toast({ variant: "destructive", description: "Could not delete plan." });
+                              }
+                            }}
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </div>
               </div>
@@ -419,34 +464,12 @@ const EditSubscription = () => {
         )}
       </div>
 
+      {/* Bottom actions: show custom-plan preview/creation; fixed-plan edit happens inline above */}
       <div className="p-4 flex flex-col gap-4 lg:flex-row-reverse items-center lg:justify-center mb-10 ">
-        <Button className="lg:w-48 w-96" onClick={() => handleSaveClick()}>
-          Save
-        </Button>
-
-        {value === "fixed" ? (
-          // <AlertPopup
-          //   headerText="Subscribe to Jaylon Stanton"
-          //   bodyText="Full access to this user's content, Direct message with this user. You can cancel your subscription at any time"
-          //   footerText={`$${fixedSubForm.getValues("price")} Monthly`}
-          //   color={true}
-          //   showPreviewPlanButton={true}
-          //   showVerifiedIcon={false}
-          // />
-          <>
-            <PreviewFixedPlan />
-          </>
-        ) : (
+        {value === "custom" ? (
           <Dialog>
             <DialogTrigger asChild>
-              <Button
-                className={cn("lg:w-48 w-96", {
-                  "border-2 border-primary italic": !isMobile,
-                })}
-                variant="outline"
-              >
-                {isMobile ? "Preview the plan" : "Preview"}
-              </Button>
+              <Button className={cn("lg:w-48 w-96")}>Preview</Button>
             </DialogTrigger>
             <DialogContent className="p-1 rounded-3xl w-11/12">
               <DialogHeader className="w-11/12 pl-2 pt-2 justify-start text-left">
@@ -467,7 +490,7 @@ const EditSubscription = () => {
               )}
             </DialogContent>
           </Dialog>
-        )}
+        ) : null}
       </div>
     </div>
   );
