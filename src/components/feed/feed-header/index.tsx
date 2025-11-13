@@ -41,7 +41,7 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
 
   return (
     <div className={wrapperClass}>
-      <nav className="mx-auto max-w-[680px] px-0">
+      <nav className="mx-auto max-w-[680px] w-full px-0">
         {/* Three columns: left / center / right aligned to media width */}
         <div className="grid grid-cols-3 items-center w-full h-10">
           {(() => {
