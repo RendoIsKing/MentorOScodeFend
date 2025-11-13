@@ -43,26 +43,30 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
     <div className={wrapperClass}>
       <nav className="mx-auto max-w-[680px] px-4">
         {/* hidden mobile switcher removed to avoid test role collisions */}
-        <ul className="grid grid-cols-3 text-center">
+        <ul className="grid grid-cols-3 items-center">
           {[
-            { key: "foryou", label: "Feed" },
-            { key: "following", label: "Following" },
-            { key: "subscribed", label: "Subscribed" },
-          ].map((t) => (
-            <li key={t.key}>
-              <button
-                className={
-                  `w-full py-3 text-sm font-medium ` +
-                  (homeHeaderFilter === t.key
-                    ? "text-primary after:block after:h-0.5 after:w-8 after:mx-auto after:mt-1 after:rounded-full after:bg-primary"
-                    : "text-muted-foreground")
-                }
-                onClick={() => handleItemClick(t.key)}
-              >
-                {t.label}
-              </button>
-            </li>
-          ))}
+            { key: "foryou", label: "Feed", align: "text-left after:ml-0 after:mr-auto" },
+            { key: "following", label: "Following", align: "text-center after:mx-auto" },
+            { key: "subscribed", label: "Subscribed", align: "text-right after:mr-0 after:ml-auto" },
+          ].map((t) => {
+            const active = homeHeaderFilter === t.key;
+            const base =
+              "w-full py-3 text-sm font-medium relative " +
+              (active ? "text-primary " : "text-muted-foreground ");
+            const underline =
+              "after:block after:h-0.5 after:w-8 after:mt-1 after:rounded-full " +
+              (active ? "after:bg-primary " : "after:bg-transparent ");
+            return (
+              <li key={t.key} className={t.align}>
+                <button
+                  className={base + underline}
+                  onClick={() => handleItemClick(t.key)}
+                >
+                  {t.label}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </nav>
     </div>
