@@ -44,10 +44,11 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
 
   return (
     <div className={wrapperClass}>
-      <nav className="mx-auto max-w-[680px] w-full px-3">
+      <nav className="mx-auto max-w-[680px] w-full px-3 relative">
         {/* Centered dropdown switcher (desktop) */}
         <div className="relative h-10">
-          <div className="absolute left-1/2 -translate-x-1/2">
+          {/* Place the chip to the LEFT of the media column, same vertical height */}
+          <div className="absolute top-0 left-0 -translate-x-full -ml-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="inline-flex items-center gap-2 rounded-full bg-background/60 px-3 py-1.5 text-sm font-semibold text-foreground shadow border border-border">
