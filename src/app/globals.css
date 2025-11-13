@@ -61,27 +61,38 @@ body { overscroll-behavior-y: none; }
   }
 
   .dark {
-    --background: 210 31% 6%;
-    --foreground: 210 40% 98%;
-    --card: 214 24% 18%;
-    --card-foreground: 210 40% 98%;
-    --popover: 214 24% 18%;
-    --popover-foreground: 210 40% 98%;
-    /* Primary: Turquoise */
-    --primary: 177 83% 43%;
-    --primary-foreground: 210 40% 98%;
-    /* Secondary: Navy */
-    --secondary: 224 64% 33%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 215 16% 35%;
-    --muted-foreground: 215 16% 70%;
-    --accent: 44 85% 72%;
-    --accent-foreground: 222 47% 11%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 20% 28%;
-    --input: 217 20% 28%;
-    --ring: 177 83% 43%;
+    /* BASE (dark blue-gray) */
+    --background: 235 25% 13%; /* ~#1a1b26 */
+    --foreground: 240 100% 99%; /* ~#f8f8ff */
+    --card: 235 24% 18%; /* ~#24253a */
+    --card-foreground: 240 100% 99%;
+    --popover: 235 24% 18%; /* ~#24253a */
+    --popover-foreground: 240 100% 99%;
+
+    /* PRIMARY & SECONDARY */
+    --primary: 224 43% 57%; /* ~#5d7bc4 */
+    --primary-foreground: 240 100% 99%;
+    --secondary: 235 17% 27%; /* ~#3a3b4f */
+    --secondary-foreground: 240 30% 95%; /* ~#f0f0f5 */
+
+    /* HELPERS & STATES */
+    --muted: 235 13% 25%; /* ~#353646 */
+    --muted-foreground: 232 10% 63%; /* ~#9899a6 */
+    --accent: 236 12% 28%; /* ~#3f4051 */
+    --accent-foreground: 240 100% 99%;
+    --success: 145 63% 61%; /* ~#4ade80 */
+    --success-foreground: 240 100% 99%;
+    --destructive: 0 85% 58%; /* ~#ef4444 */
+    --destructive-foreground: 240 100% 99%;
+    --energy: 36 92% 52%; /* ~#f59e0b */
+    --energy-foreground: 235 17% 22%; /* ~#2d2e3f */
+
+    /* BORDERS & INPUTS */
+    --border: 236 12% 32%; /* ~#464758 */
+    --input: 236 12% 32%; /* ~#464758 */
+    --input-background: 235 22% 20%; /* ~#292a3d */
+    --switch-background: 235 13% 35%; /* ~#4e4f63 */
+    --ring: 224 43% 57%; /* same as primary */
   }
 
   /* Optional Theme: Golden Yellow
@@ -107,6 +118,54 @@ body { overscroll-behavior-y: none; }
     --accent: 177 83% 43%;
     --accent-foreground: 222 47% 11%;
     --ring: 46 100% 50%;
+  }
+
+  /* Sidebar (chat interface) */
+  .theme-sidebar,
+  .chat-sidebar {
+    --sidebar: 235 22% 15%; /* ~#202131 */
+    --sidebar-foreground: 240 100% 99%; /* ~#f8f8ff */
+    --sidebar-primary: 224 43% 57%; /* ~#5d7bc4 */
+    --sidebar-primary-foreground: 240 100% 99%;
+    --sidebar-accent: 235 20% 22%; /* ~#2e2f42 */
+    --sidebar-accent-foreground: 240 100% 99%;
+    --sidebar-border: 236 12% 32%; /* ~#464758 */
+    --sidebar-ring: 224 43% 57%;
+  }
+
+  /* Section-specific (psychology-driven) */
+  :root,
+  .dark {
+    /* Stats (golden amber) */
+    --stats-primary: 36 92% 52%;   /* #f59e0b */
+    --stats-primary-foreground: 236 17% 14%; /* ~#1e1f2e */
+    --stats-secondary: 45 95% 59%; /* #fbbf24 */
+    --stats-accent: 24 95% 50%;    /* #f97316 */
+
+    /* Goals (purple/violet) */
+    --goals-primary: 268 90% 65%;  /* #a855f7 */
+    --goals-primary-foreground: 240 100% 99%;
+    --goals-secondary: 270 95% 75%;/* #c084fc */
+    --goals-accent: 262 83% 56%;   /* #9333ea */
+
+    /* Training (red/orange) */
+    --training-primary: 25 95% 51%;  /* #f97316 */
+    --training-primary-foreground: 240 100% 99%;
+    --training-secondary: 27 96% 62%;/* #fb923c */
+    --training-accent: 0 85% 57%;    /* #ef4444 */
+
+    /* Nutrition (green) */
+    --nutrition-primary: 145 63% 61%;  /* #4ade80 */
+    --nutrition-primary-foreground: 240 100% 99%;
+    --nutrition-secondary: 156 68% 65%;/* #6ee7b7 */
+    --nutrition-accent: 160 64% 53%;   /* #34d399 */
+
+    /* Charts */
+    --chart-1: 36 92% 52%;   /* stats (amber) */
+    --chart-2: 268 90% 65%;  /* goals (purple) */
+    --chart-3: 25 95% 51%;   /* training (red-orange) */
+    --chart-4: 145 63% 61%;  /* nutrition (green) */
+    --chart-5: 224 43% 57%;  /* primary (soft blue) */
   }
 
   /* Sidebar typography:

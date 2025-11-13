@@ -65,7 +65,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
-      <body className="bg-background theme-yellow">
+      <body className="bg-background">
         <main className={`${fontNormal.className}`}>
           <Provider store={store}>
             <ThemeProvider
