@@ -119,8 +119,13 @@ const Home = () => {
     <div className="min-h-[100dvh] bg-background">
       <RealtimeBootstrap />
       <div className="hidden md:block">
-        <main className="mx-auto max-w-[680px] px-4 pb-28">
-          <FeedHeader />
+        {/* Centered tabs overlay above the media column */}
+        <div className="pointer-events-none fixed inset-x-0 top-[env(safe-area-inset-top)] z-40">
+          <div className="mx-auto w-full max-w-[680px] flex justify-center py-2 pointer-events-auto bg-gradient-to-b from-background/60 to-transparent">
+            <FeedHeader floating className="bg-transparent" />
+          </div>
+        </div>
+        <main className="mx-auto max-w-[680px] px-4 pb-28 pt-10">
           <HomeFeedCarousel isMobile={false} />
         </main>
       </div>
