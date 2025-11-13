@@ -42,32 +42,68 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
   return (
     <div className={wrapperClass}>
       <nav className="mx-auto max-w-[680px] px-4">
-        {/* hidden mobile switcher removed to avoid test role collisions */}
-        <ul className="grid grid-cols-3 items-center">
-          {[
-            { key: "foryou", label: "Feed", align: "text-left after:ml-0 after:mr-auto" },
-            { key: "following", label: "Following", align: "text-center after:mx-auto" },
-            { key: "subscribed", label: "Subscribed", align: "text-right after:mr-0 after:ml-auto" },
-          ].map((t) => {
-            const active = homeHeaderFilter === t.key;
-            const base =
-              "w-full py-3 text-sm font-medium relative " +
-              (active ? "text-primary " : "text-muted-foreground ");
-            const underline =
-              "after:block after:h-0.5 after:w-8 after:mt-1 after:rounded-full " +
-              (active ? "after:bg-primary " : "after:bg-transparent ");
+        {/* Absolute-aligned tabs: left / center / right over the media */}
+        <div className="relative h-10 flex items-center">
+          {/* Left: Feed */}
+          {(() => {
+            const active = homeHeaderFilter === "foryou";
             return (
-              <li key={t.key} className={t.align}>
-                <button
-                  className={base + underline}
-                  onClick={() => handleItemClick(t.key)}
-                >
-                  {t.label}
-                </button>
-              </li>
+              <button
+                className={`absolute left-0 text-left text-sm font-medium px-0 ${
+                  active ? "text-primary" : "text-muted-foreground"
+                }`}
+                onClick={() => handleItemClick("foryou")}
+              >
+                <span>Feed</span>
+                <span
+                  className={`block h-0.5 w-8 mt-1 rounded-full ${
+                    active ? "bg-primary" : "bg-transparent"
+                  }`}
+                />
+              </button>
             );
-          })}
-        </ul>
+          })()}
+
+          {/* Center: Following */}
+          {(() => {
+            const active = homeHeaderFilter === "following";
+            return (
+              <button
+                className={`absolute left-1/2 -translate-x-1/2 text-center text-sm font-medium px-0 ${
+                  active ? "text-primary" : "text-muted-foreground"
+                }`}
+                onClick={() => handleItemClick("following")}
+              >
+                <span>Following</span>
+                <span
+                  className={`block h-0.5 w-8 mt-1 rounded-full mx-auto ${
+                    active ? "bg-primary" : "bg-transparent"
+                  }`}
+                />
+              </button>
+            );
+          })()}
+
+          {/* Right: Subscribed */}
+          {(() => {
+            const active = homeHeaderFilter === "subscribed";
+            return (
+              <button
+                className={`absolute right-0 text-right text-sm font-medium px-0 ${
+                  active ? "text-primary" : "text-muted-foreground"
+                }`}
+                onClick={() => handleItemClick("subscribed")}
+              >
+                <span>Subscribed</span>
+                <span
+                  className={`block h-0.5 w-8 mt-1 rounded-full ml-auto ${
+                    active ? "bg-primary" : "bg-transparent"
+                  }`}
+                />
+              </button>
+            );
+          })()}
+        </div>
       </nav>
     </div>
   );
