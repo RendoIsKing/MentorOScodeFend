@@ -41,7 +41,7 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
 
   return (
     <div className={wrapperClass}>
-      <nav className="mx-auto max-w-[680px] px-4">
+      <nav className="mx-auto max-w-[680px] px-0">
         {/* Three-column grid: left / center / right (no overlap) */}
         <div className="grid grid-cols-3 items-center h-10">
           {(() => {
