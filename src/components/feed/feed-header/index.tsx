@@ -42,14 +42,13 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
   return (
     <div className={wrapperClass}>
       <nav className="mx-auto max-w-[680px] px-4">
-        {/* Absolute-aligned tabs: left / center / right over the media */}
-        <div className="relative h-10 flex items-center">
-          {/* Left: Feed */}
+        {/* Three-column grid: left / center / right (no overlap) */}
+        <div className="grid grid-cols-3 items-center h-10">
           {(() => {
             const active = homeHeaderFilter === "foryou";
             return (
               <button
-                className={`absolute left-0 text-left text-sm font-medium px-0 ${
+                className={`justify-self-start text-left text-sm font-medium px-0 ${
                   active ? "text-primary" : "text-muted-foreground"
                 }`}
                 onClick={() => handleItemClick("foryou")}
@@ -64,12 +63,11 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
             );
           })()}
 
-          {/* Center: Following */}
           {(() => {
             const active = homeHeaderFilter === "following";
             return (
               <button
-                className={`absolute left-1/2 -translate-x-1/2 text-center text-sm font-medium px-0 ${
+                className={`justify-self-center text-center text-sm font-medium px-0 ${
                   active ? "text-primary" : "text-muted-foreground"
                 }`}
                 onClick={() => handleItemClick("following")}
@@ -84,12 +82,11 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
             );
           })()}
 
-          {/* Right: Subscribed */}
           {(() => {
             const active = homeHeaderFilter === "subscribed";
             return (
               <button
-                className={`absolute right-0 text-right text-sm font-medium px-0 ${
+                className={`justify-self-end text-right text-sm font-medium px-0 ${
                   active ? "text-primary" : "text-muted-foreground"
                 }`}
                 onClick={() => handleItemClick("subscribed")}
