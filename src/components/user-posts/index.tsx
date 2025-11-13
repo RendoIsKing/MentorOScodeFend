@@ -34,8 +34,16 @@ const UserPosts: React.FC<IUserPostDataProps> = ({ post, style }) => {
   const [payForPostTrigger, { isLoading }] = usePayForPostMutation();
   const mediaFile = post?.mediaFiles[0];
   const safeBase = (baseServerUrl as any) || (typeof window !== 'undefined' && (window as any).NEXT_PUBLIC_API_SERVER) || '/api/backend';
-  const postUrl = mediaFile?.path ? `${safeBase}/${mediaFile.path}` : '';
-  const isVideo = post?.media?.[0]?.mediaType === "video";
+  // Prefer id-based file endpoint so it works with S3/signing and local storage
+  const fileId = (mediaFile as any)?._id || (mediaFile as any)?.id || post?.media?.[0]?.mediaId;
+  const postUrl = fileId
+    ? `${safeBase}/v1/user/files/${String(fileId)}`
+    : (mediaFile?.path
+        ? (mediaFile.path.startsWith('http')
+            ? mediaFile.path
+            : `${safeBase}/${mediaFile.path}`)
+        : '');
+  const isVideo = (post?.media?.[0]?.mediaType === "video") || String(mediaFile?.mimetype || '').startsWith('video/');
   const isPayPerView = post?.privacy === "pay-per-view";
   const { user } = useUserOnboardingContext();
   const [isPayPerViewOpen, setIsPayPerViewOpen] = useState(false);

@@ -70,9 +70,11 @@ const Home = () => {
     const base = '/api/backend';
     // Prefer static path (actual image) over metadata endpoint
     const fileId = (m && ((m as any)._id || (m as any).id)) || (p?.media?.[0]?.mediaId);
-    const src = m?.path
-      ? (m.path.startsWith('http') ? m.path : `${base}/${m.path}`)
-      : (fileId ? `${base}/v1/user/files/${String(fileId)}` : '');
+    const src = fileId
+      ? `${base}/v1/user/files/${String(fileId)}`
+      : (m?.path
+          ? (m.path.startsWith('http') ? m.path : `${base}/${m.path}`)
+          : '');
 
     // Avatar: prefer id-based file endpoint
     const avatarPathRaw = p?.userInfo?.[0]?.photo?.path || p?.userPhoto?.[0]?.path;
