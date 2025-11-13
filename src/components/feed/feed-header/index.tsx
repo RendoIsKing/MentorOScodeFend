@@ -42,14 +42,13 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
   return (
     <div className={wrapperClass}>
       <nav className="mx-auto max-w-[680px] px-0">
-        {/* Precise left / center / right using absolute positions on a full-width container */}
-        <div className="relative w-full h-10">
-          {/* Left */}
+        {/* Three columns: left / center / right aligned to media width */}
+        <div className="grid grid-cols-3 items-center w-full h-10">
           {(() => {
             const active = homeHeaderFilter === "foryou";
             return (
               <button
-                className={`absolute left-0 top-1/2 -translate-y-1/2 text-left text-sm font-medium ${
+                className={`justify-self-start text-left text-sm font-medium ${
                   active ? "text-primary" : "text-muted-foreground"
                 }`}
                 onClick={() => handleItemClick("foryou")}
@@ -59,13 +58,11 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
               </button>
             );
           })()}
-
-          {/* Center */}
           {(() => {
             const active = homeHeaderFilter === "following";
             return (
               <button
-                className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-sm font-medium ${
+                className={`justify-self-center text-center text-sm font-medium ${
                   active ? "text-primary" : "text-muted-foreground"
                 }`}
                 onClick={() => handleItemClick("following")}
@@ -75,13 +72,11 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
               </button>
             );
           })()}
-
-          {/* Right */}
           {(() => {
             const active = homeHeaderFilter === "subscribed";
             return (
               <button
-                className={`absolute right-0 top-1/2 -translate-y-1/2 text-right text-sm font-medium ${
+                className={`justify-self-end text-right text-sm font-medium ${
                   active ? "text-primary" : "text-muted-foreground"
                 }`}
                 onClick={() => handleItemClick("subscribed")}
