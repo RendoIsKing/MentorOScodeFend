@@ -64,17 +64,18 @@ const Home = () => {
   const byId = new Map(items.map((p: any) => [String(p._id ?? p.id), p]));
   const posts = items.flatMap((p: any) => {
     const m = p?.mediaFiles?.[0];
-    if (!m?.path) return [] as any[];
-    const isVideo = (m?.mimeType && m.mimeType.startsWith('video/')) || /\.(mp4|webm|mov)$/i.test(m?.path || '');
+    const pathMaybe = m?.path as string | undefined;
+    const isVideo = (m?.mimeType && m.mimeType.startsWith('video/')) || /\.(mp4|webm|mov)$/i.test(pathMaybe || '');
     // Always use same-origin proxy for media so responses aren't blocked by cross-origin policies
     const base = '/api/backend';
-    // Prefer static path (actual image) over metadata endpoint
+    // Prefer id-based endpoint (works with S3 and local), fall back to path
     const fileId = (m && ((m as any)._id || (m as any).id)) || (p?.media?.[0]?.mediaId);
     const src = fileId
       ? `${base}/v1/user/files/${String(fileId)}`
-      : (m?.path
-          ? (m.path.startsWith('http') ? m.path : `${base}/${m.path}`)
+      : (pathMaybe
+          ? (pathMaybe.startsWith('http') ? pathMaybe : `${base}/${pathMaybe}`)
           : '');
+    if (!src) return [] as any[];
 
     // Avatar: prefer id-based file endpoint
     const avatarPathRaw = p?.userInfo?.[0]?.photo?.path || p?.userPhoto?.[0]?.path;
