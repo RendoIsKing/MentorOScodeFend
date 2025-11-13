@@ -43,7 +43,9 @@ const UserPosts: React.FC<IUserPostDataProps> = ({ post, style }) => {
             ? mediaFile.path
             : `${safeBase}/${mediaFile.path}`)
         : '');
-  const isVideo = (post?.media?.[0]?.mediaType === "video") || String(mediaFile?.mimetype || '').startsWith('video/');
+  const isVideo =
+    post?.media?.[0]?.mediaType === "video" ||
+    /\.(mp4|webm|mov|avi|mkv)$/i.test(String(mediaFile?.path || ""));
   const isPayPerView = post?.privacy === "pay-per-view";
   const { user } = useUserOnboardingContext();
   const [isPayPerViewOpen, setIsPayPerViewOpen] = useState(false);
