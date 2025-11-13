@@ -1,19 +1,15 @@
 import React, { useState } from "react";
 import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
 
-import { Search } from "lucide-react";
-import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ABeeZee, Inter_Tight, Orbitron } from "next/font/google";
 import { useHomeHeaderFilter } from "@/context/HomeFeedHeader";
-
-// TODO: Make this font definition dynamic
-const fontItalic = ABeeZee({
-  subsets: ["latin"],
-  weight: ["400"],
-  style: "italic",
-});
-const fontLogo = Orbitron({ subsets: ["latin"], weight: ["700", "800"] });
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type Props = { floating?: boolean; className?: string };
 
@@ -39,58 +35,39 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
     return null;
   }
 
+  const label =
+    homeHeaderFilter === "following"
+      ? "Following"
+      : homeHeaderFilter === "subscribed"
+      ? "Subscribed"
+      : "Feed";
+
   return (
     <div className={wrapperClass}>
-      <nav className="mx-auto max-w-[680px] w-full px-0">
-        {/* Three fixed columns: left / center / right (no overlap) */}
-        <div className="grid grid-cols-3 items-center w-full h-10">
-          {/* Left: Feed */}
-          {(() => {
-            const active = homeHeaderFilter === "foryou";
-            return (
-              <button
-                className={`justify-self-start text-left text-sm font-medium ${
-                  active ? "text-primary" : "text-muted-foreground"
-                }`}
-                onClick={() => handleItemClick("foryou")}
-              >
-                <span>Feed</span>
-                <span className={`block h-0.5 w-8 mt-1 rounded-full ${active ? "bg-primary" : "bg-transparent"}`} />
-              </button>
-            );
-          })()}
-
-          {/* Center: Following */}
-          {(() => {
-            const active = homeHeaderFilter === "following";
-            return (
-              <button
-                className={`justify-self-center text-center text-sm font-medium ${
-                  active ? "text-primary" : "text-muted-foreground"
-                }`}
-                onClick={() => handleItemClick("following")}
-              >
-                <span>Following</span>
-                <span className={`block h-0.5 w-8 mt-1 rounded-full mx-auto ${active ? "bg-primary" : "bg-transparent"}`} />
-              </button>
-            );
-          })()}
-
-          {/* Right: Subscribed */}
-          {(() => {
-            const active = homeHeaderFilter === "subscribed";
-            return (
-              <button
-                className={`justify-self-end text-right text-sm font-medium ${
-                  active ? "text-primary" : "text-muted-foreground"
-                }`}
-                onClick={() => handleItemClick("subscribed")}
-              >
-                <span>Subscribed</span>
-                <span className={`block h-0.5 w-8 mt-1 rounded-full ml-auto ${active ? "bg-primary" : "bg-transparent"}`} />
-              </button>
-            );
-          })()}
+      <nav className="mx-auto max-w-[680px] w-full px-3">
+        {/* Centered dropdown switcher (desktop) */}
+        <div className="relative h-10">
+          <div className="absolute left-1/2 -translate-x-1/2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="inline-flex items-center gap-2 rounded-full bg-background/60 px-3 py-1.5 text-sm font-semibold text-foreground shadow border border-border">
+                  {label}
+                  <ChevronDown size={14} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="p-1 border-border bg-card">
+                <DropdownMenuItem onClick={() => handleItemClick("foryou")}>
+                  Feed
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleItemClick("following")}>
+                  Following
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleItemClick("subscribed")}>
+                  Subscribed
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </nav>
     </div>
