@@ -63,18 +63,26 @@ const Home = () => {
   const items = (postDetails as any)?.data ?? [];
   const byId = new Map(items.map((p: any) => [String(p._id ?? p.id), p]));
   const posts = items.flatMap((p: any) => {
-    const m = p?.mediaFiles?.[0];
-    const pathMaybe = m?.path as string | undefined;
+    const m = p?.mediaFiles?.[0] || p?.mediaFiles?.[0];
+    const pathMaybe: string | undefined =
+      (m?.path as string | undefined) ||
+      (p?.media?.[0]?.path as string | undefined);
     const isVideo = (m?.mimeType && m.mimeType.startsWith('video/')) || /\.(mp4|webm|mov)$/i.test(pathMaybe || '');
     // Always use same-origin proxy for media so responses aren't blocked by cross-origin policies
     const base = '/api/backend';
     // Prefer id-based endpoint (works with S3 and local), fall back to path
-    const fileId = (m && ((m as any)._id || (m as any).id)) || (p?.media?.[0]?.mediaId);
-    const src = fileId
-      ? `${base}/v1/user/files/${String(fileId)}`
-      : (pathMaybe
-          ? (pathMaybe.startsWith('http') ? pathMaybe : `${base}/${pathMaybe}`)
-          : '');
+    const fileId =
+      (m && (((m as any)?._id) || ((m as any)?.id))) ||
+      (p?.media?.[0]?.mediaId);
+    let src = "";
+    if (fileId) {
+      src = `${base}/v1/user/files/${String(fileId)}`;
+    } else if (pathMaybe) {
+      src = pathMaybe.startsWith('http') ? pathMaybe : `${base}/${pathMaybe}`;
+    }
+    if (!src) {
+      return [] as any[];
+    }
     if (!src) return [] as any[];
 
     // Avatar: prefer id-based file endpoint
