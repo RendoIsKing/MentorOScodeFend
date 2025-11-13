@@ -42,14 +42,14 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
   return (
     <div className={wrapperClass}>
       <nav className="mx-auto max-w-[680px] w-full px-0">
-        {/* Left & Right via flex; Center absolutely centered to avoid crowding */}
-        <div className="relative flex items-center justify-between w-full h-10">
-          {/* Left */}
+        {/* Three fixed columns: left / center / right (no overlap) */}
+        <div className="grid grid-cols-3 items-center w-full h-10">
+          {/* Left: Feed */}
           {(() => {
             const active = homeHeaderFilter === "foryou";
             return (
               <button
-                className={`text-left text-sm font-medium ${
+                className={`justify-self-start text-left text-sm font-medium ${
                   active ? "text-primary" : "text-muted-foreground"
                 }`}
                 onClick={() => handleItemClick("foryou")}
@@ -60,34 +60,34 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
             );
           })()}
 
-          {/* Right */}
-          {(() => {
-            const active = homeHeaderFilter === "subscribed";
-            return (
-              <button
-                className={`text-right text-sm font-medium ${
-                  active ? "text-primary" : "text-muted-foreground"
-                }`}
-                onClick={() => handleItemClick("subscribed")}
-              >
-                <span>Subscribed</span>
-                <span className={`block h-0.5 w-8 mt-1 rounded-full ml-auto ${active ? "bg-primary" : "bg-transparent"}`} />
-              </button>
-            );
-          })()}
-
-          {/* Center */}
+          {/* Center: Following */}
           {(() => {
             const active = homeHeaderFilter === "following";
             return (
               <button
-                className={`absolute left-1/2 -translate-x-1/2 text-center text-sm font-medium ${
+                className={`justify-self-center text-center text-sm font-medium ${
                   active ? "text-primary" : "text-muted-foreground"
                 }`}
                 onClick={() => handleItemClick("following")}
               >
                 <span>Following</span>
                 <span className={`block h-0.5 w-8 mt-1 rounded-full mx-auto ${active ? "bg-primary" : "bg-transparent"}`} />
+              </button>
+            );
+          })()}
+
+          {/* Right: Subscribed */}
+          {(() => {
+            const active = homeHeaderFilter === "subscribed";
+            return (
+              <button
+                className={`justify-self-end text-right text-sm font-medium ${
+                  active ? "text-primary" : "text-muted-foreground"
+                }`}
+                onClick={() => handleItemClick("subscribed")}
+              >
+                <span>Subscribed</span>
+                <span className={`block h-0.5 w-8 mt-1 rounded-full ml-auto ${active ? "bg-primary" : "bg-transparent"}`} />
               </button>
             );
           })()}
