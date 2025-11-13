@@ -48,7 +48,7 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
         {/* Centered dropdown switcher (desktop) */}
         <div className="relative h-10">
           {/* Place the chip to the LEFT of the media column, same vertical height */}
-          <div className="absolute top-0 left-0 -translate-x-full -ml-3">
+          <div className="absolute top-1/2 -translate-y-1/2 right-full mr-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="inline-flex items-center gap-2 rounded-full bg-background/60 px-3 py-1.5 text-sm font-semibold text-foreground shadow border border-border">
