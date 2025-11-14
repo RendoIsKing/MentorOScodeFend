@@ -168,24 +168,21 @@ const ProfileInfo = () => {
             ? data.otherGender
             : data.genderType,
       };
-      createUserMethod(createUserObject)
-        .unwrap()
-        .then((res) => {
-          // console.log(res);
-          router.replace("/user-photo");
-
-          toast({
-            variant: "success",
-            description: "Details added successfully",
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-          toast({
-            variant: "destructive",
-            description: "Something went wrong",
-          });
+      try {
+        await createUserMethod(createUserObject).unwrap();
+        // Give the backend a brief moment to persist flags that middleware checks
+        await new Promise((resolve) => setTimeout(resolve, 250));
+        if (typeof window !== "undefined") window.location.href = "/user-photo";
+        try {
+          toast({ variant: "success", description: "Details added successfully" });
+        } catch {}
+      } catch (err) {
+        console.log(err);
+        toast({
+          variant: "destructive",
+          description: "Something went wrong",
         });
+      }
     } else {
       form.setError("username", {
         type: "manual",
