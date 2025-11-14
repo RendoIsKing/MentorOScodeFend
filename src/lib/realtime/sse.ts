@@ -17,6 +17,8 @@ class RealtimeSseClient {
   private url: string;
   private withCredentials = true;
   private started = false;
+  private lastConnectAttemptAt = 0;
+  private cooldownUntilMs = 0;
   private backoffMs = 1000;
   private readonly maxBackoffMs = 30000;
   private lastHeartbeatAt = 0;
@@ -55,6 +57,17 @@ class RealtimeSseClient {
 
   start() {
     if (this.started) return;
+    // Only start in the foreground
+    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
+      const onVisible = () => {
+        if (document.visibilityState === 'visible') {
+          document.removeEventListener('visibilitychange', onVisible);
+          this.start();
+        }
+      };
+      document.addEventListener('visibilitychange', onVisible);
+      return;
+    }
     this.started = true;
     this.connect();
     if (typeof document !== 'undefined') {
@@ -71,6 +84,8 @@ class RealtimeSseClient {
           } catch {}
         }
       });
+      // Ensure the stream is closed when the page is unloading
+      window.addEventListener('beforeunload', () => this.stop());
     }
   }
 
@@ -88,7 +103,17 @@ class RealtimeSseClient {
 
   private connect() {
     try {
+      // Respect any active cooldown (e.g., after a 429-style burst of quick failures)
+      if (this.cooldownUntilMs && Date.now() < this.cooldownUntilMs) {
+        this.scheduleReconnect(this.cooldownUntilMs - Date.now());
+        return;
+      }
+      // Avoid duplicate connection attempts while an EventSource is CONNECTING/OPEN
+      if (this.es && (this.es.readyState === EventSource.OPEN || this.es.readyState === EventSource.CONNECTING)) {
+        return;
+      }
       try { (window as any).__SENTRY__?.addBreadcrumb?.({ category: 'sse', message: 'connect', level: 'info' }); } catch {}
+      this.lastConnectAttemptAt = Date.now();
       const es = new EventSource(this.url, { withCredentials: this.withCredentials } as any);
       this.es = es;
       this.backoffMs = 1000;
@@ -123,7 +148,15 @@ class RealtimeSseClient {
 
       es.onerror = () => {
         try { (window as any).__SENTRY__?.addBreadcrumb?.({ category: 'sse', message: `error/backoff ${this.backoffMs}ms`, level: 'warning' }); } catch {}
-        // Will reconnect with backoff
+        // If the stream fails very quickly after attempting to connect,
+        // assume transient overload/rate-limit and jump to a safer backoff.
+        const elapsed = Date.now() - this.lastConnectAttemptAt;
+        if (elapsed < 2000) {
+          // Enforce a minimum cooldown (match typical Retry-After ~11s)
+          const minCooldown = 15000;
+          this.backoffMs = Math.max(this.backoffMs, minCooldown);
+          this.cooldownUntilMs = Date.now() + this.backoffMs;
+        }
         this.reconnect();
       };
     } catch {
@@ -143,10 +176,25 @@ class RealtimeSseClient {
   }
 
   private scheduleReconnect(ms: number) {
+    const delay = Math.max(
+      0,
+      Math.max(ms, this.cooldownUntilMs ? (this.cooldownUntilMs - Date.now()) : 0)
+    );
     setTimeout(() => {
       if (!this.started) return;
+      // Do not connect while hidden; wait until visible
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
+        const onVisible = () => {
+          if (document.visibilityState === 'visible') {
+            document.removeEventListener('visibilitychange', onVisible);
+            this.connect();
+          }
+        };
+        document.addEventListener('visibilitychange', onVisible);
+        return;
+      }
       this.connect();
-    }, Math.max(0, ms));
+    }, delay);
   }
 }
 
