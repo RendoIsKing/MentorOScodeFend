@@ -112,8 +112,9 @@ export async function middleware(request: NextRequest) {
     const onboardingStarted = onboardingCookie?.value === 'start';
     const isGoogle = Boolean(u?.googleId);
     const hasUserName = Boolean(u?.userName && String(u?.userName).trim().length > 0);
-    // Require username to be set even for Google-linked users; route them to google-user-info until done
-    const needsInfo = isGoogle ? !hasUserName : !(u?.hasPersonalInfo === true && hasUserName);
+    const hasPersonalInfoFlag = Boolean(u?.hasPersonalInfo === true);
+    // Consider the info step complete if either username exists OR hasPersonalInfo flag is set
+    const needsInfo = !(hasUserName || hasPersonalInfoFlag);
     const hasPhotoFlag = Boolean(u?.hasPhotoInfo === true);
     const hasPhotoId = Boolean(u?.photoId);
     const hasPhotoObj = Boolean((u as any)?.photo?._id);
