@@ -16,6 +16,7 @@ import {
   useGetSubscriberListQuery,
   usersApi,
 } from "@/redux/services/haveme/user";
+import { useGetUserDetailsQuery } from "@/redux/services/haveme";
 import { useUserOnboardingContext } from "@/context/UserOnboarding";
 import millify from "millify";
 import { toast } from "@/components/ui/use-toast";
@@ -141,11 +142,12 @@ const Followers: React.FC<ITabsModalProps> = ({ tabValue }) => {
   const isUser = true;
   const searchParams = useSearchParams();
   const { user } = useUserOnboardingContext();
+  const { data: me } = useGetUserDetailsQuery();
   const [followUser] = useFollowUserMutation();
   const [sendNotification] = useSendNotificationMutation();
 
-  // Choose target user id: query param 'uid' if provided, otherwise current user
-  const targetUid = (searchParams.get("uid") || user?._id) as any;
+  // Choose target user id: explicit uid param > context user > /auth/me
+  const targetUid = (searchParams.get("uid") || user?._id || (me as any)?.data?._id) as any;
   const { data: followersData } = useGetFollowerListQuery(targetUid, { skip: !targetUid });
   const { data: followingData } = useGetFollowingListQuery(targetUid, { skip: !targetUid });
   const { data: subscriberData } = useGetSubscriberListQuery(targetUid, { skip: !targetUid });
