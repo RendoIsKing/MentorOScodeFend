@@ -18,6 +18,7 @@ import { useGetUserDetailsByUserNameQuery } from "@/redux/services/haveme/user";
 import { useGetUserDetailsQuery } from "@/redux/services/haveme";
 import { Star } from "lucide-react";
 import { Flame } from "lucide-react";
+import { SquareStack } from "lucide-react";
 
 const ADD_POSTS = "ADD_POSTS";
 
@@ -212,12 +213,7 @@ export default function ProfileBody() {
               currentTab === "posts",
           })}
         >
-          <Image
-            height={30}
-            width={30}
-            alt="navicon"
-            src="/assets/images/search-user-profile/post.svg"
-          />
+          <SquareStack className="mr-0" size={28} strokeWidth={2} />
           {!isMobile && <h1 className="ml-4 text-base">Posts</h1>}
         </Button>
         {isOwnProfile && (
