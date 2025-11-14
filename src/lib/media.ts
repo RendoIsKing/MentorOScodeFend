@@ -8,8 +8,8 @@ export function getUserAvatarUrl(
   const avatarPath = user?.photo?.path;
   const avatarId = user?.photo?._id || user?.photoId;
   const updatedAt = user?.photo?.updatedAt || user?.updatedAt;
-  const sessionVersion = typeof window !== "undefined" ? (window as any).__IMG_V__ : undefined;
-  const cacheBuster = updatedAt ? new Date(updatedAt).getTime() : (sessionVersion || "");
+  // Use only stable server-provided timestamps to avoid SSR/CSR mismatches
+  const cacheBuster = updatedAt ? new Date(updatedAt).getTime() : undefined;
 
   if (avatarPath && !String(avatarPath).includes("undefined") && !String(avatarPath).includes("null")) {
     // If path is absolute, return as-is (append version if possible and no existing query)
@@ -34,8 +34,7 @@ export function getUserCoverUrl(
   const coverPath = user?.coverPhoto?.path;
   const coverId = user?.coverPhoto?._id || user?.coverPhotoId;
   const updatedAt = user?.coverPhoto?.updatedAt || user?.updatedAt;
-  const sessionVersion = typeof window !== "undefined" ? (window as any).__IMG_V__ : undefined;
-  const cacheBuster = updatedAt ? new Date(updatedAt).getTime() : (sessionVersion || "");
+  const cacheBuster = updatedAt ? new Date(updatedAt).getTime() : undefined;
 
   if (coverPath && !String(coverPath).includes("undefined") && !String(coverPath).includes("null")) {
     if (/^https?:\/\/+/i.test(String(coverPath))) {

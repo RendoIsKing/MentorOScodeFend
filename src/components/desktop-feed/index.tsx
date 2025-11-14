@@ -125,7 +125,7 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
       {/* Author avatar (desktop only) */}
       <div className="flex justify-center">
         <Link href={`/${authorUserName.toLowerCase()}`} className="inline-block" aria-label="Open author profile">
-          <img src={authorAvatar} alt="author avatar" className="h-10 w-10 rounded-full object-cover shadow" loading="lazy" decoding="async" />
+          <img src={authorAvatar} alt="author avatar" width="40" height="40" className="h-10 w-10 rounded-full object-cover shadow" loading="lazy" decoding="async" />
         </Link>
       </div>
 
