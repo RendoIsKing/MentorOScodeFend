@@ -404,6 +404,7 @@ const ProfileHeaderMobile = () => {
             subscribersCount={isOwnerRendered ? data?.data?.subscriberCount : userDetailsData?.subscriberCount}
             postsCount={isOwnerRendered ? data?.data?.postsCount : userDetailsData?.postsCount}
             likeCount={isOwnerRendered ? data?.data?.totalLikes : userDetailsData?.totalLikes}
+            userId={isOwnerRendered ? (data?.data?._id as any) : (userDetailsData?._id as any)}
           />
           <Separator />
           {isOwnerRendered ? (

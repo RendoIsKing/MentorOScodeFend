@@ -259,6 +259,7 @@ function ProfileHeaderDesktop() {
                   subscribersCount={data?.data?.subscriberCount}
                   postsCount={data?.data?.postsCount}
                   likeCount={data?.data?.totalLikes}
+                  userId={data?.data?._id as any}
                 />
               ) : (
                 <UserStats
@@ -268,6 +269,7 @@ function ProfileHeaderDesktop() {
                   subscribersCount={userDetailsData?.subscriberCount}
                   postsCount={userDetailsData?.postsCount}
                   likeCount={userDetailsData?.totalLikes}
+                  userId={userDetailsData?._id as any}
                 />
               )}
               <div className="flex">

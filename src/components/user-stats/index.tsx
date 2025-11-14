@@ -14,6 +14,7 @@ const fontItalic = ABeeZee({
 interface IUserStatsProps extends IFollowerPopupProps {
   likeCount?: number;
   postsCount?: number;
+  userId?: string;
 }
 
 const UserStats: React.FC<IUserStatsProps> = ({
@@ -23,6 +24,7 @@ const UserStats: React.FC<IUserStatsProps> = ({
   isOwnProfile,
   likeCount,
   postsCount,
+  userId,
 }) => {
   const router = useRouter();
 
@@ -36,9 +38,9 @@ const UserStats: React.FC<IUserStatsProps> = ({
   return (
     <div>
       <div className="grid grid-cols-3 gap-6 text-center justify-items-center">
-        <Stat label="Following" value={followingCount} onClick={() => router.push("/followers?tab=following")} />
-        <Stat label="Followers" value={followersCount} onClick={() => router.push("/followers?tab=followers")} />
-        <Stat label="Subscribers" value={subscribersCount} onClick={() => router.push("/followers?tab=subscribers")} />
+        <Stat label="Following" value={followingCount} onClick={() => router.push(`/followers?tab=following${userId ? `&uid=${encodeURIComponent(userId)}` : ""}`)} />
+        <Stat label="Followers" value={followersCount} onClick={() => router.push(`/followers?tab=followers${userId ? `&uid=${encodeURIComponent(userId)}` : ""}`)} />
+        <Stat label="Subscribers" value={subscribersCount} onClick={() => router.push(`/followers?tab=subscribers${userId ? `&uid=${encodeURIComponent(userId)}` : ""}`)} />
       </div>
     </div>
   );

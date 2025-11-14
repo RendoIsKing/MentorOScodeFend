@@ -144,9 +144,11 @@ const Followers: React.FC<ITabsModalProps> = ({ tabValue }) => {
   const [followUser] = useFollowUserMutation();
   const [sendNotification] = useSendNotificationMutation();
 
-  const { data: followersData } = useGetFollowerListQuery(user?._id);
-  const { data: followingData } = useGetFollowingListQuery(user?._id);
-  const { data: subscriberData } = useGetSubscriberListQuery(user?._id);
+  // Choose target user id: query param 'uid' if provided, otherwise current user
+  const targetUid = (searchParams.get("uid") || user?._id) as any;
+  const { data: followersData } = useGetFollowerListQuery(targetUid, { skip: !targetUid });
+  const { data: followingData } = useGetFollowingListQuery(targetUid, { skip: !targetUid });
+  const { data: subscriberData } = useGetSubscriberListQuery(targetUid, { skip: !targetUid });
   const [isFollow, setIsFollow] = useState(false);
   const appDispatch = useAppDispatch();
 
