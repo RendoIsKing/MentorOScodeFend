@@ -208,7 +208,7 @@ const Followers: React.FC<ITabsModalProps> = ({ tabValue }) => {
                 value="following"
                 className="w-full data-[state=active]:text-primary data-[state=active]:border-b border-primary  data-[state=active]:bg-transparent data-[state=active]:italic lg:py-4 lg:text-xl"
               >
-                {`${millify(followingData?.data.length)} Following`}
+                {`${millify((followingData?.data?.length || 0) as number)} Following`}
               </TabsTrigger>
             </div>
             <div>
@@ -216,7 +216,7 @@ const Followers: React.FC<ITabsModalProps> = ({ tabValue }) => {
                 value="followers"
                 className="w-full data-[state=active]:text-primary data-[state=active]:border-b border-primary   data-[state=active]:bg-transparent data-[state=active]:italic lg:py-4 lg:text-xl"
               >
-                {`${millify(followersData?.data.length)} Follower`}
+                {`${millify((followersData?.data?.length || 0) as number)} Follower`}
               </TabsTrigger>
             </div>
 
@@ -226,7 +226,7 @@ const Followers: React.FC<ITabsModalProps> = ({ tabValue }) => {
                   value="subscribers"
                   className="w-full data-[state=active]:text-primary data-[state=active]:border-b border-primary  data-[state=active]:bg-transparent data-[state=active]:italic lg:py-4 lg:text-xl"
                 >
-                  {`${millify(subscriberData?.data.length)} Subscribers`}
+                  {`${millify((subscriberData?.data?.length || 0) as number)} Subscribers`}
                 </TabsTrigger>
               </div>
             )}
@@ -241,7 +241,13 @@ const Followers: React.FC<ITabsModalProps> = ({ tabValue }) => {
                 >
                   <a href={`/${String(user?.owner?.userName || '').toLowerCase()}`} className="flex-1">
                     <AvatarWithDescription
-                      imageUrl={`${baseServerUrl}/${user?.owner?.photo?.path}`}
+                      imageUrl={(() => {
+                        const p = user?.owner?.photo?.path;
+                        const id = (user?.owner?.photo as any)?._id || (user?.owner as any)?.photoId;
+                        if (p && !String(p).includes('undefined') && !String(p).includes('null')) return `${baseServerUrl}/${p}`;
+                        if (id) return `${baseServerUrl}/v1/user/files/${String(id)}`;
+                        return '/assets/images/Home/small-profile-img.svg';
+                      })()}
                       ImageFallBackText={user?.owner?.userName}
                       userName={user?.owner?.fullName}
                       userNameTag={user?.owner?.userName}
@@ -266,7 +272,13 @@ const Followers: React.FC<ITabsModalProps> = ({ tabValue }) => {
                 >
                   <a href={`/${String(user?.followingTo?.userName || '').toLowerCase()}`} className="flex-1">
                     <AvatarWithDescription
-                      imageUrl={`${baseServerUrl}/${user?.followingTo?.photo?.path}`}
+                      imageUrl={(() => {
+                        const p = user?.followingTo?.photo?.path;
+                        const id = (user?.followingTo?.photo as any)?._id || (user?.followingTo as any)?.photoId;
+                        if (p && !String(p).includes('undefined') && !String(p).includes('null')) return `${baseServerUrl}/${p}`;
+                        if (id) return `${baseServerUrl}/v1/user/files/${String(id)}`;
+                        return '/assets/images/Home/small-profile-img.svg';
+                      })()}
                       ImageFallBackText={user?.followingTo?.userName}
                       userName={user?.followingTo?.fullName}
                       userNameTag={user?.followingTo?.userName}
@@ -287,7 +299,13 @@ const Followers: React.FC<ITabsModalProps> = ({ tabValue }) => {
               {subscriberData?.data?.map((data, index) => (
                 <div key={index} className="flex justify-between my-4 mr-4">
                   <AvatarWithDescription
-                    imageUrl={`${baseServerUrl}/${data?.photoId}`}
+                    imageUrl={(() => {
+                      const p = (data as any)?.photo?.path;
+                      const id = (data as any)?.photoId || (data as any)?.photo?._id;
+                      if (p && !String(p).includes('undefined') && !String(p).includes('null')) return `${baseServerUrl}/${p}`;
+                      if (id) return `${baseServerUrl}/v1/user/files/${String(id)}`;
+                      return '/assets/images/Home/small-profile-img.svg';
+                    })()}
                     ImageFallBackText={data?.userName}
                     userName={data?.fullName}
                     userNameTag={data?.userName}
