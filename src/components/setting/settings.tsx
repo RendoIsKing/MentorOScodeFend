@@ -103,6 +103,29 @@ const Settings: React.FC = () => {
           </div>
         </div>
         <Separator />
+        <div className="my-2">
+          <h2 className="text-sm text-muted-foreground lg:pb-2 lg:text-lg">
+            Accounts
+          </h2>
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className={`   ${fontItalic.className}`}>Add another account</h3>
+              <p className="text-sm lg:text-muted-foreground">
+                Create a new account on this device
+              </p>
+            </div>
+            <Button
+              onClick={async () => {
+                await appDispatcher(logout());
+                router.push("/signup?new=1");
+              }}
+              variant="secondary"
+            >
+              Start
+            </Button>
+          </div>
+        </div>
+        <Separator />
         <div
           className="my-2 cursor-pointer"
           onClick={() => router.push("/settings/download-data")}

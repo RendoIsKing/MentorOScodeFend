@@ -23,6 +23,7 @@ async function getUserProgress(request: NextRequest, userAuthToken: string) {
 export async function middleware(request: NextRequest) {
   const userAuthToken = request.cookies.get("auth_token");
   const currentPath = request.nextUrl.pathname;
+  const newAccount = request.nextUrl.searchParams.get("new") === "1" || request.nextUrl.searchParams.get("new") === "true";
 
   // Normalize host and hard-redirect any app.* subdomain to the apex
   const host = request.headers.get('host') || '';
@@ -61,6 +62,13 @@ export async function middleware(request: NextRequest) {
   // Allow access to initial onboarding path without forcing /auth/me first
   if (isInitialOnboardingPath) {
     return NextResponse.next();
+  }
+
+  // If user explicitly wants to start a new account/session, clear auth and proceed
+  if (newAccount) {
+    const resp = NextResponse.next();
+    try { resp.cookies.set('auth_token', '', { maxAge: 0, path: '/' }); } catch {}
+    return resp;
   }
 
   // If no token and trying to access protected route → always require signin
