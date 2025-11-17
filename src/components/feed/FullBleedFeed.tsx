@@ -48,6 +48,8 @@ export default function FullBleedFeed({
 }) {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [overlayBox, setOverlayBox] = useState<{ left: number; width: number; center: number }>({ left: 0, width: 0, center: 0 });
+  const chipElRef = useRef<HTMLDivElement | null>(null);
+  const [chipAdjustPx, setChipAdjustPx] = useState<number>(0);
   const [currentIndex, setCurrentIndex] = useState<number>(typeof initialIndex === 'number' ? Math.max(0, Math.min(initialIndex, posts.length - 1)) : 0);
   // Read once at the component root so hooks order never changes
   const { isMobile } = useClientHardwareInfo();
@@ -122,6 +124,14 @@ export default function FullBleedFeed({
       const width = Math.max(0, Math.min(rect.width, window.innerWidth - left));
       const center = Math.round(rect.left + rect.width / 2);
       setOverlayBox({ left, width, center });
+      try {
+        const chip = chipElRef.current;
+        if (chip) {
+          const rc = chip.getBoundingClientRect();
+          const dx = Math.round(center - (rc.left + rc.width / 2));
+          setChipAdjustPx(dx);
+        }
+      } catch {}
     };
     update();
     if (typeof window !== 'undefined') {
@@ -152,6 +162,14 @@ export default function FullBleedFeed({
     const width = Math.max(0, Math.min(rect.width, window.innerWidth - left));
     const center = Math.round(rect.left + rect.width / 2);
     setOverlayBox({ left, width, center });
+    try {
+      const chip = chipElRef.current;
+      if (chip) {
+        const rc = chip.getBoundingClientRect();
+        const dx = Math.round(center - (rc.left + rc.width / 2));
+        setChipAdjustPx(dx);
+      }
+    } catch {}
   }, [currentIndex]);
 
   const handleScroll = () => {
@@ -192,11 +210,12 @@ export default function FullBleedFeed({
         {/* Centered Feed switcher aligned to the media column (mobile) */}
         {isMobile ? (
           <div
+            ref={chipElRef}
             className="fixed z-[2147483647] pointer-events-none"
             style={{
               top: `calc(env(safe-area-inset-top) + 8px)`,
               left: `${overlayBox.center}px`,
-              transform: 'translateX(calc(-50% - 580px))',
+              transform: `translateX(calc(-50% + ${chipAdjustPx}px))`,
             }}
           >
             <div className="pointer-events-auto">
