@@ -118,7 +118,7 @@ export default function FullBleedFeed({
       // Clamp to viewport
       const left = Math.max(0, rect.left);
       const width = Math.max(0, Math.min(rect.width, window.innerWidth - left));
-      const center = left + width / 2;
+      const center = Math.round(left + width / 2);
       setOverlayBox({ left, width, center });
     };
     update();

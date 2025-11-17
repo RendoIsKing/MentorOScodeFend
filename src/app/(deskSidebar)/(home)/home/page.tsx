@@ -125,7 +125,7 @@ const Home = () => {
       const rect = el.getBoundingClientRect();
       const left = Math.max(0, rect.left);
       const width = Math.max(0, Math.min(rect.width, window.innerWidth - left));
-      const center = left + width / 2;
+      const center = Math.round(left + width / 2);
       setDesktopOverlayBox({ left, width, center });
     };
     update();
