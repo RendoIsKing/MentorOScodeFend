@@ -13,6 +13,7 @@ const GoogleButton: React.FC<Props> = ({ label = "Continue with Google", mode = 
   const inFlightRef = useRef(false);
   const [cooldownUntil, setCooldownUntil] = useState<number>(0);
   const cooldownRef = useRef<number>(0);
+  const backoffRef = useRef<number>(0);
   const disabled = busy || (cooldownUntil && Date.now() < cooldownUntil);
   const remainingSeconds = useMemo(() => {
     if (!cooldownUntil) return 0;
@@ -25,9 +26,14 @@ const GoogleButton: React.FC<Props> = ({ label = "Continue with Google", mode = 
     try {
       const raw = typeof window !== "undefined" ? window.localStorage.getItem("google_auth_cooldown_until") : null;
       const ts = raw ? parseInt(raw, 10) : 0;
+      const rawBackoff = typeof window !== "undefined" ? window.localStorage.getItem("google_auth_backoff_ms") : null;
+      const backoffMs = rawBackoff ? parseInt(rawBackoff, 10) : 0;
       if (ts && ts > Date.now()) {
         setCooldownUntil(ts);
         cooldownRef.current = ts;
+      }
+      if (backoffMs && backoffMs > 0) {
+        backoffRef.current = backoffMs;
       }
     } catch {}
   }, []);
@@ -42,6 +48,20 @@ const GoogleButton: React.FC<Props> = ({ label = "Continue with Google", mode = 
         window.localStorage.setItem("google_auth_cooldown_until", String(until));
       }
     } catch {}
+  };
+
+  const updateBackoff = (serverMs?: number) => {
+    // Minimum 60s window, exponential backoff up to 5 minutes
+    const MIN_MS = 60000;
+    const MAX_MS = 300000;
+    const base = Math.max(serverMs || 0, MIN_MS);
+    const prev = backoffRef.current || 0;
+    const next = Math.min(Math.max(base, prev ? Math.min(prev * 2, MAX_MS) : base), MAX_MS);
+    backoffRef.current = next;
+    try {
+      if (typeof window !== "undefined") window.localStorage.setItem("google_auth_backoff_ms", String(next));
+    } catch {}
+    return next;
   };
 
   // Hide button entirely if client ID is not configured in this environment
@@ -95,9 +115,10 @@ const GoogleButton: React.FC<Props> = ({ label = "Continue with Google", mode = 
               if (res.status === 429) {
                 // Respect server Retry-After header when rate-limited
                 const hdr = res.headers.get("retry-after");
-                const waitMs = hdr ? (parseFloat(hdr) * 1000) : 15000;
-                startCooldown(isFinite(waitMs) ? waitMs : 15000);
-                const left = Math.ceil(((isFinite(waitMs) ? waitMs : 15000) + 2000) / 1000);
+                const retryMs = hdr ? (parseFloat(hdr) * 1000) : undefined;
+                const waitMs = updateBackoff(isFinite(retryMs as any) ? (retryMs as number) : undefined);
+                startCooldown(waitMs);
+                const left = Math.ceil((waitMs + 2000) / 1000);
                 alert(`Too many attempts. Please wait ${left}s and try again.`);
                 return;
               }
@@ -115,6 +136,8 @@ const GoogleButton: React.FC<Props> = ({ label = "Continue with Google", mode = 
                 if (typeof localStorage !== 'undefined') {
                   localStorage.removeItem('student.ex');
                   localStorage.removeItem('student.p');
+                  localStorage.removeItem('google_auth_backoff_ms');
+                  localStorage.removeItem('google_auth_cooldown_until');
                 }
                 if (typeof sessionStorage !== 'undefined') sessionStorage.clear();
               } catch {}
