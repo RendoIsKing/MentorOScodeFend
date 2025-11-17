@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 
 type Props = {
@@ -12,12 +12,37 @@ const GoogleButton: React.FC<Props> = ({ label = "Continue with Google", mode = 
   const [busy, setBusy] = useState(false);
   const inFlightRef = useRef(false);
   const [cooldownUntil, setCooldownUntil] = useState<number>(0);
+  const cooldownRef = useRef<number>(0);
   const disabled = busy || (cooldownUntil && Date.now() < cooldownUntil);
   const remainingSeconds = useMemo(() => {
     if (!cooldownUntil) return 0;
     const left = Math.ceil((cooldownUntil - Date.now()) / 1000);
     return Math.max(0, left);
   }, [cooldownUntil, busy]);
+
+  // Load any persisted cooldown (shared across tabs)
+  useEffect(() => {
+    try {
+      const raw = typeof window !== "undefined" ? window.localStorage.getItem("google_auth_cooldown_until") : null;
+      const ts = raw ? parseInt(raw, 10) : 0;
+      if (ts && ts > Date.now()) {
+        setCooldownUntil(ts);
+        cooldownRef.current = ts;
+      }
+    } catch {}
+  }, []);
+
+  const startCooldown = (ms: number) => {
+    const safety = 2000; // add buffer
+    const until = Date.now() + Math.max(0, ms) + safety;
+    setCooldownUntil(until);
+    cooldownRef.current = until;
+    try {
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("google_auth_cooldown_until", String(until));
+      }
+    } catch {}
+  };
 
   // Hide button entirely if client ID is not configured in this environment
   if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) return null;
@@ -44,7 +69,14 @@ const GoogleButton: React.FC<Props> = ({ label = "Continue with Google", mode = 
           width={270 as any}
           onSuccess={async (cred) => {
             // Hard guard against duplicate callbacks (React strict/double fire)
-            if (disabled || inFlightRef.current) return;
+            if (inFlightRef.current) return;
+            // Respect persisted/global cooldown even if UI state hasn't caught up
+            if (cooldownRef.current && Date.now() < cooldownRef.current) {
+              const left = Math.ceil((cooldownRef.current - Date.now()) / 1000);
+              alert(`Please wait ${left}s before trying again.`);
+              return;
+            }
+            if (disabled) return;
             try {
               inFlightRef.current = true;
               setBusy(true);
@@ -64,8 +96,9 @@ const GoogleButton: React.FC<Props> = ({ label = "Continue with Google", mode = 
                 // Respect server Retry-After header when rate-limited
                 const hdr = res.headers.get("retry-after");
                 const waitMs = hdr ? (parseFloat(hdr) * 1000) : 15000;
-                setCooldownUntil(Date.now() + (isFinite(waitMs) ? waitMs : 15000));
-                alert(`Too many attempts. Please wait ${Math.ceil(((isFinite(waitMs) ? waitMs : 15000) / 1000))}s and try again.`);
+                startCooldown(isFinite(waitMs) ? waitMs : 15000);
+                const left = Math.ceil(((isFinite(waitMs) ? waitMs : 15000) + 2000) / 1000);
+                alert(`Too many attempts. Please wait ${left}s and try again.`);
                 return;
               }
 
