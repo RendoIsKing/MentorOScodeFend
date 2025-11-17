@@ -47,6 +47,7 @@ export default function FullBleedFeed({
   currentUserId?: string | null;
 }) {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const [overlayBox, setOverlayBox] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
   const [currentIndex, setCurrentIndex] = useState<number>(typeof initialIndex === 'number' ? Math.max(0, Math.min(initialIndex, posts.length - 1)) : 0);
   // Read once at the component root so hooks order never changes
   const { isMobile } = useClientHardwareInfo();
@@ -108,6 +109,35 @@ export default function FullBleedFeed({
     }
   }, [initialIndex, posts.length]);
 
+  // Keep a fixed overlay aligned to the media column (center exactly over posts)
+  useEffect(() => {
+    const update = () => {
+      const el = scrollerRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      // Clamp to viewport
+      const left = Math.max(0, rect.left);
+      const width = Math.max(0, Math.min(rect.width, window.innerWidth - left));
+      setOverlayBox({ left, width });
+    };
+    update();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', update);
+      window.addEventListener('scroll', update, true);
+      window.addEventListener('orientationchange', update);
+    }
+    const ro = (typeof (window as any).ResizeObserver !== 'undefined') ? new (window as any).ResizeObserver(update) : null;
+    try { ro?.observe(scrollerRef.current as any); } catch {}
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', update);
+        window.removeEventListener('scroll', update, true);
+        window.removeEventListener('orientationchange', update);
+      }
+      try { ro?.disconnect(); } catch {}
+    };
+  }, []);
+
   const handleScroll = () => {
     const el = scrollerRef.current;
     if (!el) return;
@@ -143,9 +173,16 @@ export default function FullBleedFeed({
         </div>
       ) : null}
 
-        {/* Mobile: center Feed dropdown relative to the media column (scroller width) */}
+        {/* Centered Feed switcher aligned to the media column (mobile) */}
         {isMobile ? (
-          <div className="sticky top-[calc(env(safe-area-inset-top)+8px)] z-20 pointer-events-none">
+          <div
+            className="fixed z-[2147483647] pointer-events-none"
+            style={{
+              top: `calc(env(safe-area-inset-top) + 8px)`,
+              left: `${overlayBox.left}px`,
+              width: `${overlayBox.width}px`,
+            }}
+          >
             <div className="flex justify-center pointer-events-auto">
               <FeedSwitcher />
             </div>
