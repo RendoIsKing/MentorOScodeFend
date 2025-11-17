@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 
 type Props = {
@@ -10,6 +10,7 @@ const GoogleButton: React.FC<Props> = ({ label = "Continue with Google", mode = 
   // Always use same-origin proxy so auth cookies land on the web origin
   const apiBase = "/api/backend";
   const [busy, setBusy] = useState(false);
+  const inFlightRef = useRef(false);
   const [cooldownUntil, setCooldownUntil] = useState<number>(0);
   const disabled = busy || (cooldownUntil && Date.now() < cooldownUntil);
   const remainingSeconds = useMemo(() => {
@@ -42,8 +43,10 @@ const GoogleButton: React.FC<Props> = ({ label = "Continue with Google", mode = 
           logo_alignment={"left" as any}
           width={270 as any}
           onSuccess={async (cred) => {
-            if (disabled) return;
+            // Hard guard against duplicate callbacks (React strict/double fire)
+            if (disabled || inFlightRef.current) return;
             try {
+              inFlightRef.current = true;
               setBusy(true);
               const idToken = cred.credential;
               if (!idToken) return;
@@ -95,6 +98,7 @@ const GoogleButton: React.FC<Props> = ({ label = "Continue with Google", mode = 
             } finally {
               // Keep disabled until cooldown elapses if set; otherwise clear busy
               setBusy(false);
+              inFlightRef.current = false;
             }
           }}
           onError={() => alert("Google auth cancelled")}
