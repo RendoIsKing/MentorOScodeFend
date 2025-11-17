@@ -114,11 +114,13 @@ export default function FullBleedFeed({
     const update = () => {
       const el = scrollerRef.current;
       if (!el) return;
-      const rect = el.getBoundingClientRect();
-      // Clamp to viewport
+      // Prefer the currently visible post's bounding box for perfect centering
+      const items = el.querySelectorAll('article');
+      const current = items?.[currentIndex] as HTMLElement | undefined;
+      const rect = (current ? current.getBoundingClientRect() : el.getBoundingClientRect());
       const left = Math.max(0, rect.left);
       const width = Math.max(0, Math.min(rect.width, window.innerWidth - left));
-      const center = Math.round(left + width / 2);
+      const center = Math.round(rect.left + rect.width / 2);
       setOverlayBox({ left, width, center });
     };
     update();
@@ -138,6 +140,19 @@ export default function FullBleedFeed({
       try { ro?.disconnect(); } catch {}
     };
   }, []);
+
+  // Re-align when the active post index changes
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const items = el.querySelectorAll('article');
+    const current = items?.[currentIndex] as HTMLElement | undefined;
+    const rect = (current ? current.getBoundingClientRect() : el.getBoundingClientRect());
+    const left = Math.max(0, rect.left);
+    const width = Math.max(0, Math.min(rect.width, window.innerWidth - left));
+    const center = Math.round(rect.left + rect.width / 2);
+    setOverlayBox({ left, width, center });
+  }, [currentIndex]);
 
   const handleScroll = () => {
     const el = scrollerRef.current;
