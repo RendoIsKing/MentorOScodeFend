@@ -64,6 +64,23 @@ const GoogleButton: React.FC<Props> = ({ label = "Continue with Google", mode = 
     return next;
   };
 
+  const computeServerWindowMs = (res: Response) => {
+    // Prefer absolute reset header if present, else Retry-After
+    const reset = res.headers.get("x-ratelimit-reset");
+    const ra = res.headers.get("retry-after");
+    let msFromReset = 0;
+    if (reset) {
+      const resetSec = parseFloat(reset);
+      if (isFinite(resetSec)) {
+        const nowSec = Date.now() / 1000;
+        const deltaSec = Math.max(0, resetSec - nowSec);
+        msFromReset = Math.round(deltaSec * 1000);
+      }
+    }
+    const msFromRetry = ra ? (parseFloat(ra) * 1000) : 0;
+    return Math.max(msFromReset, msFromRetry);
+  };
+
   // Hide button entirely if client ID is not configured in this environment
   if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) return null;
 
@@ -114,8 +131,8 @@ const GoogleButton: React.FC<Props> = ({ label = "Continue with Google", mode = 
 
               if (res.status === 429) {
                 // Respect server Retry-After header when rate-limited
-                const hdr = res.headers.get("retry-after");
-                const retryMs = hdr ? (parseFloat(hdr) * 1000) : undefined;
+                const windowMs = computeServerWindowMs(res);
+                const retryMs = windowMs || undefined;
                 const waitMs = updateBackoff(isFinite(retryMs as any) ? (retryMs as number) : undefined);
                 startCooldown(waitMs);
                 const left = Math.ceil((waitMs + 2000) / 1000);
