@@ -117,7 +117,7 @@ const Home = () => {
   });
   // Desktop overlay alignment to media column
   const desktopMainRef = useRef<HTMLDivElement | null>(null);
-  const [desktopOverlayBox, setDesktopOverlayBox] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
+  const [desktopOverlayBox, setDesktopOverlayBox] = useState<{ left: number; width: number; center: number }>({ left: 0, width: 0, center: 0 });
   useEffect(() => {
     const update = () => {
       const el = desktopMainRef.current;
@@ -125,7 +125,8 @@ const Home = () => {
       const rect = el.getBoundingClientRect();
       const left = Math.max(0, rect.left);
       const width = Math.max(0, Math.min(rect.width, window.innerWidth - left));
-      setDesktopOverlayBox({ left, width });
+      const center = left + width / 2;
+      setDesktopOverlayBox({ left, width, center });
     };
     update();
     if (typeof window !== 'undefined') {
@@ -152,9 +153,9 @@ const Home = () => {
         {/* Centered tabs overlay above the media column */}
         <div
           className="pointer-events-none fixed top-[env(safe-area-inset-top)] z-40"
-          style={{ left: `${desktopOverlayBox.left}px`, width: `${desktopOverlayBox.width}px` }}
+          style={{ left: `${desktopOverlayBox.center}px`, transform: 'translateX(-50%)' }}
         >
-          <div className="w-full flex justify-center py-2 px-4 pointer-events-auto bg-gradient-to-b from-background/60 to-transparent">
+          <div className="flex justify-center py-2 px-4 pointer-events-auto bg-gradient-to-b from-background/60 to-transparent">
             <FeedHeader floating className="bg-transparent" />
           </div>
         </div>

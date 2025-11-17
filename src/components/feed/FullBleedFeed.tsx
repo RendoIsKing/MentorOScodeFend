@@ -47,7 +47,7 @@ export default function FullBleedFeed({
   currentUserId?: string | null;
 }) {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
-  const [overlayBox, setOverlayBox] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
+  const [overlayBox, setOverlayBox] = useState<{ left: number; width: number; center: number }>({ left: 0, width: 0, center: 0 });
   const [currentIndex, setCurrentIndex] = useState<number>(typeof initialIndex === 'number' ? Math.max(0, Math.min(initialIndex, posts.length - 1)) : 0);
   // Read once at the component root so hooks order never changes
   const { isMobile } = useClientHardwareInfo();
@@ -118,7 +118,8 @@ export default function FullBleedFeed({
       // Clamp to viewport
       const left = Math.max(0, rect.left);
       const width = Math.max(0, Math.min(rect.width, window.innerWidth - left));
-      setOverlayBox({ left, width });
+      const center = left + width / 2;
+      setOverlayBox({ left, width, center });
     };
     update();
     if (typeof window !== 'undefined') {
@@ -179,11 +180,11 @@ export default function FullBleedFeed({
             className="fixed z-[2147483647] pointer-events-none"
             style={{
               top: `calc(env(safe-area-inset-top) + 8px)`,
-              left: `${overlayBox.left}px`,
-              width: `${overlayBox.width}px`,
+              left: `${overlayBox.center}px`,
+              transform: 'translateX(-50%)',
             }}
           >
-            <div className="flex justify-center pointer-events-auto">
+            <div className="pointer-events-auto">
               <FeedSwitcher />
             </div>
           </div>
