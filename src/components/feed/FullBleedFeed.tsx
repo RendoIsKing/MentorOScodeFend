@@ -148,8 +148,8 @@ export default function FullBleedFeed({
         )}
       </div>
 
-      {/* Fixed author bar overlay for the currently visible post */}
-      {active?.user && isMobile ? (
+      {/* Fixed overlays on mobile: centered Feed dropdown and author bar */}
+      {isMobile ? (
         createPortal(
           (() => {
             const hasOpenUi = typeof document !== 'undefined' && Boolean(
@@ -157,56 +157,62 @@ export default function FullBleedFeed({
             );
             if (hasOpenUi) return null;
             return (
-              <div data-test="author-bar" className="fixed left-3 right-3 top-[calc(env(safe-area-inset-top)+8px)] z-[2147483647] pointer-events-auto">
-                <div className="absolute -inset-x-3 -top-3 h-24 bg-gradient-to-b from-background/60 to-transparent pointer-events-none" />
-                <div className="relative flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <Link
-                      data-test="author-link"
-                      href={`/${active.user?.username || active.user?.id || ""}`}
-                      className="flex items-center gap-2 rounded-full bg-background/40 px-2 py-1"
-                    >
-                      <img src={(active as any).user?.avatarUrl || "/assets/images/Home/small-profile-img.svg"} alt="" className="h-10 w-10 rounded-full object-cover" loading="lazy" decoding="async" />
-                      <div className="flex min-w-0 flex-col">
-                        <span className="truncate text-sm font-semibold text-foreground leading-tight">{active.user.displayName || active.user.username || ""}</span>
-                        {active?.createdAt ? (
-                          <span className="text-xs text-muted-foreground leading-tight">{formatRelativeTime(active.createdAt)}</span>
-                        ) : null}
-                      </div>
-                    </Link>
-                    {/* Follow pill only on mobile */}
-                    {!isOwn && !isFollowingNow ? (
-                      <FollowPill
-                        authorId={authorId}
-                        authorName={active.user.displayName || active.user.username || "user"}
-                        onFollowed={() => setFollowedBySession((prev) => {
-                          const key = authorKey;
-                          const next = { ...prev } as Record<string, boolean>;
-                          if (key) next[key] = true;
-                          if (authorId) next[authorId] = true;
-                          if (authorUserName) {
-                            next[authorUserName] = true;
-                            next[authorUserName.toLowerCase()] = true;
-                          }
-                          try {
-                            if (typeof window !== 'undefined') {
-                              window.localStorage.setItem('followedAuthors', JSON.stringify(next));
-                              const evt = new Event('follow-cache-changed');
-                              window.dispatchEvent(evt);
-                            }
-                          } catch {}
-                          setRecentlyFollowedAt((prevTs) => (key ? { ...prevTs, [key]: Date.now() } : prevTs));
-                          return next;
-                        })}
-                      />
-                    ) : null}
-                  </div>
-                  {/* Centered feed dropdown over media */}
-                  <div className="absolute left-1/2 -translate-x-1/2">
+              <>
+                {/* Centered feed dropdown */}
+                <div className="fixed inset-x-0 top-[calc(env(safe-area-inset-top)+8px)] z-[2147483647] pointer-events-none">
+                  <div className="flex justify-center pointer-events-auto">
                     <FeedSwitcher />
                   </div>
                 </div>
-              </div>
+                {/* Author bar (left) */}
+                {active?.user ? (
+                  <div data-test="author-bar" className="fixed left-3 right-3 top-[calc(env(safe-area-inset-top)+8px)] z-[2147483646] pointer-events-auto">
+                    <div className="absolute -inset-x-3 -top-3 h-24 bg-gradient-to-b from-background/60 to-transparent pointer-events-none" />
+                    <div className="relative flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <Link
+                          data-test="author-link"
+                          href={`/${active.user?.username || active.user?.id || ""}`}
+                          className="flex items-center gap-2 rounded-full bg-background/40 px-2 py-1"
+                        >
+                          <img src={(active as any).user?.avatarUrl || "/assets/images/Home/small-profile-img.svg"} alt="" className="h-10 w-10 rounded-full object-cover" loading="lazy" decoding="async" />
+                          <div className="flex min-w-0 flex-col">
+                            <span className="truncate text-sm font-semibold text-foreground leading-tight">{active.user.displayName || active.user.username || ""}</span>
+                            {active?.createdAt ? (
+                              <span className="text-xs text-muted-foreground leading-tight">{formatRelativeTime(active.createdAt)}</span>
+                            ) : null}
+                          </div>
+                        </Link>
+                        {!isOwn && !isFollowingNow ? (
+                          <FollowPill
+                            authorId={authorId}
+                            authorName={active.user.displayName || active.user.username || "user"}
+                            onFollowed={() => setFollowedBySession((prev) => {
+                              const key = authorKey;
+                              const next = { ...prev } as Record<string, boolean>;
+                              if (key) next[key] = true;
+                              if (authorId) next[authorId] = true;
+                              if (authorUserName) {
+                                next[authorUserName] = true;
+                                next[authorUserName.toLowerCase()] = true;
+                              }
+                              try {
+                                if (typeof window !== 'undefined') {
+                                  window.localStorage.setItem('followedAuthors', JSON.stringify(next));
+                                  const evt = new Event('follow-cache-changed');
+                                  window.dispatchEvent(evt);
+                                }
+                              } catch {}
+                              setRecentlyFollowedAt((prevTs) => (key ? { ...prevTs, [key]: Date.now() } : prevTs));
+                              return next;
+                            })}
+                          />
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+              </>
             );
           })(),
           document.body
