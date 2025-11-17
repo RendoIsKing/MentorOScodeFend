@@ -201,7 +201,10 @@ export default function FullBleedFeed({
                       />
                     ) : null}
                   </div>
-                  <FeedSwitcher />
+                  {/* Centered feed dropdown over media */}
+                  <div className="absolute left-1/2 -translate-x-1/2">
+                    <FeedSwitcher />
+                  </div>
                 </div>
               </div>
             );
