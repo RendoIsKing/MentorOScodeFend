@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
 
 import HomeFeedCarousel from "@/components/shared/home-feed-carousel";
@@ -115,17 +115,51 @@ const Home = () => {
     const visibility = privacy === 'followers' ? 'followers' : (privacy === 'subscriber' ? 'subscribers' : (privacy === 'public' ? 'public' : undefined));
     return [{ id: String(p._id ?? p.id), type: isVideo ? 'video' : 'image', src, user: author, caption: String(p?.content || ""), createdAt: p?.createdAt, visibility }];
   });
+  // Desktop overlay alignment to media column
+  const desktopMainRef = useRef<HTMLDivElement | null>(null);
+  const [desktopOverlayBox, setDesktopOverlayBox] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
+  useEffect(() => {
+    const update = () => {
+      const el = desktopMainRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const left = Math.max(0, rect.left);
+      const width = Math.max(0, Math.min(rect.width, window.innerWidth - left));
+      setDesktopOverlayBox({ left, width });
+    };
+    update();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', update);
+      window.addEventListener('scroll', update, true);
+      window.addEventListener('orientationchange', update);
+    }
+    const ro = (typeof (window as any).ResizeObserver !== 'undefined') ? new (window as any).ResizeObserver(update) : null;
+    try { if (desktopMainRef.current) ro?.observe(desktopMainRef.current as any); } catch {}
+    return () => {
+      try { ro?.disconnect(); } catch {}
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', update);
+        window.removeEventListener('scroll', update, true);
+        window.removeEventListener('orientationchange', update);
+      }
+    };
+  }, []);
+
   return (
     <div className="min-h-[100dvh] bg-background">
       <RealtimeBootstrap />
       <div className="hidden md:block">
         {/* Centered tabs overlay above the media column */}
-        <div className="pointer-events-none fixed inset-x-0 top-[env(safe-area-inset-top)] z-40">
-          <div className="mx-auto w-full max-w-[680px] flex justify-center py-2 px-4 pointer-events-auto bg-gradient-to-b from-background/60 to-transparent">
+        <div
+          className="pointer-events-none fixed top-[env(safe-area-inset-top)] z-40"
+          style={{ left: `${desktopOverlayBox.left}px`, width: `${desktopOverlayBox.width}px` }}
+        >
+          <div className="w-full flex justify-center py-2 px-4 pointer-events-auto bg-gradient-to-b from-background/60 to-transparent">
             <FeedHeader floating className="bg-transparent" />
           </div>
         </div>
         <main className="mx-auto max-w-[680px] px-4 pb-28 pt-10">
+          <div ref={desktopMainRef} className="h-0 w-full pointer-events-none" />
           <HomeFeedCarousel isMobile={false} />
         </main>
       </div>
