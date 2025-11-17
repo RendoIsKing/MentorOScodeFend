@@ -143,6 +143,15 @@ export default function FullBleedFeed({
         </div>
       ) : null}
 
+        {/* Mobile: center Feed dropdown relative to the media column (scroller width) */}
+        {isMobile ? (
+          <div className="sticky top-[calc(env(safe-area-inset-top)+8px)] z-20 pointer-events-none">
+            <div className="flex justify-center pointer-events-auto">
+              <FeedSwitcher />
+            </div>
+          </div>
+        ) : null}
+
         {posts.map((post) => (
           <FullBleedItem key={post.id} post={post} RightOverlay={RightOverlay} currentUserId={currentUserId} />)
         )}
@@ -158,12 +167,6 @@ export default function FullBleedFeed({
             if (hasOpenUi) return null;
             return (
               <>
-                {/* Centered feed dropdown */}
-                <div className="fixed inset-x-0 top-[calc(env(safe-area-inset-top)+8px)] z-[2147483647] pointer-events-none">
-                  <div className="flex justify-center pointer-events-auto">
-                    <FeedSwitcher />
-                  </div>
-                </div>
                 {/* Author bar (left) */}
                 {active?.user ? (
                   <div data-test="author-bar" className="fixed left-3 right-3 top-[calc(env(safe-area-inset-top)+8px)] z-[2147483646] pointer-events-auto">
