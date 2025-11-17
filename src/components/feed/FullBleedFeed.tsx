@@ -196,8 +196,7 @@ export default function FullBleedFeed({
             style={{
               top: `calc(env(safe-area-inset-top) + 8px)`,
               left: `${overlayBox.center}px`,
-              // Small visual nudge left to compensate for scrollbar/overlay optics
-              transform: 'translateX(-50%) translateX(-6px)',
+              transform: 'translateX(-50%)',
             }}
           >
             <div className="pointer-events-auto">
