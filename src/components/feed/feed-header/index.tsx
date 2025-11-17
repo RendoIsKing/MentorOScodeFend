@@ -44,31 +44,28 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
 
   return (
     <div className={wrapperClass}>
-      <nav className="mx-auto max-w-[680px] w-full px-3 relative">
+      <nav className="mx-auto max-w-[680px] w-full px-4">
         {/* Centered dropdown switcher (desktop) */}
-        <div className="relative h-10">
-          {/* Center the chip over the media column */}
-          <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="inline-flex items-center gap-2 rounded-full bg-background/60 px-3 py-1.5 text-sm font-semibold text-foreground shadow border border-border">
-                  {label}
-                  <ChevronDown size={14} />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="p-1 border-border bg-card">
-                <DropdownMenuItem onClick={() => handleItemClick("foryou")}>
-                  Feed
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleItemClick("following")}>
-                  Following
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleItemClick("subscribed")}>
-                  Subscribed
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+        <div className="h-10 flex items-center justify-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="inline-flex items-center gap-2 rounded-full bg-background/60 px-3 py-1.5 text-sm font-semibold text-foreground shadow border border-border">
+                {label}
+                <ChevronDown size={14} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="p-1 border-border bg-card">
+              <DropdownMenuItem onClick={() => handleItemClick("foryou")}>
+                Feed
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleItemClick("following")}>
+                Following
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleItemClick("subscribed")}>
+                Subscribed
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </nav>
     </div>
