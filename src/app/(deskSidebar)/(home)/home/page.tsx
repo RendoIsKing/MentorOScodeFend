@@ -153,7 +153,7 @@ const Home = () => {
         {/* Centered tabs overlay above the media column */}
         <div
           className="pointer-events-none fixed top-[env(safe-area-inset-top)] z-40"
-          style={{ left: `${desktopOverlayBox.center}px`, transform: 'translateX(-50%)' }}
+          style={{ left: `${desktopOverlayBox.center}px`, transform: 'translateX(calc(-50% - 580px))' }}
         >
           <div className="flex justify-center py-2 px-4 pointer-events-auto bg-gradient-to-b from-background/60 to-transparent">
             <FeedHeader floating className="bg-transparent" />
