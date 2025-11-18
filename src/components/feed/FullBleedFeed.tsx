@@ -237,7 +237,7 @@ export default function FullBleedFeed({
             style={{
               top: `calc(env(safe-area-inset-top) + 8px)`,
               left: `${(chipLeftPx ?? overlayBox.center)}px`,
-              transform: 'translateX(calc(-50% - 2px))',
+              transform: 'translateX(calc(-50% - 4px))',
             }}
           >
             <div className="pointer-events-auto">

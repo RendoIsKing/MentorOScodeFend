@@ -210,7 +210,7 @@ const Home = () => {
         <div
           ref={chipRef}
           className="pointer-events-none fixed top-[env(safe-area-inset-top)] z-40"
-          style={{ left: `${overlayLeftPx ?? desktopOverlayBox.center}px`, transform: 'translateX(calc(-50% - 2px))' }}
+          style={{ left: `${overlayLeftPx ?? desktopOverlayBox.center}px`, transform: 'translateX(calc(-50% - 4px))' }}
         >
           <div className="flex justify-center py-2 px-4 pointer-events-auto bg-gradient-to-b from-background/60 to-transparent">
             <FeedHeader floating className="bg-transparent" />
