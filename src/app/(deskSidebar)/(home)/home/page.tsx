@@ -117,7 +117,9 @@ const Home = () => {
   });
   // Desktop overlay alignment to media column
   const desktopMainRef = useRef<HTMLDivElement | null>(null);
+  const chipRef = useRef<HTMLDivElement | null>(null);
   const [desktopOverlayBox, setDesktopOverlayBox] = useState<{ left: number; width: number; center: number }>({ left: 0, width: 0, center: 0 });
+  const [chipAdjustPx, setChipAdjustPx] = useState<number>(0);
   useEffect(() => {
     const update = () => {
       const el = desktopMainRef.current;
@@ -127,6 +129,14 @@ const Home = () => {
       const width = Math.max(0, Math.min(rect.width, window.innerWidth - left));
       const center = Math.round(left + width / 2);
       setDesktopOverlayBox({ left, width, center });
+      try {
+        const chip = chipRef.current;
+        if (chip) {
+          const rc = chip.getBoundingClientRect();
+          const dx = Math.round(center - (rc.left + rc.width / 2));
+          setChipAdjustPx(dx);
+        }
+      } catch {}
     };
     update();
     if (typeof window !== 'undefined') {
@@ -152,8 +162,9 @@ const Home = () => {
       <div className="hidden md:block">
         {/* Fixed overlay aligned to media column center */}
         <div
+          ref={chipRef}
           className="pointer-events-none fixed top-[env(safe-area-inset-top)] z-40"
-          style={{ left: `${desktopOverlayBox.center}px`, transform: 'translateX(-50%)' }}
+          style={{ left: `${desktopOverlayBox.center}px`, transform: `translateX(calc(-50% + ${chipAdjustPx}px))` }}
         >
           <div className="flex justify-center py-2 px-4 pointer-events-auto bg-gradient-to-b from-background/60 to-transparent">
             <FeedHeader floating className="bg-transparent" />
