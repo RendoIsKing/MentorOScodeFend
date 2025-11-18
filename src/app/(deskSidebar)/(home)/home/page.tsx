@@ -115,9 +115,10 @@ const Home = () => {
     const visibility = privacy === 'followers' ? 'followers' : (privacy === 'subscriber' ? 'subscribers' : (privacy === 'public' ? 'public' : undefined));
     return [{ id: String(p._id ?? p.id), type: isVideo ? 'video' : 'image', src, user: author, caption: String(p?.content || ""), createdAt: p?.createdAt, visibility }];
   });
-  // Desktop overlay alignment to media column
+  // Desktop overlay alignment to media column (fallback); we'll try to lock to actual media center
   const desktopMainRef = useRef<HTMLDivElement | null>(null);
   const [desktopOverlayBox, setDesktopOverlayBox] = useState<{ left: number; width: number; center: number }>({ left: 0, width: 0, center: 0 });
+  const [overlayLeftPx, setOverlayLeftPx] = useState<number | null>(null);
   useEffect(() => {
     const update = () => {
       const el = desktopMainRef.current;
@@ -146,6 +147,51 @@ const Home = () => {
     };
   }, []);
 
+  // Try to center to visible media (img/video) for exact alignment
+  useEffect(() => {
+    const computeFromMedia = () => {
+      try {
+        const midY = window.innerHeight / 2;
+        const posts = Array.from(document.querySelectorAll('article'));
+        let mediaRect: DOMRect | null = null;
+        for (const p of posts) {
+          const pr = (p as HTMLElement).getBoundingClientRect();
+          if (pr.top <= midY && pr.bottom >= midY) {
+            const medias = Array.from(p.querySelectorAll('img,video'));
+            let bestArea = 0;
+            let bestRect: DOMRect | null = null;
+            for (const m of medias) {
+              const mr = (m as HTMLElement).getBoundingClientRect();
+              const area = Math.max(0, mr.width) * Math.max(0, mr.height);
+              if (area > bestArea) { bestArea = area; bestRect = mr; }
+            }
+            mediaRect = bestRect || pr;
+            break;
+          }
+        }
+        if (!mediaRect) {
+          // Fallback to media column
+          const col = document.querySelector('main [class*="max-w-[680px]"]') as HTMLElement | null;
+          if (col) mediaRect = col.getBoundingClientRect();
+        }
+        if (mediaRect) setOverlayLeftPx(Math.round(mediaRect.left + mediaRect.width / 2));
+      } catch {}
+    };
+    computeFromMedia();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', computeFromMedia);
+      window.addEventListener('scroll', computeFromMedia, true);
+      window.addEventListener('orientationchange', computeFromMedia);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', computeFromMedia);
+        window.removeEventListener('scroll', computeFromMedia, true);
+        window.removeEventListener('orientationchange', computeFromMedia);
+      }
+    };
+  }, []);
+
   return (
     <div className="min-h-[100dvh] bg-background">
       <RealtimeBootstrap />
@@ -153,7 +199,7 @@ const Home = () => {
         {/* Fixed overlay aligned to media column center */}
         <div
           className="pointer-events-none fixed top-[env(safe-area-inset-top)] z-40"
-          style={{ left: `${desktopOverlayBox.center}px`, transform: 'translateX(-50%)' }}
+          style={{ left: `${overlayLeftPx ?? desktopOverlayBox.center}px`, transform: 'translateX(-50%)' }}
         >
           <div className="flex justify-center py-2 px-4 pointer-events-auto bg-gradient-to-b from-background/60 to-transparent">
             <FeedHeader floating className="bg-transparent" />
