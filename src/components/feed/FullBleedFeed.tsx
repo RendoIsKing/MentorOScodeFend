@@ -116,10 +116,23 @@ export default function FullBleedFeed({
     const update = () => {
       const el = scrollerRef.current;
       if (!el) return;
-      // Prefer the currently visible post's bounding box for perfect centering
+      // Prefer the currently visible post's MEDIA bounding box for perfect centering
       const items = el.querySelectorAll('article');
       const current = items?.[currentIndex] as HTMLElement | undefined;
-      const rect = (current ? current.getBoundingClientRect() : el.getBoundingClientRect());
+      let rect: DOMRect;
+      if (current) {
+        const media = current.querySelectorAll('img, video');
+        let best: HTMLElement | null = null;
+        let bestArea = 0;
+        media.forEach((n) => {
+          const r = (n as HTMLElement).getBoundingClientRect();
+          const area = Math.max(0, r.width) * Math.max(0, r.height);
+          if (area > bestArea) { bestArea = area; best = n as HTMLElement; }
+        });
+        rect = (best ? best.getBoundingClientRect() : current.getBoundingClientRect());
+      } else {
+        rect = el.getBoundingClientRect();
+      }
       const left = Math.max(0, rect.left);
       const width = Math.max(0, Math.min(rect.width, window.innerWidth - left));
       const center = Math.round(rect.left + rect.width / 2);
@@ -157,7 +170,20 @@ export default function FullBleedFeed({
     if (!el) return;
     const items = el.querySelectorAll('article');
     const current = items?.[currentIndex] as HTMLElement | undefined;
-    const rect = (current ? current.getBoundingClientRect() : el.getBoundingClientRect());
+    let rect: DOMRect;
+    if (current) {
+      const media = current.querySelectorAll('img, video');
+      let best: HTMLElement | null = null;
+      let bestArea = 0;
+      media.forEach((n) => {
+        const r = (n as HTMLElement).getBoundingClientRect();
+        const area = Math.max(0, r.width) * Math.max(0, r.height);
+        if (area > bestArea) { bestArea = area; best = n as HTMLElement; }
+      });
+      rect = (best ? best.getBoundingClientRect() : current.getBoundingClientRect());
+    } else {
+      rect = el.getBoundingClientRect();
+    }
     const left = Math.max(0, rect.left);
     const width = Math.max(0, Math.min(rect.width, window.innerWidth - left));
     const center = Math.round(rect.left + rect.width / 2);
