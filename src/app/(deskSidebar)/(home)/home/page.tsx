@@ -170,15 +170,19 @@ const Home = () => {
             break;
           }
         }
-        if (!mediaRect) {
-          // Fallback to media column
-          const col = document.querySelector('main [class*="max-w-[680px]"]') as HTMLElement | null;
-          if (col) mediaRect = col.getBoundingClientRect();
+        // Fallback to the 680px column center if media not found or has zero width
+        if (!mediaRect || !(mediaRect.width > 0)) {
+          mediaRect = desktopMainRef.current?.getBoundingClientRect() || null;
         }
-        if (mediaRect) {
+        if (mediaRect && mediaRect.width > 0) {
           const mediaCenter = Math.round(mediaRect.left + mediaRect.width / 2);
           const half = chipRef.current ? Math.round(chipRef.current.offsetWidth / 2) : 0;
           const clamped = Math.max(half + 8, Math.min(window.innerWidth - half - 8, mediaCenter));
+          setOverlayLeftPx(clamped);
+        } else {
+          // As a last resort, use the computed overlay box center
+          const half = chipRef.current ? Math.round(chipRef.current.offsetWidth / 2) : 0;
+          const clamped = Math.max(half + 8, Math.min(window.innerWidth - half - 8, desktopOverlayBox.center));
           setOverlayLeftPx(clamped);
         }
       } catch {}
