@@ -49,7 +49,7 @@ export default function FullBleedFeed({
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [overlayBox, setOverlayBox] = useState<{ left: number; width: number; center: number }>({ left: 0, width: 0, center: 0 });
   const chipElRef = useRef<HTMLDivElement | null>(null);
-  const [chipAdjustPx, setChipAdjustPx] = useState<number>(0);
+  const [chipLeftPx, setChipLeftPx] = useState<number | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(typeof initialIndex === 'number' ? Math.max(0, Math.min(initialIndex, posts.length - 1)) : 0);
   // Read once at the component root so hooks order never changes
   const { isMobile } = useClientHardwareInfo();
@@ -139,11 +139,9 @@ export default function FullBleedFeed({
       setOverlayBox({ left, width, center });
       try {
         const chip = chipElRef.current;
-        if (chip) {
-          const rc = chip.getBoundingClientRect();
-          const dx = Math.round(center - (rc.left + rc.width / 2));
-          setChipAdjustPx(dx);
-        }
+        const half = chip ? Math.round(chip.offsetWidth / 2) : 0;
+        const clamped = Math.max(half + 8, Math.min(window.innerWidth - half - 8, center));
+        setChipLeftPx(clamped);
       } catch {}
     };
     update();
@@ -190,11 +188,9 @@ export default function FullBleedFeed({
     setOverlayBox({ left, width, center });
     try {
       const chip = chipElRef.current;
-      if (chip) {
-        const rc = chip.getBoundingClientRect();
-        const dx = Math.round(center - (rc.left + rc.width / 2));
-        setChipAdjustPx(dx);
-      }
+      const half = chip ? Math.round(chip.offsetWidth / 2) : 0;
+      const clamped = Math.max(half + 8, Math.min(window.innerWidth - half - 8, center));
+      setChipLeftPx(clamped);
     } catch {}
   }, [currentIndex]);
 
@@ -240,8 +236,8 @@ export default function FullBleedFeed({
             className="fixed z-[2147483647] pointer-events-none"
             style={{
               top: `calc(env(safe-area-inset-top) + 8px)`,
-              left: `${overlayBox.center}px`,
-              transform: `translateX(calc(-50% + ${chipAdjustPx}px))`,
+              left: `${(chipLeftPx ?? overlayBox.center)}px`,
+              transform: 'translateX(-50%)',
             }}
           >
             <div className="pointer-events-auto">
