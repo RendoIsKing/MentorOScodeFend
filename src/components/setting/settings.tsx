@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import DsButton from "@/ui/ds/Button";
 import { Switch } from "@/components/ui/switch";
 import { ChevronRightIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
@@ -114,7 +114,7 @@ const Settings: React.FC = () => {
                 Create a new account on this device
               </p>
             </div>
-            <Button
+            <DsButton
               onClick={async () => {
                 await appDispatcher(logout());
                 router.push("/signup?new=1");
@@ -122,7 +122,7 @@ const Settings: React.FC = () => {
               variant="secondary"
             >
               Start
-            </Button>
+            </DsButton>
           </div>
         </div>
         <Separator />
@@ -174,13 +174,13 @@ const Settings: React.FC = () => {
         <Separator />
         {isMobile && (
           <div className="w-full flex align-middle justify-center">
-            <Button
+            <DsButton
               onClick={handleLogout}
-              variant={"destructive"}
+              variant={"primary"}
               className="mt-4 w-3/4"
             >
               Logout
-            </Button>
+            </DsButton>
           </div>
         )}
       </div>
