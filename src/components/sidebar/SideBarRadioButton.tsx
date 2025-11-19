@@ -136,14 +136,6 @@ const SideBarRadioButton = () => {
       segment: currentUserName,
       hasDocumentVerified: false, // Enable button
     },
-    {
-      id: 9,
-      name: "Student Center",
-      url: "/student",
-      icon: <CircleUserRound size={30} strokeWidth={1.5} absoluteStrokeWidth />,
-      segment: "student",
-      hasDocumentVerified: false, // Enable button
-    },
   ];
 
   return (
