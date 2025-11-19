@@ -26,7 +26,7 @@ const SystemNotificationWithData: React.FC<ISystemNotificationProps> = ({
       <div className="mb-3">
         <Label className="text-muted-foreground text-base">{description}</Label>
       </div>
-      <div className="border-t border-gray-500/100"></div>
+      <div className="border-t border-[hsl(var(--border))]"></div>
     </div>
   );
 };
