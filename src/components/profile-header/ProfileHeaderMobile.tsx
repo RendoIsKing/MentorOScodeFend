@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import DsButton from "@/ui/ds/Button";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 import {
@@ -310,9 +310,9 @@ const ProfileHeaderMobile = () => {
               <div className="flex items-center gap-2">
                 <Drawer>
                   <DrawerTrigger asChild>
-                    <Button variant="secondary" size="icon" className="bg-white/10 backdrop-blur border">
-                      <Pencil className="h-4 w-4 text-white" />
-                    </Button>
+                    <DsButton variant="secondary" className="h-10 w-10 rounded-full bg-white/10 backdrop-blur border">
+                      <Pencil className="h-4 w-4" />
+                    </DsButton>
                   </DrawerTrigger>
                   <DrawerContent className="z-[10050] pb-tabbar">
                     <div className="w-full p-4 pb-tabbar">
@@ -320,9 +320,9 @@ const ProfileHeaderMobile = () => {
                         <DrawerHeader className={`text-xl ${fontItalic.className}`}>Profile options</DrawerHeader>
                       </div>
                       <div className="mx-auto w-full max-w-sm space-y-2">
-                        <Button className="w-full" onClick={() => router.push("/edit-profile")}>Edit Profile</Button>
-                        <Button variant="secondary" className="w-full" onClick={() => router.push("/subscription")}>Edit Subscriptions</Button>
-                        <Button variant="secondary" className="w-full" onClick={() => router.push("/edit-avatar")}>Edit Avatar</Button>
+                        <DsButton className="w-full">Edit Profile</DsButton>
+                        <DsButton variant="secondary" className="w-full">Edit Subscriptions</DsButton>
+                        <DsButton variant="secondary" className="w-full">Edit Avatar</DsButton>
                       </div>
                     </div>
                   </DrawerContent>
@@ -347,9 +347,9 @@ const ProfileHeaderMobile = () => {
               <div></div>
             )}
             {!isOwnerRendered && (
-              <Button variant={"ghost"} size={"icon"} className="bg-muted-foreground/50 ">
-                <Ellipsis onClick={() => router.push(`/more-settings/${userName?.uid}`)} strokeWidth={3} className="text-white" />
-              </Button>
+              <DsButton variant="ghost" className="h-10 w-10 rounded-full bg-[hsl(var(--accent))]">
+                <Ellipsis onClick={() => router.push(`/more-settings/${userName?.uid}`)} strokeWidth={3} />
+              </DsButton>
             )}
           </div>
         </article>
@@ -366,7 +366,7 @@ const ProfileHeaderMobile = () => {
             <p className="text-muted-foreground flex items-center gap-3">
               Bio
               {isOwnerRendered && !isEditingBio && (
-                <Button variant="link" className="p-0 h-auto" onClick={startEditBio}>Edit Bio</Button>
+                <DsButton variant="ghost" className="p-0 h-auto underline text-[hsl(var(--primary))]" onClick={startEditBio}>Edit Bio</DsButton>
               )}
             </p>
             {isOwnerRendered && isEditingBio ? (
@@ -378,8 +378,8 @@ const ProfileHeaderMobile = () => {
                   onChange={(e) => setBioDraft(e.target.value)}
                 />
                 <div className="mt-2 flex gap-2">
-                  <Button size="sm" onClick={saveBio} disabled={isSavingBio}>Save</Button>
-                  <Button size="sm" variant="ghost" onClick={() => setIsEditingBio(false)}>Cancel</Button>
+                  <DsButton className="h-9 px-3" onClick={saveBio} disabled={isSavingBio}>Save</DsButton>
+                  <DsButton variant="ghost" className="h-9 px-3" onClick={() => setIsEditingBio(false)}>Cancel</DsButton>
                 </div>
               </div>
             ) : (
@@ -414,9 +414,9 @@ const ProfileHeaderMobile = () => {
           ) : (
             <div className="flex justify-between px-4 py-3">
               <SubscribePlan />
-              <Button size={"sleek"} className="w-36" onClick={() => handleFollowClick(userDetailsData?._id)} disabled={followBusy}>
+              <DsButton className="h-9 px-4 w-36" onClick={() => handleFollowClick(userDetailsData?._id)} disabled={followBusy}>
                 {isFollowingLocal ? "Unfollow" : "Follow"}
-              </Button>
+              </DsButton>
               <Link href={(userDetailsData?.userName ? String(userDetailsData.userName).toLowerCase().replace(/-/g,'') : '') === 'coachmajen' ? "/coach-majen" : "/chat"}>
                 <ChatIcon className="stroke-foreground" />
               </Link>

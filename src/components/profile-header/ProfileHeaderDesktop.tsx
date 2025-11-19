@@ -1,7 +1,7 @@
 "use client";
 import { Avatar } from "@radix-ui/react-avatar";
 import React, { useMemo, useState } from "react";
-import { Button } from "../ui/button";
+import DsButton from "@/ui/ds/Button";
 import { useParams, useRouter } from "next/navigation";
 import ContentUploadOptions from "../upload-content-options";
 import ProfileButtons from "../profie-login-buttons";
@@ -126,13 +126,13 @@ function ProfileHeaderDesktop() {
             <>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="float-end inline-block">
-                    <Button variant={"link"} size={"icon"} className=" bg-muted-foreground/50 m-8">
-                      <Ellipsis strokeWidth={3} className="text-white" />
-                    </Button>
+                  <div className="float-end inline-block m-8">
+                    <DsButton variant="ghost" className="h-10 w-10 rounded-full bg-[hsl(var(--accent))]">
+                      <Ellipsis strokeWidth={3} />
+                    </DsButton>
                   </div>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="p-2 mx-10 -my-5 border-border bg-card inline-block" side="bottom">
+                <DropdownMenuContent className="p-2 mx-10 -my-5 border-[hsl(var(--border))] bg-[hsl(var(--card))] inline-block" side="bottom">
                   <div className="flex items-center justify-between px-4 py-2 my-4">
                     <div className="flex items-center space-x-2 mr-4">
                       <BellOff />
@@ -140,14 +140,14 @@ function ProfileHeaderDesktop() {
                     </div>
                     <Switch id="mute-notifications" />
                   </div>
-                  <Button variant={"link"} className="w-full text-destructive flex justify-start gap-2">
+                  <DsButton variant="ghost" className="w-full flex justify-start gap-2 text-[hsl(var(--destructive))]">
                     <Ban /> Block
-                  </Button>
-                  <Button variant={"link"} className="flex justify-between text-destructive" onClick={() => setIsReportUserOpen(true)}>
+                  </DsButton>
+                  <DsButton variant="ghost" className="flex justify-between text-[hsl(var(--destructive))]" onClick={() => setIsReportUserOpen(true)}>
                     <div className="flex gap-2">
                       <Info /> Report User
                     </div>
-                  </Button>
+                  </DsButton>
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
@@ -209,7 +209,7 @@ function ProfileHeaderDesktop() {
                 {isOwnerRendered && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant={"secondary"} size="sleek" className={`py-2 px-4 rounded-3xl ${fontItalic.className}`}>Edit</Button>
+                      <DsButton variant="secondary" className={`h-8 px-3 rounded-[var(--radius)] ${fontItalic.className}`}>Edit</DsButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                       <DropdownMenuItem onClick={() => router.push("/edit-profile")}>Edit Profile</DropdownMenuItem>
@@ -229,7 +229,7 @@ function ProfileHeaderDesktop() {
                 <p className="text-muted-foreground flex items-center gap-3">
                   Bio
                   {isOwnerRendered && !isEditingBio && (
-                    <Button variant="link" className="p-0 h-auto" onClick={startEditBio}>Edit Bio</Button>
+                    <DsButton variant="ghost" className="p-0 h-auto underline text-[hsl(var(--primary))]" onClick={startEditBio}>Edit Bio</DsButton>
                   )}
                 </p>
                 {isOwnerRendered && isEditingBio ? (
@@ -241,8 +241,8 @@ function ProfileHeaderDesktop() {
                       onChange={(e) => setBioDraft(e.target.value)}
                     />
                     <div className="mt-2 flex gap-2">
-                      <Button size="sm" onClick={saveBio} disabled={isSavingBio}>Save</Button>
-                      <Button size="sm" variant="ghost" onClick={() => setIsEditingBio(false)}>Cancel</Button>
+                      <DsButton className="h-9 px-3" onClick={saveBio} disabled={isSavingBio}>Save</DsButton>
+                      <DsButton variant="ghost" className="h-9 px-3" onClick={() => setIsEditingBio(false)}>Cancel</DsButton>
                     </div>
                   </div>
                 ) : (
