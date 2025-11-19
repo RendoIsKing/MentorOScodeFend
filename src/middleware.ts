@@ -27,8 +27,11 @@ export async function middleware(request: NextRequest) {
 
   // Normalize host and hard-redirect any app.* subdomain to the apex
   const host = request.headers.get('host') || '';
-  // Preview environment detection (Vercel preview URLs)
+  // Preview environment detection (Vercel)
   const isPreviewHost = /\.vercel\.app$/i.test(host);
+  const vercelEnvHeader = (request.headers.get('x-vercel-env') || '').toLowerCase();
+  const isPreviewHeader = vercelEnvHeader === 'preview';
+  const isPreviewEnv = (process.env.VERCEL_ENV || '').toLowerCase() === 'preview';
   if (host.startsWith('app.')) {
     const target = `https://${host.replace(/^app\./, '')}${request.nextUrl.pathname}${request.nextUrl.search}${request.nextUrl.hash}`;
     return NextResponse.redirect(target);
@@ -37,8 +40,8 @@ export async function middleware(request: NextRequest) {
   // Always base redirects on current host (without app.)
   const baseDomain = `https://${host}`;
 
-  // Allow anonymous access to chat preview on Vercel preview domains so you can QA UI without auth
-  if (isPreviewHost && request.method === 'GET') {
+  // Allow anonymous access to chat preview on Vercel preview deployments (host, headers or env indicate preview)
+  if ((isPreviewHost || isPreviewHeader || isPreviewEnv) && request.method === 'GET') {
     if (currentPath.startsWith('/chat') || currentPath.startsWith('/chat-mfe')) {
       return NextResponse.next();
     }
@@ -201,6 +204,7 @@ export const config = {
     "/notification/:id*",
     "/settings/:id*",
     "/admin/:id*",
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    // Exclude static micro-frontend assets under /chat-mfe from middleware
+    "/((?!api|_next/static|_next/image|favicon.ico|chat-mfe).*)",
   ],
 };
