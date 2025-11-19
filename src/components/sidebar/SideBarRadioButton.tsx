@@ -91,7 +91,7 @@ const SideBarRadioButton = () => {
     {
       id: 3,
       name: "Chat",
-      url: "/chat",
+      url: "/room",
       icon: <Sms />,
       segment: "(inbox)",
       hasDocumentVerified: false, // Enable button

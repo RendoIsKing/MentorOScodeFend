@@ -314,7 +314,7 @@ const userChats: UserChatProps[] = [
     name: "The PT",
     message: "Hi there!",
     profilePhoto: "/assets/images/inbox/the-pt.jpg",
-    href: "/room/The PT",
+    href: "/chat",
   },
 ];
 
