@@ -49,7 +49,7 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
         {/* Centered dropdown switcher (desktop) */}
         <div className="h-10 flex items-center justify-center">
           <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex items-center gap-2 rounded-[var(--radius)] border border-[hsl(var(--border))] bg-[hsl(var(--accent))] px-3 h-8 text-sm font-medium">
+            <DropdownMenuTrigger className="inline-flex items-center gap-2 rounded-[var(--radius)] border border-[hsl(var(--border))] bg-[hsl(var(--accent))]/80 backdrop-blur px-3 h-8 text-sm font-medium hover:brightness-110">
               {label} <ChevronDown size={14} />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="p-1 border-[hsl(var(--border))] bg-[hsl(var(--card))]">
