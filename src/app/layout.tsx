@@ -24,6 +24,7 @@ import dynamic from "next/dynamic";
 import ErrorBoundary from "@/components/common/ErrorBoundary";
 import type { Viewport } from "next";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import DsButton from "@/ui/ds/Button";
 
 const fontNormal = Manrope({ subsets: ["latin"], weight: ["400"], display: "swap" });
 
@@ -56,6 +57,30 @@ export default function RootLayout({
       } catch {}
     }, []);
     return null;
+  }
+  function DesignToggle() {
+    useEffect(() => {}, []);
+    const onToggle = () => {
+      try {
+        const cur = typeof window !== "undefined" ? window.localStorage.getItem("ds") : null;
+        if (cur === "figma") {
+          window.localStorage.removeItem("ds");
+        } else {
+          window.localStorage.setItem("ds", "figma");
+        }
+        window.location.reload();
+      } catch {}
+    };
+    return (
+      <DsButton
+        variant="secondary"
+        className="h-9 px-3 rounded-full text-xs opacity-80 hover:opacity-100"
+        onClick={onToggle}
+        aria-label="Toggle new design"
+      >
+        Design
+      </DsButton>
+    );
   }
   function PushInit(){
     const { fcmToken } = useFCM();
@@ -104,7 +129,10 @@ export default function RootLayout({
                                 <PushInit />
                                 <DesignSystemFlag />
                                 <div className="absolute top-20 z-50 opacity-50 right-0">
-                                  <ModeToggle />
+                                  <div className="flex items-center gap-2">
+                                    <DesignToggle />
+                                    <ModeToggle />
+                                  </div>
                                 </div>
                                 <div className="pb-tabbar md:pb-0">
                                   <ErrorBoundary fallback={<div className="p-4 text-muted-foreground text-sm">Kunne ikke laste. Prøv å oppdatere.</div>}>
@@ -135,7 +163,10 @@ export default function RootLayout({
                               <PushInit />
                               <DesignSystemFlag />
                               <div className="absolute top-20 z-50 opacity-50 right-0">
-                                <ModeToggle />
+                                <div className="flex items-center gap-2">
+                                  <DesignToggle />
+                                  <ModeToggle />
+                                </div>
                               </div>
                               <div className="pb-tabbar md:pb-0">
                                 <ErrorBoundary fallback={<div className="p-4 text-muted-foreground text-sm">Kunne ikke laste. Prøv å oppdatere.</div>}>
