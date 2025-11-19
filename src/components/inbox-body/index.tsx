@@ -311,7 +311,7 @@ interface InboxBodyProps {
 
 const userChats: UserChatProps[] = [
   {
-    name: "The PT",
+    name: "Coach Sarah",
     message: "Hi there!",
     profilePhoto: "/assets/images/inbox/the-pt.jpg",
     href: "/chat",
