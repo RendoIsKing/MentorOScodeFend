@@ -21,17 +21,17 @@ const SearchResults = () => {
       onValueChange={setActiveTab}
       className="w-full mx-auto my-2 lg:my-6"
     >
-      <TabsList className="lg:h-14 grid w-full grid-cols-2 bg-transparent border-b border-secondary ">
+      <TabsList className="lg:h-14 grid w-full grid-cols-2">
         
         <TabsTrigger
           value="users"
-          className=" lg:h-14 lg:text-xl data-[state=active]:text-primary data-[state=active]:border-b border-primary italic data-[state=active]:bg-transparent"
+          className="lg:h-14 lg:text-xl"
         >
           Users
         </TabsTrigger>
         <TabsTrigger
           value="posts"
-          className="lg:h-14 lg:text-xl data-[state=active]:text-primary data-[state=active]:border-b border-primary italic data-[state=active]:bg-transparent"
+          className="lg:h-14 lg:text-xl"
         >
           Posts
         </TabsTrigger>

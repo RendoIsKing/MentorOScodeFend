@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Button } from "@/components/ui/button";
+import DsButton from "@/ui/ds/Button";
 import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import AvatarWithDescription from "../avatar-with-description";
 import { useFollowUserMutation } from "@/redux/services/haveme/user";
@@ -64,7 +64,7 @@ const UserCard: React.FC<IUserCardProps> = ({
   };
 
   return (
-    <Card className="flex justify-between bg-muted border-muted p-4">
+    <Card className="flex justify-between bg-[hsl(var(--card))] border-[hsl(var(--border))] p-4 rounded-[var(--radius)]">
       <CardHeader className="p-0">
         <AvatarWithDescription
           imageUrl={imageUrl}
@@ -79,9 +79,9 @@ const UserCard: React.FC<IUserCardProps> = ({
         onClick={handleRedirect}
       >
         {hasPlan && <SubscribePlan type="card" userNameTag={userNameTag} />}
-        <Button size="sleek" className="py-4 px-8" onClick={handleFollowClick}>
+        <DsButton className="h-9 px-4" onClick={handleFollowClick}>
           {isFollowingLocal ? "Unfollow" : "Follow"}
-        </Button>
+        </DsButton>
       </CardFooter>
     </Card>
   );

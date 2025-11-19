@@ -4,7 +4,7 @@ import { useGetUsersQuery } from "@/redux/services/haveme/search";
 import UserCard from "@/components/shared/user-card";
 import { baseServerUrl } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { Button } from "../ui/button";
+import DsButton from "@/ui/ds/Button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useInView } from "react-intersection-observer";
@@ -104,12 +104,11 @@ function UserSearchResults() {
     <div>
       <div className="flex justify-start my-4 lg:justify-start gap-2">
         {buttonUserTabs.map((item, index) => (
-          <Button
+          <DsButton
             key={index}
             className={cn(
-              "justify-center rounded-3xl lg:min-w-24 text-foreground bg-muted hover:bg-transparent/10 dark:hover:bg-muted/50 dark:hover:text-foreground",
-              selectedUserFilter === item.value &&
-                "font-bold dark:text-muted dark:bg-white bg-transparent/10 focus:dark:bg-white focus:dark:text-muted"
+              "justify-center lg:min-w-24",
+              selectedUserFilter === item.value && "brightness-110"
             )}
             onClick={(e) => {
               handleUserButtonClick(item.value);
@@ -118,7 +117,7 @@ function UserSearchResults() {
             <div className="flex justify-start items-center gap-2 text-sm lg:text-base">
               {item.name}
             </div>
-          </Button>
+          </DsButton>
         ))}
       </div>
       <div className="flex gap-4 flex-col">
