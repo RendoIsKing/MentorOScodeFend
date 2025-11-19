@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import DsButton from "@/ui/ds/Button";
 import {
   Form,
   FormControl,
@@ -202,7 +202,7 @@ const ProfileInfo = () => {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="mt-4 space-y-6 lg:space-y-4 lg:border-2 lg:border-solid lg:rounded-xl lg:border-muted-foreground/30 lg:w-[550px] lg:my-0 lg:mr-auto lg:ml-auto lg:p-8"
+          className="mt-4 space-y-6 lg:space-y-4 lg:border lg:rounded-[var(--radius)] lg:border-[hsl(var(--border))] lg:bg-[hsl(var(--card))] lg:w-[550px] lg:my-0 lg:mr-auto lg:ml-auto lg:p-8"
         >
           {!isMobile && (
             <>
@@ -343,10 +343,11 @@ const ProfileInfo = () => {
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="rounded-full p-3 h-12 text-muted-foreground">
+                          <SelectTrigger className="p-3 h-12 text-[hsl(var(--muted-foreground))]"
+                          >
                             <SelectValue
                               placeholder="Select a gender to procced"
-                              className=" border-muted-foreground/50  "
+                              className=""
                             />
                           </SelectTrigger>
                         </FormControl>
@@ -388,9 +389,9 @@ const ProfileInfo = () => {
                 )}
               />
             </div>
-            <Button className="block w-full" type="submit">
+            <DsButton className="block w-full" type="submit">
               Confirm
-            </Button>
+            </DsButton>
           </div>
         </form>
       </Form>

@@ -29,10 +29,10 @@ const toastVariants = cva(
   {
     variants: {
       variant: {
-        default: "border bg-background text-foreground",
+        default: "border border-[hsl(var(--border))] bg-[hsl(var(--card))] text-[hsl(var(--card-foreground))] rounded-[var(--radius)]",
         destructive:
-          "destructive group border-destructive bg-destructive text-destructive-foreground",
-        success: "success group border-green-500 bg-green-500 text-neutral-50",
+          "destructive group border-[hsl(var(--destructive))] bg-[hsl(var(--destructive))] text-[hsl(var(--destructive-foreground))] rounded-[var(--radius)]",
+        success: "success group border-green-500 bg-green-500 text-neutral-50 rounded-[var(--radius)]",
       },
     },
     defaultVariants: {

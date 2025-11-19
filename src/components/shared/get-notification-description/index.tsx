@@ -20,7 +20,7 @@ const NotificationRow: React.FC<NotificationProps> = ({ actorAvatar, actorName, 
   };
 
   return (
-    <div className="flex items-start justify-between gap-3 py-3">
+    <div className="flex items-start justify-between gap-3 py-3 bg-[hsl(var(--card))] border border-[hsl(var(--border))] rounded-[var(--radius)] px-3">
       <div className="flex items-start gap-3 min-w-0">
         <img src={leftSrc} alt="avatar" className="h-11 w-11 rounded-full object-cover" />
         <div className="min-w-0">
