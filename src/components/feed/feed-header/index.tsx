@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import DsButton from "@/ui/ds/Button";
 
 type Props = { floating?: boolean; className?: string };
 
@@ -49,12 +50,11 @@ const FeedHeader = ({ floating = false, className = "" }: Props) => {
         <div className="h-10 flex items-center justify-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="inline-flex items-center gap-2 rounded-full bg-background/60 px-3 py-1.5 text-sm font-semibold text-foreground shadow border border-border">
-                {label}
-                <ChevronDown size={14} />
-              </button>
+              <DsButton variant="secondary" className="gap-2 h-8 px-3 rounded-[var(--radius)] bg-[hsl(var(--accent))] text-[hsl(var(--foreground))] border border-[hsl(var(--border))]">
+                {label} <ChevronDown size={14} />
+              </DsButton>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-1 border-border bg-card">
+            <DropdownMenuContent className="p-1 border-[hsl(var(--border))] bg-[hsl(var(--card))]">
               <DropdownMenuItem onClick={() => handleItemClick("foryou")}>
                 Feed
               </DropdownMenuItem>
