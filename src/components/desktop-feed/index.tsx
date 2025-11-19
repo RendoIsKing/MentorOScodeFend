@@ -137,7 +137,7 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
           onClick={() => handleSelectHeart(feedData?._id)}
         >
           {heartStates ? (
-            <HeartActive className="fill-foreground cursor-pointer" />
+            <HeartActive className="fill-[hsl(var(--primary))] cursor-pointer" />
           ) : (
             <Heart className="fill-foreground cursor-pointer" />
           )}
@@ -156,10 +156,7 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
         onClick={() => handleSavePost(feedData?._id)}
         aria-label={saveStates ? "Unsave post" : "Save post"}
       >
-        <Star
-          className="cursor-pointer"
-          fill={saveStates ? "currentColor" : "none"}
-        />
+        <Star className="cursor-pointer" fill={saveStates ? "currentColor" : "none"} />
         {saveLikecount}
       </div>
       {feedData?.userTags?.length > 0 && (
