@@ -20,14 +20,6 @@ function IconInbox({ active }: { active: boolean }) {
     </svg>
   );
 }
-function IconStudent({ active }: { active: boolean }) {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="7" r="3.5" stroke="currentColor" strokeWidth={active ? 2.2 : 1.8}/>
-      <path d="M4 21a8 8 0 0 1 16 0" stroke="currentColor" strokeWidth={active ? 2.2 : 1.8}/>
-    </svg>
-  );
-}
 function IconUser({ active }: { active: boolean }) {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -92,12 +84,6 @@ export default function MobileTabBar() {
         </div>
 
         <ul className="flex items-center justify-end gap-6">
-          <li>
-            <Link href="/student" className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${is("/student") ? "text-primary font-medium" : "text-muted-foreground"}`} aria-label="Student Center">
-              <div className="h-6 w-6"><IconStudent active={Boolean(is("/student"))} /></div>
-              <span>Student</span>
-            </Link>
-          </li>
           <li>
             <Link href={profileHref} className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${is(profileHref) ? "text-primary font-medium" : "text-muted-foreground"}`} aria-label="Profile">
               <div className="h-6 w-6"><IconUser active={Boolean(is(profileHref))} /></div>
