@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import DsButton from "@/ui/ds/Button";
 import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
@@ -78,7 +78,7 @@ const NotificationSettingModal = ({
   return (
     <AlertDialog open={openPopup}>
       <AlertDialogContent
-        className="py-10 bg-[#171a1f] w-full p-6 border-none bg-background max-w-[40rem]"
+        className="py-10 w-full p-6 max-w-[40rem]"
         ref={dialogRef}
       >
         <div className="flex flex-col">
@@ -200,12 +200,9 @@ const NotificationSettingModal = ({
           </div>
         </div>
         <div className="mt-3 p-4 flex justify-center">
-          <Button
-            className=" bg-primary h-14 w-56 rounded-[30px]"
-            onClick={() => setOpenPopup(false)}
-          >
+          <DsButton className="h-11 w-56" onClick={() => setOpenPopup(false)}>
             <p className="font-light text-base">Save</p>
-          </Button>
+          </DsButton>
         </div>
       </AlertDialogContent>
     </AlertDialog>
