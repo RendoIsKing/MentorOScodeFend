@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/theme-toggle";
 import { Provider } from "react-redux";
 import "./globals.css";
+import "@/styles/ds-figma.css";
 import { useRouter } from "next/navigation";
 import store from "@/redux/store";
 import { NotificationBannerContextProvider } from "@/context/NotificationBanner";
@@ -40,6 +41,22 @@ export default function RootLayout({
   postslot: React.ReactNode;
 }) {
   const router = useRouter();
+  // Feature flag loader for the new design system.
+  // When localStorage 'ds' === 'figma', we add class 'ds-figma' on <html>.
+  function DesignSystemFlag() {
+    useEffect(() => {
+      try {
+        const flag = typeof window !== "undefined" ? window.localStorage.getItem("ds") : null;
+        const root = document.documentElement;
+        if (flag === "figma") {
+          root.classList.add("ds-figma");
+        } else {
+          root.classList.remove("ds-figma");
+        }
+      } catch {}
+    }, []);
+    return null;
+  }
   function PushInit(){
     const { fcmToken } = useFCM();
     const [update] = useUpdateFCMTokenMutation();
@@ -85,6 +102,7 @@ export default function RootLayout({
                               <UserTagsContextProvider>
                                 <CountryCodeProvider>
                                 <PushInit />
+                                <DesignSystemFlag />
                                 <div className="absolute top-20 z-50 opacity-50 right-0">
                                   <ModeToggle />
                                 </div>
@@ -115,6 +133,7 @@ export default function RootLayout({
                             <UserTagsContextProvider>
                               <CountryCodeProvider>
                               <PushInit />
+                              <DesignSystemFlag />
                               <div className="absolute top-20 z-50 opacity-50 right-0">
                                 <ModeToggle />
                               </div>

@@ -1,0 +1,41 @@
+/* New design system overrides inspired by the Chat + Student Center bundle.
+   Toggle by adding class "ds-figma" to the <html> element (via feature flag). */
+
+@layer base {
+  /* Base: dark, soft-contrast surfaces, accent violet/blue and amber metrics */
+  .ds-figma {
+    /* Surfaces */
+    --background: 222 24% 10%;       /* ~#12141a */
+    --foreground: 220 14% 96%;       /* ~#f3f4f6 */
+    --card: 222 23% 13%;             /* ~#181b23 */
+    --card-foreground: 220 14% 96%;
+    --popover: 222 23% 13%;
+    --popover-foreground: 220 14% 96%;
+
+    /* Brand accents (from chat UI) */
+    --primary: 262 83% 56%;          /* ~#9333ea (violet) */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 224 43% 57%;        /* soft blue used in chat chrome */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Muted + borders */
+    --muted: 223 16% 20%;            /* ~#262a35 */
+    --muted-foreground: 223 10% 70%; /* ~#9aa3b1 */
+    --accent: 222 18% 22%;           /* ~#2a2e3a */
+    --accent-foreground: 220 14% 96%;
+    --border: 224 14% 28%;
+    --input: 224 14% 28%;
+    --ring: 262 83% 56%;
+
+    /* Radii */
+    --radius: 0.75rem; /* slightly rounder */
+
+    /* Section tokens aligned with Student Center tabs */
+    --stats-primary: 36 92% 52%;     /* amber cards */
+    --goals-primary: 268 90% 65%;    /* purple */
+    --training-primary: 25 95% 51%;  /* orange-red */
+    --nutrition-primary: 145 63% 61%;/* green */
+  }
+}
+
+
