@@ -208,8 +208,8 @@ function ProfileHeaderDesktop() {
                 )}
                 {isOwnerRendered && (
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <DsButton variant="secondary" className={`h-8 px-3 rounded-[var(--radius)] ${fontItalic.className}`}>Edit</DsButton>
+                    <DropdownMenuTrigger className={`inline-flex items-center justify-center h-8 px-3 rounded-[var(--radius)] bg-[hsl(var(--accent))] border border-[hsl(var(--border))] text-sm ${fontItalic.className}`}>
+                      Edit
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                       <DropdownMenuItem onClick={() => router.push("/edit-profile")}>Edit Profile</DropdownMenuItem>
