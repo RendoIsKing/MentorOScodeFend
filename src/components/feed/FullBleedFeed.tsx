@@ -235,7 +235,7 @@ export default function FullBleedFeed({
             ref={chipElRef}
             className="fixed z-[2147483647] pointer-events-none"
             style={{
-              top: `calc(env(safe-area-inset-top) + 8px)`,
+              top: `calc(env(safe-area-inset-top) + 2px)`,
               left: `${(chipLeftPx ?? overlayBox.center)}px`,
               transform: 'translateX(calc(-50% - 60px))',
             }}
