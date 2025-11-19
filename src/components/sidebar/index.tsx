@@ -31,7 +31,7 @@ function SideBar() {
 
   return (
     <ContentUploadProvider>
-      <div className="flex flex-col m-2">
+      <div className="flex flex-col m-2 bg-[hsl(var(--sidebar))] text-[hsl(var(--sidebar-foreground))] rounded-[var(--radius)] border border-[hsl(var(--sidebar-border))]">
         <div className="flex pt-6 pb-4 pl-2 pr-2 cursor-pointer h-[8vh]" onClick={() => router.push("/home")}>
           <Logo />
         </div>
@@ -40,14 +40,14 @@ function SideBar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className="flex gap-3 p-3 cursor-pointer">
-                <MoreIcon className="stroke-foreground" />
+                <MoreIcon className="stroke-[hsl(var(--sidebar-foreground))]" />
                 More
               </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-2 border-border bg-card">
+            <DropdownMenuContent className="p-2 border-[hsl(var(--sidebar-border))] bg-[hsl(var(--card))]">
               <DropdownMenuItem>
                 <div className="flex items-center gap-2">
-                  <Settings className="fill-foreground" />
+                  <Settings className="fill-[hsl(var(--foreground))]" />
                   <Link href="/settings">
                     <Button variant={"link"} className="text-foreground p-0">
                       Settings
