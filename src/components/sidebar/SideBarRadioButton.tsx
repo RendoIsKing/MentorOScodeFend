@@ -140,14 +140,14 @@ const SideBarRadioButton = () => {
 
   return (
     <>
-      <div className="flex gap-4">
-        <div className={`flex flex-col w-full flex-wrap justify-start gap-4 ${orbitron.className}`}>
+      <div className="flex gap-6">
+        <div className={`flex flex-col w-full flex-wrap justify-start gap-6 ${orbitron.className}`}>
           {sidebar.map((button) => (
             <Button
               disabled={button.hasDocumentVerified}
               variant={"link"}
               key={button.id}
-              className={`justify-start rounded-none text-foreground flex-grow first:rounded-l-2xl last:rounded-r-2xl focus:text-primary ${
+              className={`justify-start rounded-none text-foreground flex-grow first:rounded-l-2xl last:rounded-r-2xl focus:text-primary py-1.5 ${
                 selectedButton === button.segment ? "text-primary" : ""
               }`}
               onClick={(e) => {
@@ -155,12 +155,14 @@ const SideBarRadioButton = () => {
                 router.replace(`${button.url}`);
               }}
             >
-              <div className="flex  fill-background justify-start fill items-center gap-2 text-base">
+              <div className="flex  fill-background justify-start fill items-center gap-3 text-lg">
                 {React.cloneElement(button.icon, {
                   className:
-                    selectedButton === button.segment
+                    (selectedButton === button.segment
                       ? "stroke-primary"
-                      : "stroke-foreground/80  ",
+                      : "stroke-foreground/80") + " w-8 h-8",
+                  width: 32,
+                  height: 32,
                 })}
                 {button.name}
               </div>
