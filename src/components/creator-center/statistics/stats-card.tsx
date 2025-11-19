@@ -20,7 +20,7 @@ const StatsCard: React.FC<IStatsCardProps> = ({ cards, duration }) => {
       {cards?.map((card: Statistics) => (
         <div
           key={card.title}
-          className="p-2 bg-muted rounded-lg lg:px-6 lg:py-7"
+          className="p-2 bg-[hsl(var(--card))] border border-[hsl(var(--border))] rounded-[var(--radius)] lg:px-6 lg:py-7"
         >
           <div className="text-muted-foreground">{card.title}</div>
           <div

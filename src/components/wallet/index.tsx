@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Button } from "../ui/button";
+import DsButton from "@/ui/ds/Button";
 import { ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ABeeZee } from "next/font/google";
@@ -76,13 +76,13 @@ const Wallet: React.FC = () => {
             Payment Methods
           </div>
           <div className="">
-            <Button
+            <DsButton
               onClick={() => router.push("/wallet/add-payment-method")}
-              variant={"link"}
-              className="text-primary tracking-wide pr-1"
+              variant="secondary"
+              className="h-8 px-3"
             >
               Add payment method
-            </Button>
+            </DsButton>
           </div>
         </div>
         <div className="flex flex-col gap-6 justify-between align-middle mx-4 lg:mx-12 mb-4">
@@ -96,7 +96,7 @@ const Wallet: React.FC = () => {
         <div className="flex justify-between lg:justify-start gap-2 flex-wrap">
           <div
             onClick={() => router.push("/wallet/transactions")}
-            className="lg:flex lg:flex-col lg:justify-between rounded-xl bg-muted-foreground/20 w-1/2 lg:w-3/12 lg:h-32 p-3 mr-2 lg:cursor-pointer"
+            className="lg:flex lg:flex-col lg:justify-between rounded-[var(--radius)] bg-[hsl(var(--accent))] w-1/2 lg:w-3/12 lg:h-32 p-3 mr-2 lg:cursor-pointer border border-[hsl(var(--border))]"
           >
             <div className="mt-2 mb-3">
               <img
@@ -135,7 +135,7 @@ const Wallet: React.FC = () => {
                 setSubStatus('Failed to create session');
               }
             }}
-            className="lg:flex lg:flex-col lg:justify-between rounded-xl bg-muted-foreground/20 w-1/2 lg:w-3/12 p-3 ml-2 lg:cursor-pointer"
+            className="lg:flex lg:flex-col lg:justify-between rounded-[var(--radius)] bg-[hsl(var(--accent))] w-1/2 lg:w-3/12 p-3 ml-2 lg:cursor-pointer border border-[hsl(var(--border))]"
           >
             <div className="mt-2 mb-3">
               <img
@@ -188,7 +188,7 @@ const Wallet: React.FC = () => {
                 setSubStatus('Failed to start checkout');
               }
             }}
-            className="lg:flex lg:flex-col lg:justify-between rounded-xl bg-muted-foreground/20 w-full lg:w-3/12 p-3 lg:cursor-pointer"
+            className="lg:flex lg:flex-col lg:justify-between rounded-[var(--radius)] bg-[hsl(var(--accent))] w-full lg:w-3/12 p-3 lg:cursor-pointer border border-[hsl(var(--border))]"
           >
             <div className="mt-2 mb-3">
               <img

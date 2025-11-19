@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Button } from "@/components/ui/button";
+import DsButton from "@/ui/ds/Button";
 import { Info, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ABeeZee } from "next/font/google";
@@ -17,12 +17,12 @@ const Earnings = () => {
 
   return (
     <div className="flex flex-col mx-4 lg:mx-10 mt-8">
-      <div className="p-2 flex bg-primary/50 rounded-lg align-middle">
+      <div className="p-2 flex bg-[hsl(var(--accent))] rounded-[var(--radius)] align-middle border border-[hsl(var(--border))]">
         <Star className="mx-2" fill="yellow" />
         {"You're in the 2.7% of all creators."}
       </div>
       <div className="lg:flex lg:gap-4">
-        <div className="bg-secondary rounded-lg mt-4 lg:w-1/2">
+        <div className="bg-[hsl(var(--card))] border border-[hsl(var(--border))] rounded-[var(--radius)] mt-4 lg:w-1/2">
           <div
             className={`flex justify-center text-primary  mt-4 ${fontItalic.className}`}
           >{`Primary Balance`}</div>
@@ -30,7 +30,7 @@ const Earnings = () => {
             className={`flex justify-center  text-3xl mt-2 ${fontItalic.className}`}
           >{`$2535.54`}</div>
           <div className={`flex justify-center  my-4 ${fontItalic.className}`}>
-            <Button className="w-3/4">Request Withdrawal</Button>
+            <DsButton className="w-3/4">Request Withdrawal</DsButton>
           </div>
           {/* <div className={`flex justify-center  my-4 ${fontItalic.className}`}>
            <AddMoneyComponent/>
@@ -62,12 +62,12 @@ const Earnings = () => {
             <div>{"$2322.00"}</div>
           </div>
           <div className="flex justify-center w-11/12 fixed lg:relative lg:bottom-0 lg:justify-end lg:w-full bottom-8">
-            <Button
-              className="bg-foreground w-full text-lg italic text-secondary lg:w-1/2 hover:bg-foreground/80"
+            <DsButton
+              className="w-full text-lg italic lg:w-1/2"
               onClick={() => router.push("creator-center/statistics")}
             >
               Earning Statistics
-            </Button>
+            </DsButton>
           </div>
         </div>
       </div>
