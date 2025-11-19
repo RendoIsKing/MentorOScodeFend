@@ -87,8 +87,8 @@ export const RadioButtonGroup = ({ label = "Tip Amount" }) => {
           <Button
             key={index}
             className={cn(
-              "rounded-none text-foreground flex-grow first:rounded-l-2xl last:rounded-r-2xl bg-secondary focus:outline-none",
-              selectedButton === button.label && "bg-primary"
+              "rounded-[var(--radius)] text-[hsl(var(--foreground))] flex-grow mx-1 bg-[hsl(var(--secondary))] focus:outline-none",
+              selectedButton === button.label && "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]"
             )}
             onClick={(e) => handleButtonClick(e, button)}
           >

@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
+import DsButton from "@/ui/ds/Button";
 import {
   Dialog,
   DialogContent,
@@ -56,10 +56,9 @@ const AlertPopup = ({
           )}
 
           {showSubscribeButton && (
-            <Button
-              variant={"secondary"}
-              size="sleek"
-              className="ml-4 py-1 px-4 italic font-medium lg: rounded-3xl bg-[#40A7EB]"
+            <DsButton
+              variant="secondary"
+              className="ml-4 h-8 px-4 italic font-medium rounded-[var(--radius)]"
             >
               <img
                 src="/assets/images/ShareIcons/subscribe.svg"
@@ -67,33 +66,30 @@ const AlertPopup = ({
                 className="w-6 h-5 mr-2 "
               />
               Subscribe
-            </Button>
+            </DsButton>
           )}
 
           {showTakeMeHomeButton && (
-            <Button
-              variant={"secondary"}
-              size="sleek"
-              className="ml-4 py-2 px-4 italic lg: rounded-3xl bg-[#8B5Cf6] w-36"
+            <DsButton
+              variant="secondary"
+              className="ml-4 h-9 px-4 italic rounded-[var(--radius)] w-36"
             >
               Take me home
-            </Button>
+            </DsButton>
           )}
 
           {showPreviewPlanButton && (
-            <Button
-              variant="outline"
-              className={cn("lg:w-48 w-96", {
-                "border-2 border-primary": !isMobile,
-              })}
+            <DsButton
+              variant="ghost"
+              className={cn("lg:w-48 w-96 border border-[hsl(var(--border))]", { "border-2": !isMobile })}
             >
               {isMobile ? "Preview the plan" : "Preview"}
-            </Button>
+            </DsButton>
           )}
         </div>
       </DialogTrigger>
       <div className="">
-        <DialogContent className="xs:max-w-[450px] lg:max-w-sm border-0">
+        <DialogContent className="xs:max-w-[450px] lg:max-w-sm">
           <DialogHeader>
             <div className="flex justify-center ">
               <Avatar className="mb-3 h-[4.5rem] w-[4.5rem]">
@@ -135,15 +131,7 @@ const AlertPopup = ({
           </DialogHeader>
 
           <div className="flex justify-center">
-            <Button
-              type="submit"
-              className={cn(
-                "w-full",
-                "bg-gradient-to-r from-[#6aaff0] to-[#7385dd]"
-              )}
-            >
-              {footerText}
-            </Button>
+            <DsButton className="w-full h-10">{footerText}</DsButton>
           </div>
         </DialogContent>
       </div>
