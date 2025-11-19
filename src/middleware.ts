@@ -27,6 +27,8 @@ export async function middleware(request: NextRequest) {
 
   // Normalize host and hard-redirect any app.* subdomain to the apex
   const host = request.headers.get('host') || '';
+  // Preview environment detection (Vercel preview URLs)
+  const isPreviewHost = /\.vercel\.app$/i.test(host);
   if (host.startsWith('app.')) {
     const target = `https://${host.replace(/^app\./, '')}${request.nextUrl.pathname}${request.nextUrl.search}${request.nextUrl.hash}`;
     return NextResponse.redirect(target);
@@ -34,6 +36,13 @@ export async function middleware(request: NextRequest) {
 
   // Always base redirects on current host (without app.)
   const baseDomain = `https://${host}`;
+
+  // Allow anonymous access to chat preview on Vercel preview domains so you can QA UI without auth
+  if (isPreviewHost && request.method === 'GET') {
+    if (currentPath.startsWith('/chat') || currentPath.startsWith('/chat-mfe')) {
+      return NextResponse.next();
+    }
+  }
 
   // Public paths that don't require authentication
   const publicPaths = [
