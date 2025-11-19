@@ -73,8 +73,8 @@ export default function MobileTabBar() {
             </Link>
           </li>
           <li>
-            <Link href="/room" className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${is("/room") || is("/chat") ? "text-primary font-medium" : "text-muted-foreground"}`} aria-label="Inbox">
-              <div className="h-6 w-6"><IconInbox active={Boolean(is("/room") || is("/chat"))} /></div>
+            <Link href="/chat" className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${is("/chat") ? "text-primary font-medium" : "text-muted-foreground"}`} aria-label="Inbox">
+              <div className="h-6 w-6"><IconInbox active={Boolean(is("/chat"))} /></div>
               <span>Inbox</span>
             </Link>
           </li>
