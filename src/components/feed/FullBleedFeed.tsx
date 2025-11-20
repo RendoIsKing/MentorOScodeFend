@@ -291,6 +291,9 @@ export default function FullBleedFeed({
                           />
                         ) : null}
                       </div>
+                      <div className="flex items-center">
+                        <FeedSwitcher />
+                      </div>
                     </div>
                   </div>
                 ) : null}
@@ -375,9 +378,9 @@ const FullBleedItem = memo(function FullBleedItem({
         </div>
       ) : null}
 
-      {/* Top-right action: on mobile show Feed switcher; on desktop show Report */}
+      {/* Top-right action: on desktop keep Report; mobile switcher is in author bar */}
       <div className="absolute right-3 top-3 z-30">
-        {isMobile ? <FeedSwitcher /> : <ReportButton postId={post.id} />}
+        {!isMobile ? <ReportButton postId={post.id} /> : null}
       </div>
 
       {/* Caption bar - always show if provided */}
