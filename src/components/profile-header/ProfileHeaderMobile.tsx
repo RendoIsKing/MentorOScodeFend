@@ -328,12 +328,12 @@ const ProfileHeaderMobile = () => {
                   <DrawerContent className="z-[10050] pb-tabbar">
                     <div className="w-full p-4 pb-tabbar">
                       <div className="flex justify-center">
-                        <DrawerHeader className={`text-xl ${fontItalic.className}`}>Profile options</DrawerHeader>
+                        <DrawerHeader className={`text-xl ${fontItalic.className}`}>Edit options</DrawerHeader>
                       </div>
                       <div className="mx-auto w-full max-w-sm space-y-2">
-                        <DsButton className="w-full">Edit Profile</DsButton>
-                        <DsButton variant="secondary" className="w-full">Edit Subscriptions</DsButton>
-                        <DsButton variant="secondary" className="w-full">Edit Avatar</DsButton>
+                        <DsButton className="w-full" onClick={() => router.push("/edit-profile")}>Edit Profile</DsButton>
+                        <DsButton variant="secondary" className="w-full" onClick={() => router.push("/subscription")}>Edit Subscriptions</DsButton>
+                        <DsButton variant="secondary" className="w-full" onClick={() => router.push("/edit-avatar")}>Edit Avatar</DsButton>
                       </div>
                     </div>
                   </DrawerContent>
