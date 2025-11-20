@@ -111,15 +111,19 @@ function ProfileHeaderDesktop() {
           const baseCover = coverPath ? `${base}/${coverPath}` : (coverId ? `${base}/v1/user/files/${String(coverId)}` : undefined);
           const coverUrl = baseCover ? `${baseCover}?v=${encodeURIComponent(String(coverPath || coverId || ''))}` : undefined;
           const fallback = 'https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
-          return (
-            <img
-              className="w-full h-64 object-cover"
-              src={coverUrl || fallback}
-              alt="cover"
-              loading="lazy"
-              decoding="async"
-            />
-          );
+          if (coverUrl) {
+            return (
+              <img
+                className="w-full h-64 object-cover"
+                src={coverUrl}
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+            );
+          }
+          // Placeholder gradient
+          return <div className="w-full h-64 bg-gradient-to-br from-violet-500/30 via-fuchsia-500/25 to-emerald-400/25" />;
         })()}
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40">
           {!isOwnerRendered && (

@@ -275,20 +275,31 @@ const ProfileHeaderMobile = () => {
     <div>
       <div className="flex-col items-center justify-center">
         <article className="relative isolate flex flex-col justify-end overflow-hidden pt-24 mx-auto">
-          <img
-            className="absolute inset-0 h-full w-full object-cover"
-            src={(() => {
-              const ownerCoverPath = isOwnerRendered ? (data as any)?.data?.coverPhoto?.path : (userDetailsData as any)?.coverPhoto?.path;
-              const ownerCoverId = isOwnerRendered ? (data as any)?.data?.coverPhoto?._id : (userDetailsData as any)?.coverPhoto?._id;
-              // Prefer path with cache-busting
-              if (ownerCoverPath && !String(ownerCoverPath).includes('undefined')) return `${baseServerUrl}/${ownerCoverPath}?v=${encodeURIComponent(String(ownerCoverPath))}`;
-              if (ownerCoverId) return `${baseServerUrl}/v1/user/files/${ownerCoverId}?v=${encodeURIComponent(String(ownerCoverId))}`;
-              return "";
-            })()}
-            alt="cover"
-            loading="lazy"
-            decoding="async"
-          />
+          {(() => {
+            const ownerCoverPath = isOwnerRendered ? (data as any)?.data?.coverPhoto?.path : (userDetailsData as any)?.coverPhoto?.path;
+            const ownerCoverId = isOwnerRendered ? (data as any)?.data?.coverPhoto?._id : (userDetailsData as any)?.coverPhoto?._id;
+            const coverUrl =
+              ownerCoverPath && !String(ownerCoverPath).includes("undefined")
+                ? `${baseServerUrl}/${ownerCoverPath}?v=${encodeURIComponent(String(ownerCoverPath))}`
+                : ownerCoverId
+                ? `${baseServerUrl}/v1/user/files/${ownerCoverId}?v=${encodeURIComponent(String(ownerCoverId))}`
+                : "";
+            if (coverUrl) {
+              return (
+                <img
+                  className="absolute inset-0 h-full w-full object-cover"
+                  src={coverUrl}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+              );
+            }
+            // Placeholder gradient if no cover image
+            return (
+              <div className="absolute inset-0 h-full w-full bg-gradient-to-br from-violet-500/30 via-fuchsia-500/25 to-emerald-400/25" />
+            );
+          })()}
           <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40"></div>
           <div className="flex items-center px-4 py-2 z-10 justify-between">
             <AvatarWithDescription
