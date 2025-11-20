@@ -428,7 +428,7 @@ const ProfileHeaderMobile = () => {
               <DsButton className="h-9 px-4 w-36" onClick={() => handleFollowClick(userDetailsData?._id)} disabled={followBusy}>
                 {isFollowingLocal ? "Unfollow" : "Follow"}
               </DsButton>
-              <Link href={(userDetailsData?.userName ? String(userDetailsData.userName).toLowerCase().replace(/-/g,'') : '') === 'coachmajen' ? "/coach-majen" : "/chat"}>
+              <Link href={(userDetailsData?.userName ? String(userDetailsData.userName).toLowerCase().replace(/-/g,'') : '') === 'coachmajen' ? "/chat" : "/chat"}>
                 <ChatIcon className="stroke-foreground" />
               </Link>
             </div>
