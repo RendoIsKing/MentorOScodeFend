@@ -280,6 +280,8 @@ import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
 import { LivePostPopup } from "../live-post-popup";
 import FeedFooter from "../feed/feed-footer";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
 import ContentUploadProvider from "@/context/open-content-modal";
 import {
   useGetFollowingUsersStoryQuery,
@@ -323,6 +325,7 @@ function InboxBody({ loggedInUser, fullName, image }: InboxBodyProps) {
   const [inputValue, setInputValue] = useState("");
   const [majenPinned, setMajenPinned] = useState<boolean>(false);
   const [majenRow, setMajenRow] = useState<UserChatProps | null>(null);
+  const router = useRouter();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -405,13 +408,25 @@ function InboxBody({ loggedInUser, fullName, image }: InboxBodyProps) {
 							return String(row.name).toLowerCase().includes(q) || String(row.message).toLowerCase().includes(q);
 						})
 						.map((chat: any, index: number) => (
-            <Link key={index} href={chat.href || `/room/${chat.name}`}>
-              <UserChat
-                name={chat.name}
-                message={chat.message}
-                profilePhoto={chat.profilePhoto}
-              />
-            </Link>
+						<SwipeableChatRow
+							key={`${chat.name}-${index}`}
+							onOpen={() => router.push(chat.href || `/room/${chat.name}`)}
+							onDelete={async () => {
+								try {
+									// Special-case: Coach Majen – clear preview and local cache
+									if ((chat.name || '').toLowerCase().includes('majen')) {
+										try { if (typeof window !== 'undefined') { window.localStorage.removeItem('inbox-conv-coach-majen'); window.dispatchEvent(new Event('inbox-refresh')); } } catch {}
+										setMajenRow(null);
+									}
+								} catch {}
+							}}
+						>
+							<UserChat
+								name={chat.name}
+								message={chat.message}
+								profilePhoto={chat.profilePhoto}
+							/>
+						</SwipeableChatRow>
 					))}
         </ScrollArea>
       </div>
@@ -421,3 +436,84 @@ function InboxBody({ loggedInUser, fullName, image }: InboxBodyProps) {
 }
 
 export default InboxBody;
+
+// Lightweight swipe-to-delete row (mobile friendly)
+function SwipeableChatRow({
+	onOpen,
+	onDelete,
+	children,
+}: {
+	onOpen: () => void;
+	onDelete: () => void | Promise<void>;
+	children: React.ReactNode;
+}) {
+	const [dragX, setDragX] = useState(0);
+	const [startX, setStartX] = useState<number | null>(null);
+	const [revealed, setRevealed] = useState(false);
+
+	const maxReveal = 80; // px
+	const threshold = 50; // px
+
+	const onTouchStart = (e: React.TouchEvent) => {
+		setStartX(e.touches[0].clientX);
+	};
+	const onTouchMove = (e: React.TouchEvent) => {
+		if (startX === null) return;
+		const dx = e.touches[0].clientX - startX;
+		// Only allow left swipe
+		if (dx < 0) {
+			setDragX(Math.max(dx, -maxReveal));
+		}
+	};
+	const onTouchEnd = () => {
+		if (dragX <= -threshold) {
+			setRevealed(true);
+			setDragX(-maxReveal);
+		} else {
+			setRevealed(false);
+			setDragX(0);
+		}
+		setStartX(null);
+	};
+
+	const onClick = (e: React.MouseEvent) => {
+		// If revealed, clicking the row should close it instead of opening
+		if (revealed) {
+			e.preventDefault();
+			setRevealed(false);
+			setDragX(0);
+			return;
+		}
+		onOpen();
+	};
+
+	return (
+		<div className="relative select-none">
+			{/* Delete action surface */}
+			<div className="absolute inset-y-0 right-0 w-20 flex items-center justify-center bg-destructive/90 rounded-lg">
+				<button
+					type="button"
+					aria-label="Delete conversation"
+					className="text-destructive-foreground flex items-center justify-center"
+					onClick={async (e) => {
+						e.stopPropagation();
+						await onDelete();
+					}}
+				>
+					<Trash2 className="h-5 w-5" />
+				</button>
+			</div>
+			{/* Foreground content */}
+			<div
+				className="relative"
+				style={{ transform: `translateX(${dragX}px)`, transition: startX === null ? 'transform 180ms ease' : 'none' }}
+				onTouchStart={onTouchStart}
+				onTouchMove={onTouchMove}
+				onTouchEnd={onTouchEnd}
+				onClick={onClick}
+			>
+				{children}
+			</div>
+		</div>
+	);
+}
