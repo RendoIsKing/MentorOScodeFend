@@ -229,22 +229,7 @@ export default function FullBleedFeed({
         </div>
       ) : null}
 
-        {/* Centered Feed switcher aligned to the media column (mobile) */}
-        {isMobile ? (
-          <div
-            ref={chipElRef}
-            className="fixed z-[2147483647] pointer-events-none"
-            style={{
-              top: `calc(env(safe-area-inset-top) + 2px)`,
-              left: `${(chipLeftPx ?? overlayBox.center)}px`,
-              transform: 'translateX(calc(-50% - 60px))',
-            }}
-          >
-            <div className="pointer-events-auto">
-              <FeedSwitcher />
-            </div>
-          </div>
-        ) : null}
+        {/* Mobile feed switcher moved to top-right (replaces Report) */}
 
         {posts.map((post) => (
           <FullBleedItem key={post.id} post={post} RightOverlay={RightOverlay} currentUserId={currentUserId} />)
@@ -389,9 +374,9 @@ const FullBleedItem = memo(function FullBleedItem({
         </div>
       ) : null}
 
-      {/* Report action (always available) */}
+      {/* Top-right action: on mobile show Feed switcher; on desktop show Report */}
       <div className="absolute right-3 top-3 z-30">
-        <ReportButton postId={post.id} />
+        {isMobile ? <FeedSwitcher /> : <ReportButton postId={post.id} />}
       </div>
 
       {/* Caption bar - always show if provided */}
