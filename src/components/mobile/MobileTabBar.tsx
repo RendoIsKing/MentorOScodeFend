@@ -28,6 +28,14 @@ function IconUser({ active }: { active: boolean }) {
     </svg>
   );
 }
+function IconSearch({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth={active ? 2.2 : 1.8} />
+      <path d="M20 20l-3-3" stroke="currentColor" strokeWidth={active ? 2.2 : 1.8} />
+    </svg>
+  );
+}
 
 export default function MobileTabBar() {
   const pathname = usePathname();
@@ -65,9 +73,9 @@ export default function MobileTabBar() {
             </Link>
           </li>
           <li>
-            <Link href="/room" className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${is("/room") ? "text-primary font-medium" : "text-muted-foreground"}`} aria-label="Inbox">
-              <div className="h-6 w-6"><IconInbox active={Boolean(is("/room"))} /></div>
-              <span>Inbox</span>
+            <Link href="/search" className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${is("/search") ? "text-primary font-medium" : "text-muted-foreground"}`} aria-label="Search">
+              <div className="h-6 w-6"><IconSearch active={Boolean(is("/search"))} /></div>
+              <span>Search</span>
             </Link>
           </li>
         </ul>
@@ -84,6 +92,12 @@ export default function MobileTabBar() {
         </div>
 
         <ul className="flex items-center justify-end gap-6">
+          <li>
+            <Link href="/room" className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${is("/room") ? "text-primary font-medium" : "text-muted-foreground"}`} aria-label="Inbox">
+              <div className="h-6 w-6"><IconInbox active={Boolean(is("/room"))} /></div>
+              <span>Inbox</span>
+            </Link>
+          </li>
           <li>
             <Link href={profileHref} className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${is(profileHref) ? "text-primary font-medium" : "text-muted-foreground"}`} aria-label="Profile">
               <div className="h-6 w-6"><IconUser active={Boolean(is(profileHref))} /></div>
