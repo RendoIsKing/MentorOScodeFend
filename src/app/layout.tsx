@@ -6,7 +6,7 @@ import { ModeToggle } from "@/components/theme-toggle";
 import { Provider } from "react-redux";
 import "./globals.css";
 import "@/styles/ds-figma.css";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import store from "@/redux/store";
 import { NotificationBannerContextProvider } from "@/context/NotificationBanner";
 import { UserOnboardingContextProvider } from "@/context/UserOnboarding";
@@ -42,6 +42,8 @@ export default function RootLayout({
   postslot: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const isChatRoute = pathname === "/chat";
   // Feature flag loader for the new design system.
   // When localStorage 'ds' === 'figma', we add class 'ds-figma' on <html>.
   function DesignSystemFlag() {
@@ -128,13 +130,13 @@ export default function RootLayout({
                                 <CountryCodeProvider>
                                 <PushInit />
                                 <DesignSystemFlag />
-                                <div className="pb-tabbar md:pb-0">
+                                <div className={`${isChatRoute ? "md:pb-0" : "pb-tabbar md:pb-0"}`}>
                                   <ErrorBoundary fallback={<div className="p-4 text-muted-foreground text-sm">Kunne ikke laste. Prøv å oppdatere.</div>}>
                                     {postslot}
                                     {children}
                                   </ErrorBoundary>
                                 </div>
-                                <MobileTabBar />
+                                {!isChatRoute && <MobileTabBar />}
                                 <Toaster />
                                 </CountryCodeProvider>
                               </UserTagsContextProvider>
@@ -156,13 +158,13 @@ export default function RootLayout({
                               <CountryCodeProvider>
                               <PushInit />
                               <DesignSystemFlag />
-                              <div className="pb-tabbar md:pb-0">
+                              <div className={`${isChatRoute ? "md:pb-0" : "pb-tabbar md:pb-0"}`}>
                                 <ErrorBoundary fallback={<div className="p-4 text-muted-foreground text-sm">Kunne ikke laste. Prøv å oppdatere.</div>}>
                                   {postslot}
                                   {children}
                                 </ErrorBoundary>
                               </div>
-                              <MobileTabBar />
+                              {!isChatRoute && <MobileTabBar />}
                               <Toaster />
                               </CountryCodeProvider>
                             </UserTagsContextProvider>
