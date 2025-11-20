@@ -449,6 +449,7 @@ function SwipeableChatRow({
 }) {
 	const [dragX, setDragX] = useState(0);
 	const [startX, setStartX] = useState<number | null>(null);
+	const [startBase, setStartBase] = useState(0);
 	const [revealed, setRevealed] = useState(false);
 
 	const maxReveal = 80; // px
@@ -456,14 +457,14 @@ function SwipeableChatRow({
 
 	const onTouchStart = (e: React.TouchEvent) => {
 		setStartX(e.touches[0].clientX);
+		setStartBase(revealed ? -maxReveal : 0);
 	};
 	const onTouchMove = (e: React.TouchEvent) => {
 		if (startX === null) return;
 		const dx = e.touches[0].clientX - startX;
-		// Only allow left swipe
-		if (dx < 0) {
-			setDragX(Math.max(dx, -maxReveal));
-		}
+		// Allow both directions, clamp within [-maxReveal, 0]
+		const next = Math.max(-maxReveal, Math.min(0, startBase + dx));
+		setDragX(next);
 	};
 	const onTouchEnd = () => {
 		if (dragX <= -threshold) {
@@ -488,9 +489,13 @@ function SwipeableChatRow({
 	};
 
 	return (
-		<div className="relative select-none">
+		<div className="relative select-none overflow-hidden">
 			{/* Delete action surface */}
-			<div className="absolute inset-y-0 right-0 w-20 flex items-center justify-center bg-destructive/90 rounded-lg">
+			<div
+				className="absolute inset-y-0 right-0 w-20 flex items-center justify-center bg-destructive/90 rounded-lg"
+				style={{ opacity: revealed || dragX < 0 ? 1 : 0, transition: 'opacity 180ms ease' }}
+				aria-hidden={!(revealed || dragX < 0)}
+			>
 				<button
 					type="button"
 					aria-label="Delete conversation"
