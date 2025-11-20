@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
-import { Menu, Bell, Settings, ChevronRight, Search } from "lucide-react";
+import { Menu, Settings, ChevronRight } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import CreatorCenter from "@/assets/images/Sidebar/creator-active.svg";
@@ -75,10 +75,7 @@ export default function ProfileNavbar() {
           <div />
         )}
         <h1 className="text-2xl pt-1">Profile</h1>
-        <div className="flex justify-center items-center">
-          <button onClick={()=> router.push('/search')} className="mr-3"><Search /></button>
-          <Bell onClick={() => router.push("/notification")} />
-        </div>
+        <div className="flex justify-center items-center" />
       </div>
     </>
   );
