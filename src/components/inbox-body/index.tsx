@@ -278,7 +278,6 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
 import { LivePostPopup } from "../live-post-popup";
-import Search from "@/assets/images/Sidebar/search.svg";
 import FeedFooter from "../feed/feed-footer";
 import Link from "next/link";
 import ContentUploadProvider from "@/context/open-content-modal";
@@ -363,44 +362,49 @@ function InboxBody({ loggedInUser, fullName, image }: InboxBodyProps) {
               <div className="flex justify-between">
                 <div></div>
                 <h1>Chat</h1>
-                <Link href={"/chat-search"}>
-                  <Search className="stroke-foreground" />
-                </Link>
               </div>
             </div>
             <FeedFooter />
           </>
-        ) : (
-          <div className="relative px-4 pt-6 mb-5 ">
-            <Input
-              type="text"
-              onChange={handleChange}
-              value={inputValue}
-              className="px-12 text-muted-foreground bg-muted border border-muted h-10 w-full rounded-3xl text-sm"
-              placeholder="Search Chat"
-            />
-            <img
-              //assets/images/search/search-normal.svg
-              src="/assets/images/search/search-normal.svg"
-              alt="search"
-              className="absolute left-8 top-8 text-primary"
-            />
+				) : null}
 
-            {inputValue && (
-              <X
-                className="cancel-button absolute right-8 top-9 cursor-pointer"
-                size={20}
-                onClick={resetField}
-              />
-            )}
-          </div>
-        )}
+				{/* Unified search bar (mobile + desktop) placed above Unread messages */}
+				<div className="relative px-4 pt-4 mb-3">
+					<Input
+						type="text"
+						onChange={handleChange}
+						value={inputValue}
+						className="px-12 text-muted-foreground bg-muted border border-muted h-10 w-full rounded-3xl text-sm"
+						placeholder="Search chats"
+					/>
+					<img
+						//assets/images/search/search-normal.svg
+						src="/assets/images/search/search-normal.svg"
+						alt="search"
+						className="absolute left-8 top-6 text-primary"
+					/>
+
+					{inputValue && (
+						<X
+							className="cancel-button absolute right-8 top-7 cursor-pointer"
+							size={20}
+							onClick={resetField}
+						/>
+					)}
+				</div>
         <Separator />
         <ScrollArea className="h-[75vh] p-2">
            <h1 className="text-muted-foreground">
             Unread messages ({totalUnreadCount})
           </h1>
-          {[(majenPinned && majenRow) ? majenRow : null, ...userChats].filter(Boolean).map((chat: any, index: number) => (
+					{[(majenPinned && majenRow) ? majenRow : null, ...userChats]
+						.filter(Boolean)
+						.filter((row: any) => {
+							if (!inputValue) return true;
+							const q = inputValue.toLowerCase();
+							return String(row.name).toLowerCase().includes(q) || String(row.message).toLowerCase().includes(q);
+						})
+						.map((chat: any, index: number) => (
             <Link key={index} href={chat.href || `/room/${chat.name}`}>
               <UserChat
                 name={chat.name}
@@ -408,7 +412,7 @@ function InboxBody({ loggedInUser, fullName, image }: InboxBodyProps) {
                 profilePhoto={chat.profilePhoto}
               />
             </Link>
-          ))}
+					))}
         </ScrollArea>
       </div>
       {/* </LoadingSpinner> */}
