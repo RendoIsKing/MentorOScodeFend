@@ -128,12 +128,6 @@ export default function RootLayout({
                                 <CountryCodeProvider>
                                 <PushInit />
                                 <DesignSystemFlag />
-                                <div className="absolute top-20 z-50 opacity-50 right-0">
-                                  <div className="flex items-center gap-2">
-                                    <DesignToggle />
-                                    <ModeToggle />
-                                  </div>
-                                </div>
                                 <div className="pb-tabbar md:pb-0">
                                   <ErrorBoundary fallback={<div className="p-4 text-muted-foreground text-sm">Kunne ikke laste. Prøv å oppdatere.</div>}>
                                     {postslot}
@@ -162,12 +156,6 @@ export default function RootLayout({
                               <CountryCodeProvider>
                               <PushInit />
                               <DesignSystemFlag />
-                              <div className="absolute top-20 z-50 opacity-50 right-0">
-                                <div className="flex items-center gap-2">
-                                  <DesignToggle />
-                                  <ModeToggle />
-                                </div>
-                              </div>
                               <div className="pb-tabbar md:pb-0">
                                 <ErrorBoundary fallback={<div className="p-4 text-muted-foreground text-sm">Kunne ikke laste. Prøv å oppdatere.</div>}>
                                   {postslot}

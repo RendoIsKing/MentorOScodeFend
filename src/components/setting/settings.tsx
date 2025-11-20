@@ -12,6 +12,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import DsButton from "@/ui/ds/Button";
+import { ModeToggle } from "@/components/theme-toggle";
 import { Switch } from "@/components/ui/switch";
 import { ChevronRightIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
@@ -100,6 +101,17 @@ const Settings: React.FC = () => {
             <a className="underline text-muted-foreground" href="/legal/privacy" target="_blank" rel="noreferrer">Privacy</a>
             <a className="underline text-muted-foreground" href="/legal/guidelines" target="_blank" rel="noreferrer">Guidelines</a>
             <a className="underline text-muted-foreground" href="/legal/ai" target="_blank" rel="noreferrer">AI Use</a>
+          </div>
+        </div>
+        <Separator />
+        <div className="my-2">
+          <h2 className="text-sm text-muted-foreground lg:pb-2 lg:text-lg">Appearance</h2>
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className={`${fontItalic.className}`}>Theme</h3>
+              <p className="text-sm lg:text-muted-foreground">Choose light or dark mode</p>
+            </div>
+            <ModeToggle />
           </div>
         </div>
         <Separator />
