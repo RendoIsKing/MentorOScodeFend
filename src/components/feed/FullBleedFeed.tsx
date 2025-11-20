@@ -314,6 +314,7 @@ const FullBleedItem = memo(function FullBleedItem({
   currentUserId?: string | null;
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const { isMobile } = useClientHardwareInfo();
 
   useEffect(() => {
     if (post.type !== 'video' || !videoRef.current) return;
