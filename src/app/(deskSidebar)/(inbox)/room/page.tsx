@@ -12,6 +12,8 @@ const NotificationsPage = dynamic(() => import("@/app/(deskSidebar)/notification
 export default function InboxPageResponsive() {
   const userData = useUserOnboardingContext();
   const { isMobile } = useClientHardwareInfo();
+  // Tabs state must be declared unconditionally to satisfy React Hooks rules.
+  const [tab, setTab] = React.useState<"chats" | "notifications">("chats");
 
   if (!userData) return <div>Loading.......</div>;
 
@@ -24,7 +26,6 @@ export default function InboxPageResponsive() {
   }
 
   // Mobile: provide Chats/Notifications tabs inside Inbox
-  const [tab, setTab] = React.useState<"chats" | "notifications">("chats");
 
   return (
     <div className="h-screen">
