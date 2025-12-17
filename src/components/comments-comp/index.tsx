@@ -6,6 +6,7 @@ import Message from "@/assets/images/Home/message.svg";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
+import { cn } from "@/lib/utils";
 
 import {
   Drawer,
@@ -39,9 +40,10 @@ import { useUserOnboardingContext } from "@/context/UserOnboarding";
 import { IPostObjectResponse } from "@/contracts/responses/IPostObjectResponse";
 interface IMyUserDataProps {
   feedData?: IPostObjectResponse;
+  variant?: "default" | "ui-v2";
 }
 import { useToast } from "@/components/ui/use-toast";
-const CommentsComp: React.FC<IMyUserDataProps> = ({ feedData }) => {
+const CommentsComp: React.FC<IMyUserDataProps> = ({ feedData, variant = "default" }) => {
   const { toast } = useToast();
   const { isMobile } = useClientHardwareInfo();
   const [inputValue, setInputValue] = useState("");
@@ -151,11 +153,14 @@ const CommentsComp: React.FC<IMyUserDataProps> = ({ feedData }) => {
         <Drawer>
           <DrawerTrigger asChild>
             <div
-              className="flex flex-col items-center gap-2 justify-center"
+              className={cn(
+                "flex flex-col items-center gap-2 justify-center",
+                variant === "ui-v2" && "gap-1 drop-shadow-lg text-white"
+              )}
               onClick={() => handlePostClick(feedData?._id || "")}
             >
-              <Message className="dark:fill-foreground fill-white cursor-pointer" />
-              <p className="text-white">{feedData?.commentsCount}</p>
+              <Message className={cn("dark:fill-foreground fill-white cursor-pointer", variant === "ui-v2" && "h-7 w-7")} />
+              <p className={cn("text-white", variant === "ui-v2" && "text-xs font-semibold")}>{feedData?.commentsCount}</p>
             </div>
           </DrawerTrigger>
           <DrawerContent className="h-[88vh] pb-tabbar">
@@ -229,11 +234,14 @@ const CommentsComp: React.FC<IMyUserDataProps> = ({ feedData }) => {
         <Dialog>
           <DialogTrigger asChild>
             <div
-              className="flex flex-col items-center gap-2 justify-center cursor-pointer"
+              className={cn(
+                "flex flex-col items-center gap-2 justify-center cursor-pointer",
+                variant === "ui-v2" && "gap-1 drop-shadow-lg text-white"
+              )}
               onClick={() => handlePostClick(feedData?._id || "")}
             >
-              <Message className="fill-foreground cursor-pointer" />
-              {feedData?.commentsCount}
+              <Message className={cn("fill-foreground cursor-pointer", variant === "ui-v2" && "h-7 w-7")} />
+              <span className={cn("", variant === "ui-v2" && "text-xs font-semibold")}>{feedData?.commentsCount}</span>
             </div>
           </DialogTrigger>
 

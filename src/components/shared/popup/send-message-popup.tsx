@@ -76,7 +76,7 @@ const SendMessagePopup = ({
             <Button
               variant={"outline"}
               className="text-[#01b9ae] w-3/12 border border-[#01b9ae]"
-              onClick={() => router.push("/chat/Coach%20Engh")}
+              onClick={() => router.push("/chat?to=Coach%20Engh")}
             >
               Chat
             </Button>

@@ -7,7 +7,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { ChevronRight, Info, Tags, ThumbsDown, Star } from "lucide-react";
+import { ChevronRight, Info, Tags, ThumbsDown, Star, Share2 } from "lucide-react";
 import { baseServerUrl, cn, getInitials } from "@/lib/utils";
 import CommentsComp from "@/components/comments-comp";
 import { Separator } from "@/components/ui/separator";
@@ -44,9 +44,10 @@ import HeartActive from "@/assets/images/Home/heart-active.svg";
 
 interface IMyUserDataProps {
   feedData: IPostObjectResponse;
+  variant?: "default" | "ui-v2";
 }
 
-const MobileFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
+const MobileFeed: React.FC<IMyUserDataProps> = ({ feedData, variant = "default" }) => {
   const [getTaggedUserList, { data: tagListDetails }] =
     useLazyGetTaggedUserListQuery();
 
@@ -183,43 +184,59 @@ const MobileFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
     [followUser]
   );
 
-  return (
-    <div className="flex flex-col gap-y-4">
+  const railCls = cn(
+    "flex flex-col gap-y-4",
+    variant === "ui-v2" && "items-center gap-6 pb-2"
+  );
+  const actionCls = cn(
+    "flex flex-col items-center gap-2 justify-center text-white",
+    variant === "ui-v2" && "gap-1 drop-shadow-lg"
+  );
+  const countCls = cn("text-white", variant === "ui-v2" && "text-xs font-semibold");
 
-      <div className="flex justify-center ">
+  return (
+    <div className={railCls}>
+
+      <div className="flex justify-center">
         <div
           className={cn(
-            "flex flex-col items-center gap-2 justify-center text-white",
+            actionCls,
             { "text-primary": selectHeart }
           )}
           onClick={() => handleSelectHeart(feedData._id)}
         >
           {heartStates ? (
-            <HeartActive className="fill-foreground cursor-pointer" />
+            <HeartActive className={cn("fill-foreground cursor-pointer", variant === "ui-v2" && "h-7 w-7")} />
           ) : (
-            <Heart className="fill-foreground cursor-pointer" />
+            <Heart className={cn("fill-foreground cursor-pointer", variant === "ui-v2" && "h-7 w-7")} />
           )}
 
-          {heartLikecount}
+          <span className={countCls}>{heartLikecount}</span>
           {/* {feedData?.isLiked ? 1 : 0} */}
         </div>
       </div>
 
-      <CommentsComp feedData={feedData} />
+      <CommentsComp feedData={feedData} variant={variant} />
+
+      {/* Share (UI v2 only): uses Web Share API, falls back to clipboard */}
+      {variant === "ui-v2" ? (
+        <ShareV2 postId={String(feedData?._id)} />
+      ) : null}
+
       <div
-        className={cn("flex flex-col items-center gap-2 justify-center", {
+        className={cn(actionCls, {
           "text-primary": saveStates,
         })}
         onClick={() => handleSavePost(feedData?._id)}
         aria-label={saveStates ? "Unsave post" : "Save post"}
       >
-        <Star
-          className="cursor-pointer"
-          fill={saveStates ? "currentColor" : "none"}
-        />
-        <p className={cn("text-white", { "text-primary": saveStates })}>
-          {saveStates ? 1 : 0}
-        </p>
+        <Star className={cn("cursor-pointer", variant === "ui-v2" && "h-7 w-7")} fill={saveStates ? "currentColor" : "none"} />
+        {/* Match Figma: save typically has no count; keep count only for non-ui-v2 */}
+        {variant !== "ui-v2" ? (
+          <p className={cn("text-white", { "text-primary": saveStates })}>
+            {saveLikecount}
+          </p>
+        ) : null}
       </div>
       {feedData?.userTags?.length > 0 && (
         <Drawer>
@@ -319,3 +336,38 @@ const MobileFeed: React.FC<IMyUserDataProps> = ({ feedData }) => {
 };
 
 export default MobileFeed;
+
+function ShareV2({ postId }: { postId: string }) {
+  const [busy, setBusy] = useState(false);
+  const href = `/post/${encodeURIComponent(postId)}`;
+  const onShare = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const url = typeof window !== "undefined" ? `${window.location.origin}${href}` : href;
+      if (typeof navigator !== "undefined" && (navigator as any).share) {
+        await (navigator as any).share({ url });
+      } else if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+        toast({ duration: 1200, description: "Link copied" });
+      }
+    } catch {}
+    setBusy(false);
+  };
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onShare();
+      }}
+      className="flex flex-col items-center gap-1 justify-center text-white drop-shadow-lg"
+      aria-label="Share post"
+      data-test="share-button"
+    >
+      <Share2 className="h-7 w-7" />
+      <span className="text-xs font-semibold">{busy ? "…" : ""}</span>
+    </button>
+  );
+}

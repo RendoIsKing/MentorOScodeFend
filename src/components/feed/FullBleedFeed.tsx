@@ -39,12 +39,14 @@ export default function FullBleedFeed({
   RightOverlay,
   initialIndex,
   currentUserId,
+  variant = 'default',
 }: {
   posts: Post[];
   TopOverlay?: () => JSX.Element;
   RightOverlay?: (args: { post: Post }) => JSX.Element;
   initialIndex?: number;
   currentUserId?: string | null;
+  variant?: 'default' | 'ui-v2';
 }) {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [overlayBox, setOverlayBox] = useState<{ left: number; width: number; center: number }>({ left: 0, width: 0, center: 0 });
@@ -221,7 +223,7 @@ export default function FullBleedFeed({
 
 
   return (
-    <section className="relative h-full w-full overflow-hidden">
+    <section className="relative h-full w-full overflow-hidden" data-test="feed-root">
       <div ref={scrollerRef} onScroll={handleScroll} className="vh-screen h-full w-full overflow-y-auto snap-y snap-mandatory snap-always overscroll-contain pb-[calc(env(safe-area-inset-bottom)+var(--bottom-nav-h))]">
       {TopOverlay ? (
         <div className="pointer-events-none absolute inset-x-0 top-0 z-20">
@@ -232,8 +234,14 @@ export default function FullBleedFeed({
         {/* Mobile feed switcher moved to top-right (replaces Report) */}
 
         {posts.map((post) => (
-          <FullBleedItem key={post.id} post={post} RightOverlay={RightOverlay} currentUserId={currentUserId} />)
-        )}
+          <FullBleedItem
+            key={post.id}
+            post={post}
+            RightOverlay={RightOverlay}
+            currentUserId={currentUserId}
+            variant={variant}
+          />
+        ))}
       </div>
 
       {/* Fixed overlays on mobile: centered Feed dropdown and author bar */}
@@ -311,10 +319,12 @@ const FullBleedItem = memo(function FullBleedItem({
   post,
   RightOverlay,
   currentUserId,
+  variant = 'default',
 }: {
   post: Post;
   RightOverlay?: (args: { post: Post }) => JSX.Element;
   currentUserId?: string | null;
+  variant?: 'default' | 'ui-v2';
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const { isMobile } = useClientHardwareInfo();
@@ -332,9 +342,13 @@ const FullBleedItem = memo(function FullBleedItem({
   }, [post.id, post.type]);
 
   return (
-    <article className="relative h-full min-h-full snap-start">
+    <article className="relative h-full min-h-full snap-start" data-test="feed-item">
       {/* Gradient for readability */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-background/60 to-transparent z-10" />
+      {variant === 'ui-v2' ? (
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60 pointer-events-none z-10" />
+      ) : (
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-background/60 to-transparent z-10" />
+      )}
 
       {/* Visibility badge */}
       <div className="absolute left-3 top-3 z-30 pointer-events-none">
@@ -369,8 +383,12 @@ const FullBleedItem = memo(function FullBleedItem({
         <img src={post.src} alt="" className="absolute inset-0 h-full w-full object-cover pointer-events-none" loading="lazy" />
       )}
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-background/50 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background/60 to-transparent" />
+      {variant === 'ui-v2' ? null : (
+        <>
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-background/50 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background/60 to-transparent" />
+        </>
+      )}
 
       {RightOverlay ? (
         <div data-test="right-rail" className="absolute right-3 bottom-[calc(env(safe-area-inset-bottom)+var(--bottom-nav-h)+8px)] z-30">
@@ -383,16 +401,66 @@ const FullBleedItem = memo(function FullBleedItem({
         {!isMobile ? <ReportButton postId={post.id} /> : null}
       </div>
 
-      {/* Caption bar - always show if provided */}
+      {/* Caption bar / bottom-left meta (UI v2 matches Figma export structure) */}
       {post?.caption ? (
-        <div
-          data-test="caption-bar"
-          className="absolute left-3 right-3 bottom-[calc(env(safe-area-inset-bottom)+var(--bottom-nav-h)+8px)] z-20 pointer-events-none"
-        >
-          <div className="bg-background/45 rounded-xl px-3 py-2 pointer-events-auto">
-            <p className="text-foreground text-[15px] leading-snug clamp-2">{post.caption}</p>
+        variant === 'ui-v2' ? (
+          <div
+            data-test="caption-bar"
+            className="absolute inset-0 flex flex-col justify-end p-4 pb-[200px] md:pb-24 z-20 pointer-events-none"
+          >
+            <div className="flex items-end justify-between gap-4 pointer-events-auto mb-20 md:mb-10">
+              <div className="flex-1 space-y-3 text-white drop-shadow-lg">
+                <div className="flex items-center gap-3">
+                  <Link
+                    href={`/${post.user?.username || post.user?.id || ""}`}
+                    className="pointer-events-auto"
+                    aria-label="Open author profile"
+                  >
+                    <img
+                      src={post.user?.avatarUrl || "/assets/images/Home/small-profile-img.svg"}
+                      alt=""
+                      className="h-10 w-10 rounded-full border-2 border-white object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </Link>
+                  <div className="min-w-0">
+                    <Link
+                      href={`/${post.user?.username || post.user?.id || ""}`}
+                      className="pointer-events-auto font-semibold hover:opacity-80 transition-opacity flex items-center gap-2"
+                    >
+                      <span className="truncate">{post.user?.username || post.user?.displayName || ""}</span>
+                    </Link>
+                    {post?.createdAt ? (
+                      <p className="text-xs opacity-80">{formatRelativeTime(post.createdAt)}</p>
+                    ) : null}
+                  </div>
+                </div>
+                <p
+                  className="text-sm leading-relaxed"
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 3 as any,
+                    WebkitBoxOrient: "vertical" as any,
+                    overflow: "hidden",
+                  }}
+                >
+                  {post.caption}
+                </p>
+              </div>
+              {/* Right rail rendered separately (absolute) */}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div
+            data-test="caption-bar"
+            className="absolute left-3 right-3 bottom-[calc(env(safe-area-inset-bottom)+var(--bottom-nav-h)+8px)] z-20 pointer-events-none"
+          >
+            <div className="bg-background/45 rounded-xl px-3 py-2 pointer-events-auto">
+              <p className="text-foreground text-[15px] leading-snug clamp-2">{post.caption}</p>
+            </div>
+          </div>
+        )
       ) : null}
     </article>
   );

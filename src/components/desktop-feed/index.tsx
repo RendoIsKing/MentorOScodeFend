@@ -5,7 +5,7 @@ import HeartActive from "@/assets/images/Home/heart-active.svg";
 // Replace bookmark icons with star
 import More from "@/assets/images/Home/more.svg";
 
-import { Info, ThumbsDown, Star } from "lucide-react";
+import { Info, ThumbsDown, Star, Share2 } from "lucide-react";
 import CommentsComp from "@/components/comments-comp";
 import Link from "next/link";
 import { baseServerUrl } from "@/lib/utils";
@@ -34,13 +34,17 @@ import NotInterestedComp from "../shared/not-interested";
 interface IMyUserDataProps {
   feedData: IPostObjectResponse;
   currentUserId?: string | null;
+  variant?: "default" | "ui-v2";
 }
 
 import DeleteModal from "@/components/delete-modal";
 import { useGetUserDetailsQuery } from "@/redux/services/haveme";
 import { useMeNormalized } from "@/hooks/useMeNormalized";
 
-const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) => {
+const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId, variant = "default" }) => {
+  const railCls = cn("flex flex-col gap-y-4", variant === "ui-v2" && "items-center gap-6 pb-2 text-white");
+  const actionCls = cn("flex flex-col items-center gap-2 justify-center cursor-pointer", variant === "ui-v2" && "gap-1 drop-shadow-lg");
+  const countCls = cn("", variant === "ui-v2" && "text-xs font-semibold");
   const [isReportUserOpen, setIsReportUserOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
@@ -121,7 +125,7 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
   const isOwner = isOwnerApi || isOwnerById || isOwnerByUserName;
 
   return (
-    <div className="flex flex-col gap-y-4">
+    <div className={railCls}>
       {/* Author avatar (desktop only) */}
       <div className="flex justify-center">
         <Link href={`/${authorUserName.toLowerCase()}`} className="inline-block" aria-label="Open author profile">
@@ -132,23 +136,48 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
       <div className="flex justify-center ">
         <div
           className={cn(
-            "flex flex-col items-center gap-2 justify-center cursor-pointer"
+            actionCls
           )}
           onClick={() => handleSelectHeart(feedData?._id)}
         >
           {heartStates ? (
-            <HeartActive className="fill-[hsl(var(--primary))] cursor-pointer" />
+            <HeartActive className={cn("fill-[hsl(var(--primary))] cursor-pointer", variant === "ui-v2" && "h-7 w-7")} />
           ) : (
-            <Heart className="fill-foreground cursor-pointer" />
+            <Heart className={cn("fill-foreground cursor-pointer", variant === "ui-v2" && "h-7 w-7")} />
           )}
-          {heartLikecount}
+          <span className={countCls}>{heartLikecount}</span>
         </div>
       </div>
 
-      <CommentsComp feedData={feedData} />
+      <CommentsComp feedData={feedData} variant={variant} />
+
+      {/* Share (UI v2 only) */}
+      {variant === "ui-v2" ? (
+        <button
+          type="button"
+          onClick={async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            try {
+              const href = `/post/${encodeURIComponent(String(feedData?._id))}`;
+              const url = typeof window !== "undefined" ? `${window.location.origin}${href}` : href;
+              if (typeof navigator !== "undefined" && (navigator as any).share) {
+                await (navigator as any).share({ url });
+              } else if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(url);
+              }
+            } catch {}
+          }}
+          className={actionCls}
+          aria-label="Share post"
+          data-test="share-button"
+        >
+          <Share2 className="h-7 w-7" />
+        </button>
+      ) : null}
       <div
         className={cn(
-          "flex flex-col items-center gap-2 justify-center cursor-pointer",
+          actionCls,
           {
             "text-primary": saveStates,
           }
@@ -156,8 +185,8 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
         onClick={() => handleSavePost(feedData?._id)}
         aria-label={saveStates ? "Unsave post" : "Save post"}
       >
-        <Star className="cursor-pointer" fill={saveStates ? "currentColor" : "none"} />
-        {saveLikecount}
+        <Star className={cn("cursor-pointer", variant === "ui-v2" && "h-7 w-7")} fill={saveStates ? "currentColor" : "none"} />
+        {variant !== "ui-v2" ? <span>{saveLikecount}</span> : null}
       </div>
       {feedData?.userTags?.length > 0 && (
         <TaggedUserPopup postId={feedData?._id} />
@@ -165,8 +194,8 @@ const DesktopFeed: React.FC<IMyUserDataProps> = ({ feedData, currentUserId }) =>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <div className="flex flex-col items-center gap-2 lg:gap-0 justify-center cursor-pointer">
-            <More className="fill-foreground cursor-pointer" />
+          <div className={cn("flex flex-col items-center gap-2 lg:gap-0 justify-center cursor-pointer", variant === "ui-v2" && "gap-1 drop-shadow-lg text-white")}>
+            <More className={cn("fill-foreground cursor-pointer", variant === "ui-v2" && "h-7 w-7")} />
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent
