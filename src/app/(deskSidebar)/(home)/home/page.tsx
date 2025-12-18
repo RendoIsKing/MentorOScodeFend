@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
+import { useRouter } from "next/navigation";
 
 import HomeFeedCarousel from "@/components/shared/home-feed-carousel";
 import FullBleedFeed from "@/components/feed/FullBleedFeed";
@@ -15,6 +16,7 @@ import { useUserOnboardingContext } from "@/context/UserOnboarding";
 import RealtimeBootstrap from '@/components/realtime/RealtimeBootstrap';
 
 const Home = () => {
+  const router = useRouter();
   const { isMobile, orientation } = useClientHardwareInfo();
   useBottomNavVar();
   const { fcmToken } = useFCM();
@@ -22,6 +24,15 @@ const Home = () => {
   const { data: me } = useGetUserDetailsQuery();
 
   const [updateFCMTokenTrigger] = useUpdateFCMTokenMutation();
+
+  // Cutover flag: enable new ui-v2 feed on the real /home route.
+  useEffect(() => {
+    const enabled =
+      String(process.env.NEXT_PUBLIC_UI_V2 || "") === "1" ||
+      String(process.env.NEXT_PUBLIC_UI_V2_FEED || "") === "1";
+    if (!enabled) return;
+    router.replace("/feature/ui-v2/feed");
+  }, [router]);
 
   useEffect(() => {
     if (fcmToken && fcmToken !== "") {
