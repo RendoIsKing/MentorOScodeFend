@@ -4,11 +4,20 @@ import PostSearchResults from "@/components/post-search-results";
 import SearchResults from "@/components/search-results";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const Search = () => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const search = searchParams.get("q") ?? "";
+
+  React.useEffect(() => {
+    const designEnabled =
+      String(process.env.NEXT_PUBLIC_DESIGN_SEARCH || "") === "1" ||
+      String(process.env.NEXT_PUBLIC_DESIGN || "") === "1";
+    if (!designEnabled) return;
+    router.replace("/feature/design/search");
+  }, [router]);
 
   return (
     <>

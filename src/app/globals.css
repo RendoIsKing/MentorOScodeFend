@@ -136,6 +136,11 @@ body { overscroll-behavior-y: none; }
   /* Section-specific (psychology-driven) */
   :root,
   .dark {
+    /* MentorOS Brand Colors (from Figma export) */
+    --brand-light-blue: 195 100% 47%; /* #00AEEF */
+    --brand-medium-blue: 209 100% 42%; /* #0078D7 */
+    --brand-dark-blue: 210 100% 30%; /* #004C97 */
+
     /* Stats (golden amber) */
     --stats-primary: 36 92% 52%;   /* #f59e0b */
     --stats-primary-foreground: 236 17% 14%; /* ~#1e1f2e */
