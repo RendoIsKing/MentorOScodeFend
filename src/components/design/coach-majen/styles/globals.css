@@ -1,0 +1,356 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+  
+  /* Base colors - Clean dark background for happiness and calm */
+  --background: oklch(0.14 0.012 240);
+  --foreground: oklch(0.98 0.005 240);
+  
+  /* Card surfaces - elevated with minimal tint */
+  --card: oklch(0.18 0.015 240);
+  --card-foreground: oklch(0.98 0.005 240);
+  
+  /* Popover surfaces */
+  --popover: oklch(0.18 0.015 240);
+  --popover-foreground: oklch(0.98 0.005 240);
+  
+  /* Primary - Soft Blue (chat interface, calm and trustworthy) */
+  /* Minimal saturation for clean, matching chat colors */
+  --primary: oklch(0.60 0.14 240);
+  --primary-foreground: oklch(0.99 0.005 240);
+  
+  /* Secondary - Neutral gray (chat messages) */
+  /* Low saturation for cohesive, non-messy chat */
+  --secondary: oklch(0.26 0.015 240);
+  --secondary-foreground: oklch(0.95 0.005 240);
+  
+  /* Muted - For subtle backgrounds and secondary text */
+  --muted: oklch(0.24 0.012 240);
+  --muted-foreground: oklch(0.62 0.010 240);
+  
+  /* Accent - Lighter background for elevation */
+  --accent: oklch(0.28 0.015 240);
+  --accent-foreground: oklch(0.98 0.005 240);
+  
+  /* Success - Bright Green (positive feedback) */
+  --success: oklch(0.72 0.22 145);
+  --success-foreground: oklch(0.99 0.005 240);
+  
+  /* Destructive - Soft Red (errors) */
+  --destructive: oklch(0.62 0.22 20);
+  --destructive-foreground: oklch(0.99 0.005 240);
+  
+  /* Energy - Golden Amber (energy, motivation, vitality) */
+  --energy: oklch(0.70 0.18 60);
+  --energy-foreground: oklch(0.20 0.015 240);
+  
+  /* Borders and inputs */
+  --border: oklch(0.30 0.018 240);
+  --input: oklch(0.30 0.018 240);
+  --input-background: oklch(0.20 0.015 240);
+  --switch-background: oklch(0.34 0.020 240);
+  
+  /* Ring for focus states */
+  --ring: oklch(0.60 0.14 240);
+  
+  /* ========================================
+     SECTION-SPECIFIC THEME COLORS
+     Each section has meaningful psychology
+     ======================================== */
+  
+  /* STATS - Golden Amber (pride, achievement, success) */
+  --stats-primary: oklch(0.70 0.18 60);
+  --stats-primary-foreground: oklch(0.15 0.015 240);
+  --stats-secondary: oklch(0.75 0.16 50);
+  --stats-accent: oklch(0.65 0.20 70);
+  
+  /* GOALS - Purple/Violet (dreams, aspiration, hope, future) */
+  --goals-primary: oklch(0.62 0.22 285);
+  --goals-primary-foreground: oklch(0.99 0.005 240);
+  --goals-secondary: oklch(0.68 0.20 295);
+  --goals-accent: oklch(0.58 0.24 275);
+  
+  /* TRAINING - Red/Orange (energy, power, action, intensity) */
+  --training-primary: oklch(0.64 0.24 25);
+  --training-primary-foreground: oklch(0.99 0.005 240);
+  --training-secondary: oklch(0.68 0.22 35);
+  --training-accent: oklch(0.60 0.26 15);
+  
+  /* NUTRITION - Green (nature, health, balance, vitality) */
+  --nutrition-primary: oklch(0.68 0.20 145);
+  --nutrition-primary-foreground: oklch(0.99 0.005 240);
+  --nutrition-secondary: oklch(0.72 0.18 155);
+  --nutrition-accent: oklch(0.64 0.22 135);
+  
+  /* Chart colors - happiness palette */
+  --chart-1: oklch(0.70 0.18 60);  /* Golden amber */
+  --chart-2: oklch(0.62 0.22 285); /* Purple */
+  --chart-3: oklch(0.64 0.24 25);  /* Orange-red */
+  --chart-4: oklch(0.68 0.20 145); /* Green */
+  --chart-5: oklch(0.60 0.14 240); /* Soft blue */
+  
+  /* Border radius */
+  --radius: 0.625rem;
+  
+  /* Font weights */
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  
+  /* Sidebar - Chat interface colors (clean and cohesive) */
+  --sidebar: oklch(0.99 0.002 240); /* White background */
+  --sidebar-foreground: oklch(0.20 0.015 240); /* Dark text */
+  --sidebar-primary: oklch(0.60 0.14 240); /* Soft blue for accents */
+  --sidebar-primary-foreground: oklch(0.99 0.005 240); /* White text on primary */
+  --sidebar-accent: oklch(0.96 0.005 240); /* Very light gray for hover states */
+  --sidebar-accent-foreground: oklch(0.20 0.015 240); /* Dark text on accent */
+  --sidebar-border: oklch(0.88 0.010 240); /* Light border */
+  --sidebar-ring: oklch(0.60 0.14 240); /* Blue focus ring */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-energy: var(--energy);
+  --color-energy-foreground: var(--energy-foreground);
+  --color-stats-primary: var(--stats-primary);
+  --color-stats-primary-foreground: var(--stats-primary-foreground);
+  --color-stats-secondary: var(--stats-secondary);
+  --color-stats-accent: var(--stats-accent);
+  --color-goals-primary: var(--goals-primary);
+  --color-goals-primary-foreground: var(--goals-primary-foreground);
+  --color-goals-secondary: var(--goals-secondary);
+  --color-goals-accent: var(--goals-accent);
+  --color-training-primary: var(--training-primary);
+  --color-training-primary-foreground: var(--training-primary-foreground);
+  --color-training-secondary: var(--training-secondary);
+  --color-training-accent: var(--training-accent);
+  --color-nutrition-primary: var(--nutrition-primary);
+  --color-nutrition-primary-foreground: var(--nutrition-primary-foreground);
+  --color-nutrition-secondary: var(--nutrition-secondary);
+  --color-nutrition-accent: var(--nutrition-accent);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-white: #F5F9FC;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/**
+ * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    h1 {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h2 {
+      font-size: var(--text-xl);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h3 {
+      font-size: var(--text-lg);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h4 {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    p {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+
+    label {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    button {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    input {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+}
+
+/* Custom Range Slider Styles for Energy Level */
+input[type="range"].slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="range"].slider-thumb::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease;
+}
+
+input[type="range"].slider-thumb::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+input[type="range"].slider-thumb::-webkit-slider-thumb:active {
+  transform: scale(0.95);
+}
+
+input[type="range"].slider-thumb::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease;
+}
+
+input[type="range"].slider-thumb::-moz-range-thumb:hover {
+  transform: scale(1.1);
+}
+
+input[type="range"].slider-thumb::-moz-range-thumb:active {
+  transform: scale(0.95);
+}
+
+/* Compact Energy Level Slider */
+input[type="range"].slider-thumb-compact {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="range"].slider-thumb-compact::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.15s ease;
+}
+
+input[type="range"].slider-thumb-compact::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+input[type="range"].slider-thumb-compact::-webkit-slider-thumb:active {
+  transform: scale(1.0);
+}
+
+input[type="range"].slider-thumb-compact::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.15s ease;
+}
+
+input[type="range"].slider-thumb-compact::-moz-range-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+input[type="range"].slider-thumb-compact::-moz-range-thumb:active {
+  transform: scale(1.0);
+}
+
+/* Hide scrollbars but keep scroll functionality */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Ensure smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* iOS momentum scrolling for smooth feel */
+.overflow-y-auto,
+.overflow-x-auto,
+.overflow-auto {
+  -webkit-overflow-scrolling: touch;
+}

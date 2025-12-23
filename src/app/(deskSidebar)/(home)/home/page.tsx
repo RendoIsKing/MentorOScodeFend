@@ -27,6 +27,11 @@ const Home = () => {
 
   // Cutover flag: enable new ui-v2 feed on the real /home route.
   useEffect(() => {
+    const designEnabled = String(process.env.NEXT_PUBLIC_DESIGN_HOME || "") === "1" || String(process.env.NEXT_PUBLIC_DESIGN || "") === "1";
+    if (designEnabled) {
+      router.replace("/feature/design/home-wired");
+      return;
+    }
     const enabled =
       String(process.env.NEXT_PUBLIC_UI_V2 || "") === "1" ||
       String(process.env.NEXT_PUBLIC_UI_V2_FEED || "") === "1";

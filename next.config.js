@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+const webpackLib = require("webpack");
 const nextConfig = {
   experimental: { instrumentationHook: true },
   // Alternative approach for older Next.js versions
@@ -7,6 +8,31 @@ const nextConfig = {
     pagesBufferLength: 2,
   },
   webpack(config, { dev, isServer }) {
+    // Figma export sometimes pins package versions in import specifiers, e.g.
+    //   "@radix-ui/react-dialog@1.1.6" or "lucide-react@0.487.0"
+    // Next/webpack cannot resolve these, so we strip the "@version" suffix at build time.
+    config.plugins.push(
+      new webpackLib.NormalModuleReplacementPlugin(
+        /^(@radix-ui\/react-[^@]+)@[\d.]+$/,
+        (resource) => {
+          resource.request = resource.request.replace(/@[\d.]+$/, "");
+        }
+      )
+    );
+    config.plugins.push(
+      new webpackLib.NormalModuleReplacementPlugin(/^lucide-react@[\d.]+$/, (resource) => {
+        resource.request = "lucide-react";
+      })
+    );
+    config.plugins.push(
+      new webpackLib.NormalModuleReplacementPlugin(
+        /^(class-variance-authority|react-day-picker|embla-carousel-react)@[\d.]+$/,
+        (resource) => {
+          resource.request = resource.request.replace(/@[\d.]+$/, "");
+        }
+      )
+    );
+
     // Allow cross-origin requests in development
     if (dev && !isServer) {
       config.devServer = {

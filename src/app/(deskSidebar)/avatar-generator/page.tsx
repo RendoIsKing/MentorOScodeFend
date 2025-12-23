@@ -65,8 +65,6 @@ const Page = () => {
   const [deleteAvatar, { isLoading: newLoading, error: newError }] =
     useDeleteAvatarMutation();
 
-  console.log("files", filesData);
-
   const [
     deleteTrainingAvatar,
     { isLoading: newTrainingLoading, error: newAvatarTrainingDeleteError },
@@ -236,7 +234,6 @@ const Page = () => {
     setIsDeleteModalOpen(false);
   };
 
-  console.log("selectedId", selectedId);
   const handleDelete = async () => {
     try {
       if (selectedId) {

@@ -10,6 +10,11 @@ export default function InboxThreadPage() {
   const roomId = String(params?.roomId || "");
 
   React.useEffect(() => {
+    const designEnabled = String(process.env.NEXT_PUBLIC_DESIGN_CHAT || "") === "1";
+    if (designEnabled) {
+      router.replace("/feature/design/chat-wired");
+      return;
+    }
     const enabled = String(process.env.NEXT_PUBLIC_UI_V2_INBOX || "") === "1";
     if (!enabled) return;
     // Best-effort: if old route is used, land in ui-v2 inbox.

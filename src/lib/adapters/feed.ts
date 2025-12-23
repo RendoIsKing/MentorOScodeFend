@@ -9,6 +9,7 @@ export type FullBleedPost = {
     displayName?: string;
     avatarUrl?: string;
     viewerFollows?: boolean;
+    isMentor?: boolean;
   };
   caption?: string;
   createdAt?: string;
@@ -32,6 +33,7 @@ export function adaptBackendPostsToFullBleedPosts(
   const selfUserId = opts.selfUserId || "";
 
   return items.flatMap((p: any) => {
+    const userInfo = Array.isArray(p?.userInfo) ? p.userInfo?.[0] : p?.userInfo;
     const m = p?.mediaFiles?.[0] || p?.mediaFiles?.[0];
     const pathMaybe: string | undefined =
       (m?.path as string | undefined) || (p?.media?.[0]?.path as string | undefined);
@@ -49,13 +51,13 @@ export function adaptBackendPostsToFullBleedPosts(
     if (!src) return [] as FullBleedPost[];
 
     // Avatar: prefer a usable image path, fall back to id endpoint.
-    const avatarPathRaw = p?.userInfo?.[0]?.photo?.path || p?.userPhoto?.[0]?.path;
+    const avatarPathRaw = userInfo?.photo?.path || p?.userPhoto?.[0]?.path || p?.userPhoto?.path;
     const safeAvatarPath =
       avatarPathRaw && avatarPathRaw !== "undefined" && avatarPathRaw !== "null"
         ? avatarPathRaw
         : undefined;
     const avatarFileId =
-      p?.userInfo?.[0]?.photoId || p?.userPhoto?.[0]?._id || p?.userInfo?.[0]?.photo?._id;
+      userInfo?.photoId || p?.userPhoto?.[0]?._id || userInfo?.photo?._id;
 
     let avatarUrl = safeAvatarPath
       ? String(safeAvatarPath).startsWith("http")
@@ -92,11 +94,12 @@ export function adaptBackendPostsToFullBleedPosts(
         type: isVideo ? "video" : "image",
         src,
         user: {
-          id: String(p?.userInfo?.[0]?._id || ""),
-          username: String(p?.userInfo?.[0]?.userName || ""),
-          displayName: String(p?.userInfo?.[0]?.fullName || ""),
+          id: String(userInfo?._id || ""),
+          username: String(userInfo?.userName || ""),
+          displayName: String(userInfo?.fullName || ""),
           avatarUrl: avatarUrl && String(avatarUrl).includes("undefined") ? undefined : avatarUrl,
           viewerFollows: Boolean(p?.isFollowing),
+          isMentor: Boolean(userInfo?.isMentor),
         },
         caption: String(p?.content || ""),
         createdAt: p?.createdAt,
@@ -104,6 +107,28 @@ export function adaptBackendPostsToFullBleedPosts(
       },
     ];
   });
+}
+
+export type DesignFeedItem = FullBleedPost & {
+  likesCount?: number;
+  commentsCount?: number;
+  savedCount?: number;
+  isLiked?: boolean;
+  isSaved?: boolean;
+};
+
+// Adapter used by the verbatim Figma feed/search pages.
+export function adaptPostToFeedItem(post: any, selfUserId?: string | null): DesignFeedItem | null {
+  const [base] = adaptBackendPostsToFullBleedPosts([post], { selfUserId });
+  if (!base) return null;
+  return {
+    ...base,
+    likesCount: Number(post?.likesCount ?? 0),
+    commentsCount: Number(post?.commentsCount ?? 0),
+    savedCount: Number(post?.savedCount ?? 0),
+    isLiked: Boolean(post?.isLiked),
+    isSaved: Boolean(post?.isSaved),
+  };
 }
 
 
