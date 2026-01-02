@@ -139,6 +139,13 @@ export async function middleware(request: NextRequest) {
       { path: "/age-confirmation", check: true },
     ];
 
+    // Allow navigating back to auth/otp pages during onboarding (PWA back button),
+    // otherwise middleware will bounce back to /user-info and it feels like "back doesn't work".
+    const allowDuringOnboarding = ["/signup", "/signin", "/verify-otp", "/validate-otp", "/forgotpassword", "/new-password"];
+    if ((process.env.NODE_ENV === "production" || onboardingStarted) && allowDuringOnboarding.includes(currentPath)) {
+      return NextResponse.next();
+    }
+
     // Don't redirect away from current onboarding step
     for (const element of pathsAndChecks) {
       if (element.path === currentPath) {

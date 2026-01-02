@@ -71,7 +71,7 @@ export default function VerifyOtpPage() {
           if (typeof document !== 'undefined') {
             document.cookie = `onboarding=start; Path=/; Max-Age=600; SameSite=None; Secure`;
           }
-          router.replace("/user-info?from=verify");
+          router.push("/user-info?from=verify");
 
           toast({
             variant: "success",
@@ -97,7 +97,7 @@ export default function VerifyOtpPage() {
           if (typeof document !== 'undefined') {
             document.cookie = `onboarding=start; Path=/; Max-Age=600; SameSite=None; Secure`;
           }
-          router.replace("/user-info?from=verify");
+          router.push("/user-info?from=verify");
 
           toast({
             variant: "success",

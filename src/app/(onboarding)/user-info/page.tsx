@@ -183,7 +183,7 @@ const ProfileInfo = () => {
         await updateMe(payload).unwrap();
         // Give the backend a brief moment to persist fields that middleware checks (username)
         await new Promise((resolve) => setTimeout(resolve, 150));
-        router.replace("/user-photo");
+        router.push("/user-photo");
         router.refresh();
         try {
           toast({ variant: "success", description: "Details added successfully" });
