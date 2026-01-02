@@ -18,6 +18,7 @@ import { setAuthData } from "@/redux/slices/auth";
 import AddToHomescreenPrompt from "@/components/shared/AddToHomescreenPrompt";
 import GoogleButton from "@/components/shared/google-button";
 import CustomHr from "@/components/shared/custom-hr";
+import DesignAuthShell from "@/components/design/auth/DesignAuthShell";
 
 const Signin = () => {
   const { isMobile } = useClientHardwareInfo();
@@ -25,6 +26,8 @@ const Signin = () => {
   const appDispatcher = useAppDispatch();
   const router = useRouter();
   const { toast } = useToast();
+
+  const designEnabled = String(process.env.NEXT_PUBLIC_DESIGN || "") === "1";
 
   // Anti-rate-limit guards (persist across tabs)
   const inFlightRef = useRef(false);
@@ -152,69 +155,95 @@ const Signin = () => {
   return (
     <div>
       <AddToHomescreenPrompt />
-      {isMobile && (
-        <PageHeader
-          title="Sign In"
-          description="Enter Your Phone Number or Email"
-        />
-      )}
-      {isMobile ? (
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="">
-            <FormField
-              control={form.control}
-              name="loginMethod"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <AuthInputs
-                      type="signin"
-                      afterBelow={
-                        <div className="mt-4">
-                          <GoogleButton mode="signin" />
-                          <CustomHr />
-                        </div>
-                      }
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </form>
-        </Form>
+
+      {designEnabled ? (
+        <DesignAuthShell title="Welcome Back" subtitle="Sign in to your mentorio account">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <FormField
+                control={form.control}
+                name="loginMethod"
+                render={() => (
+                  <FormItem>
+                    <FormControl>
+                      <AuthInputs
+                        type="signin"
+                        afterBelow={
+                          <div className="mt-4">
+                            <GoogleButton mode="signin" />
+                            <CustomHr />
+                          </div>
+                        }
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </form>
+          </Form>
+        </DesignAuthShell>
       ) : (
-        <div className="min-h-[calc(100vh-120px)] flex items-center justify-center px-4">
-          <div className="w-full max-w-[520px] border border-[hsl(var(--border))] rounded-[var(--radius)] bg-[hsl(var(--card))] p-8">
-            <div className="p-0 mb-2 flex justify-center">
-              <Logo />
+        <>
+          {isMobile && <PageHeader title="Sign In" description="Enter Your Phone Number or Email" />}
+          {isMobile ? (
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="">
+                <FormField
+                  control={form.control}
+                  name="loginMethod"
+                  render={() => (
+                    <FormItem>
+                      <FormControl>
+                        <AuthInputs
+                          type="signin"
+                          afterBelow={
+                            <div className="mt-4">
+                              <GoogleButton mode="signin" />
+                              <CustomHr />
+                            </div>
+                          }
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+          ) : (
+            <div className="min-h-[calc(100vh-120px)] flex items-center justify-center px-4">
+              <div className="w-full max-w-[520px] border border-[hsl(var(--border))] rounded-[var(--radius)] bg-[hsl(var(--card))] p-8">
+                <div className="p-0 mb-2 flex justify-center">
+                  <Logo />
+                </div>
+                <div className="lg:p-2">
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="">
+                      <FormField
+                        control={form.control}
+                        name="loginMethod"
+                        render={() => (
+                          <FormItem>
+                            <FormControl>
+                              <AuthInputs
+                                type="signin"
+                                afterBelow={
+                                  <div className="mt-4">
+                                    <GoogleButton mode="signin" />
+                                    <CustomHr />
+                                  </div>
+                                }
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </form>
+                  </Form>
+                </div>
+              </div>
             </div>
-            <div className="lg:p-2">
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="">
-                  <FormField
-                    control={form.control}
-                    name="loginMethod"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <AuthInputs
-                            type="signin"
-                            afterBelow={
-                              <div className="mt-4">
-                                <GoogleButton mode="signin" />
-                                <CustomHr />
-                              </div>
-                            }
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </form>
-              </Form>
-            </div>
-          </div>
-        </div>
+          )}
+        </>
       )}
     </div>
   );

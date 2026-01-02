@@ -20,6 +20,7 @@ import { phoneNumberRefine } from "@/lib/utils";
 import AddToHomescreenPrompt from "@/components/shared/AddToHomescreenPrompt";
 import GoogleButton from "@/components/shared/google-button";
 import CustomHr from "@/components/shared/custom-hr";
+import DesignAuthShell from "@/components/design/auth/DesignAuthShell";
 
 const Signup = () => {
   const { countryCode } = useCountryCodeContext();
@@ -27,6 +28,8 @@ const Signup = () => {
   const { isMobile } = useClientHardwareInfo();
   const appDispatcher = useAppDispatch();
   const router = useRouter();
+
+  const designEnabled = String(process.env.NEXT_PUBLIC_DESIGN || "") === "1";
   const form = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
     defaultValues: {
@@ -110,70 +113,96 @@ const Signup = () => {
   return (
     <div>
       <AddToHomescreenPrompt />
-      {isMobile && (
-        <PageHeader title="Sign Up" description="Enter Your Phone Number" />
-      )}
-      {isMobile ? (
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="">
-            <FormField
-              control={form.control}
-              name="phoneNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <AuthInputs
-                      type="signup"
-                      afterBelow={
-                        <div className="mt-4">
-                          <GoogleButton mode="signup" />
-                          <CustomHr />
-                        </div>
-                      }
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </form>
-        </Form>
-      ) : (
-        <div className="min-h-[calc(100vh-120px)] flex items-center justify-center px-4">
-          <div className="w-full max-w-[520px] border lg:border-muted-foreground/30 lg:rounded-lg p-8">
-            <div className="p-0 mb-2 flex justify-center">
-              <Logo />
-            </div>
-            <div className="p-2">
-              <PageHeader
-                title="Sign Up"
-                description="Enter Your Phone Number"
+
+      {designEnabled ? (
+        <DesignAuthShell title="Create Account" subtitle="Join mentorio and start your journey">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <FormField
+                control={form.control}
+                name="phoneNumber"
+                render={() => (
+                  <FormItem>
+                    <FormControl>
+                      <AuthInputs
+                        type="signup"
+                        afterBelow={
+                          <div className="mt-4">
+                            <GoogleButton mode="signup" />
+                            <CustomHr />
+                          </div>
+                        }
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
               />
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="">
-                  <FormField
-                    control={form.control}
-                    name="phoneNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <AuthInputs
-                            type="signup"
-                            afterBelow={
-                              <div className="mt-4">
-                                <GoogleButton mode="signup" />
-                                <CustomHr />
-                              </div>
-                            }
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </form>
-              </Form>
+            </form>
+          </Form>
+        </DesignAuthShell>
+      ) : (
+        <>
+          {isMobile && <PageHeader title="Sign Up" description="Enter Your Phone Number" />}
+          {isMobile ? (
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="">
+                <FormField
+                  control={form.control}
+                  name="phoneNumber"
+                  render={() => (
+                    <FormItem>
+                      <FormControl>
+                        <AuthInputs
+                          type="signup"
+                          afterBelow={
+                            <div className="mt-4">
+                              <GoogleButton mode="signup" />
+                              <CustomHr />
+                            </div>
+                          }
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+          ) : (
+            <div className="min-h-[calc(100vh-120px)] flex items-center justify-center px-4">
+              <div className="w-full max-w-[520px] border lg:border-muted-foreground/30 lg:rounded-lg p-8">
+                <div className="p-0 mb-2 flex justify-center">
+                  <Logo />
+                </div>
+                <div className="p-2">
+                  <PageHeader title="Sign Up" description="Enter Your Phone Number" />
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="">
+                      <FormField
+                        control={form.control}
+                        name="phoneNumber"
+                        render={() => (
+                          <FormItem>
+                            <FormControl>
+                              <AuthInputs
+                                type="signup"
+                                afterBelow={
+                                  <div className="mt-4">
+                                    <GoogleButton mode="signup" />
+                                    <CustomHr />
+                                  </div>
+                                }
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </form>
+                  </Form>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          )}
+        </>
       )}
     </div>
   );
