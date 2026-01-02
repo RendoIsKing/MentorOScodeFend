@@ -89,7 +89,7 @@ export default function ProfilePageWired() {
           <div className="absolute top-4 right-4 z-10">
             <Button
               size="icon"
-              onClick={() => router.push("/settings")}
+              onClick={() => router.push("/feature/design/settings")}
               className="bg-white/90 hover:bg-white text-gray-900 backdrop-blur-sm shadow-lg h-10 w-10 rounded-full"
             >
               <Settings className="h-5 w-5" />
@@ -136,7 +136,7 @@ export default function ProfilePageWired() {
                 <Button
                   variant="outline"
                   className="gap-2 border-2 border-[#0078D7] text-[#0078D7] hover:bg-[#0078D7]/5 h-11 px-6 rounded-xl"
-                  onClick={() => router.push("/edit-profile")}
+                  onClick={() => router.push("/feature/design/edit-profile")}
                 >
                   <Edit className="h-4 w-4" />
                   Edit Profile
@@ -153,7 +153,7 @@ export default function ProfilePageWired() {
                 <Button
                   variant="outline"
                   className="w-full gap-2 border-2 border-[#0078D7] text-[#0078D7] hover:bg-[#0078D7]/5 h-11 rounded-xl"
-                  onClick={() => router.push("/edit-profile")}
+                  onClick={() => router.push("/feature/design/edit-profile")}
                 >
                   <Edit className="h-4 w-4" />
                   Edit Profile

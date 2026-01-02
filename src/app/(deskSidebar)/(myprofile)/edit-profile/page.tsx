@@ -35,6 +35,14 @@ export default function EditProfilePage() {
   const { toast } = useToast();
   const { isMobile } = useClientHardwareInfo();
   const router = useRouter();
+  // Cutover flag: enable new design edit profile on the real /edit-profile route.
+  useEffect(() => {
+    const designEnabled =
+      String(process.env.NEXT_PUBLIC_DESIGN || "") === "1" ||
+      String(process.env.NEXT_PUBLIC_DESIGN_PROFILE || "") === "1";
+    if (!designEnabled) return;
+    router.replace("/feature/design/edit-profile");
+  }, [router]);
   const { user } = useUserOnboardingContext();
   const { data: meData, refetch: refetchMe } = useGetUserDetailsQuery();
   const { data: userPhotoData } = useGetUserProfilePhotoQuery(user?.photoId, {
@@ -90,6 +98,12 @@ export default function EditProfilePage() {
     // setPhotoId(photoInfo.file.data.id);
     // setPhotoPath(newPhotoPath);
   };
+
+  // Avoid flashing the old edit profile while we redirect to the new design.
+  const designEnabled =
+    String(process.env.NEXT_PUBLIC_DESIGN || "") === "1" ||
+    String(process.env.NEXT_PUBLIC_DESIGN_PROFILE || "") === "1";
+  if (designEnabled) return <div className="h-dvh w-full" />;
 
   return (
     <div className="min-h-[100dvh] overflow-y-auto pb-tabbar">
