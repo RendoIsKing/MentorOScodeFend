@@ -142,7 +142,7 @@ const Signup = () => {
         </DesignAuthShell>
       ) : (
         <>
-          {isMobile && <PageHeader title="Sign Up" description="Enter Your Phone Number" />}
+          {isMobile && <PageHeader title="Sign Up" description="Enter Your Phone Number" showBackButton backHref="/signin" />}
           {isMobile ? (
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="">
@@ -174,7 +174,7 @@ const Signup = () => {
                   <Logo />
                 </div>
                 <div className="p-2">
-                  <PageHeader title="Sign Up" description="Enter Your Phone Number" />
+                  <PageHeader title="Sign Up" description="Enter Your Phone Number" showBackButton backHref="/signin" />
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="">
                       <FormField

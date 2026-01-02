@@ -209,6 +209,8 @@ const ProfileInfo = () => {
         <PageHeader
           title="Personal Info"
           description="This will help us to create your profile"
+          showBackButton
+          backHref="/verify-otp"
         />
       )}
       <Form {...form}>

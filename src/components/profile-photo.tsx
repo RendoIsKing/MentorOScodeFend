@@ -140,6 +140,8 @@ const ProfilePhoto: React.FC<IProfilePhotoProps> = ({ isUpdating }) => {
             <PageHeader
               title="Profile photo"
               description="Upload or capture your real profile photo."
+              showBackButton
+              backHref="/user-info"
             />
           </div>
         </>

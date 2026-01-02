@@ -120,6 +120,8 @@ export default function VerifyOtpPage() {
         <PageHeader
           title="Verification Code"
           description="Please enter 6 digit code."
+          showBackButton
+          backHref="/signup"
         />
       )}
       <Form {...form}>

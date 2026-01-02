@@ -69,6 +69,8 @@ const Signup = () => {
         <PageHeader
           title="Forgot Password"
           description="Enter Your Phone Number"
+          showBackButton
+          backHref="/validate-otp"
         />
       )}
       {isMobile ? (

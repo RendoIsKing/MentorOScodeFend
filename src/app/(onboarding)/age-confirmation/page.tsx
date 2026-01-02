@@ -151,6 +151,8 @@ const AgeConfirmation = () => {
         <PageHeader
           title="When is your Birthday?"
           description="Your birthdate won’t be shown publicly"
+          showBackButton
+          backHref="/user-photo"
         />
       )}
 
