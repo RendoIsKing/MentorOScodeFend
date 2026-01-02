@@ -2,6 +2,7 @@
 
 import React from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import DesignBottomNav from "@/components/design/DesignBottomNav";
 
 function pageFromPath(pathname: string): "home" | "search" | "chat" | "profile" {
@@ -19,6 +20,25 @@ function pageFromPath(pathname: string): "home" | "search" | "chat" | "profile" 
 export default function DesignShellClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || "";
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
+  const prevThemeRef = React.useRef<string | undefined>(undefined);
+
+  // Force light theme for the design experience (the export is designed for light tokens).
+  // Prevents dark-token Card/Button backgrounds from making UI look "off" on iOS.
+  React.useEffect(() => {
+    if (!prevThemeRef.current) prevThemeRef.current = theme;
+    if (theme && theme !== "light") {
+      setTheme("light");
+    }
+    return () => {
+      const prev = prevThemeRef.current;
+      // Restore previous theme when leaving /feature/design/*
+      if (prev && prev !== "light") {
+        setTheme(prev);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // Some design routes implement their own fixed bottom action bars (e.g. onboarding wizard).
   // Hide the global bottom nav there to avoid blocking taps.
   const hideNav =
