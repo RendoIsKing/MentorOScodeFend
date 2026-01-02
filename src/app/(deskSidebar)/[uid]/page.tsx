@@ -9,26 +9,24 @@ export default function ProfileBodyPage() {
   const router = useRouter();
   const params = useParams() as any;
   const uid = String(params?.uid || "");
-  const { data: userRes } = useGetUserDetailsByUserNameQuery({ userName: uid } as any, { skip: !uid });
+  const { data: userRes, isLoading: userLoading } = useGetUserDetailsByUserNameQuery({ userName: uid } as any, { skip: !uid });
   const targetRaw = (userRes as any)?.data ?? {};
+  const designEnabled =
+    String(process.env.NEXT_PUBLIC_DESIGN_PROFILE || "") === "1" ||
+    String(process.env.NEXT_PUBLIC_DESIGN || "") === "1";
 
   // Cutover flag: enable new design profile on the real /[uid] route.
   React.useEffect(() => {
-    const designEnabled =
-      String(process.env.NEXT_PUBLIC_DESIGN_PROFILE || "") === "1" ||
-      String(process.env.NEXT_PUBLIC_DESIGN || "") === "1";
     if (!designEnabled) return;
     if (!uid) return;
+    if (userLoading) return;
     const isMentor = Boolean(targetRaw?.isMentor);
     router.replace(`/feature/design/${isMentor ? "mentor" : "u"}/${encodeURIComponent(uid)}`);
-  }, [router, uid, targetRaw?.isMentor]);
+  }, [router, uid, userLoading, targetRaw?.isMentor, designEnabled]);
 
   // Cutover flag: enable new ui-v2 profile on the real /[uid] route.
   React.useEffect(() => {
     // Design takes precedence.
-    const designEnabled =
-      String(process.env.NEXT_PUBLIC_DESIGN_PROFILE || "") === "1" ||
-      String(process.env.NEXT_PUBLIC_DESIGN || "") === "1";
     if (designEnabled) return;
 
     const enabled =
@@ -38,6 +36,11 @@ export default function ProfileBodyPage() {
     if (!uid) return;
     router.replace(`/feature/ui-v2/u/${encodeURIComponent(uid)}`);
   }, [router, uid]);
+
+  // Avoid flashing the old profile while we redirect to the new design.
+  if (designEnabled) {
+    return <div className="h-dvh w-full" />;
+  }
 
   return (
     <>

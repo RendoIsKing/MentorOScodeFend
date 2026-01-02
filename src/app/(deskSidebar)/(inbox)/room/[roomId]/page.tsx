@@ -10,7 +10,9 @@ export default function InboxThreadPage() {
   const roomId = String(params?.roomId || "");
 
   React.useEffect(() => {
-    const designEnabled = String(process.env.NEXT_PUBLIC_DESIGN_CHAT || "") === "1";
+    const designEnabled =
+      String(process.env.NEXT_PUBLIC_DESIGN_CHAT || "") === "1" ||
+      String(process.env.NEXT_PUBLIC_DESIGN || "") === "1";
     if (designEnabled) {
       router.replace("/feature/design/chat-wired");
       return;

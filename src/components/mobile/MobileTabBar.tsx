@@ -41,6 +41,14 @@ export default function MobileTabBar() {
   const pathname = usePathname();
   const is = (href: string) => pathname === href || pathname?.startsWith(href);
 
+  const designEnabled =
+    String(process.env.NEXT_PUBLIC_DESIGN || "") === "1" ||
+    String(process.env.NEXT_PUBLIC_DESIGN_HOME || "") === "1" ||
+    String(process.env.NEXT_PUBLIC_DESIGN_SEARCH || "") === "1" ||
+    String(process.env.NEXT_PUBLIC_DESIGN_PROFILE || "") === "1" ||
+    String(process.env.NEXT_PUBLIC_DESIGN_CHAT || "") === "1" ||
+    String(process.env.NEXT_PUBLIC_DESIGN_MAJEN || "") === "1";
+
   // Avoid unnecessary /auth/me calls on auth pages or when no session cookie exists
   const isAuthPage = Boolean(
     pathname === "/signin" ||
@@ -59,7 +67,13 @@ export default function MobileTabBar() {
   // Do not render bottom bar on auth-related pages
   if (isAuthPage) return null;
   const profileUserName = (data?.data?.userName || data?.data?.fullName || '').toString();
-  const profileHref = profileUserName ? `/${profileUserName}` : "/signin";
+  const profileHref = designEnabled
+    ? "/feature/design/profile"
+    : (profileUserName ? `/${profileUserName}` : "/signin");
+
+  const homeHref = designEnabled ? "/feature/design/home-wired" : "/home";
+  const searchHref = designEnabled ? "/feature/design/search" : "/search";
+  const inboxHref = designEnabled ? "/feature/design/chat-wired" : "/room";
 
   return (
     <nav className="md:hidden fixed inset-x-0 bottom-0 z-[9999] pointer-events-auto" data-test="bottom-nav">
@@ -67,14 +81,14 @@ export default function MobileTabBar() {
         <div className="relative grid grid-cols-3 items-end h-[var(--tabbar-height)]">
         <ul className="flex items-center gap-6">
           <li>
-            <Link href="/home" className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${is("/home") || pathname === "/" ? "text-primary font-medium" : "text-muted-foreground"}`} aria-label="Home">
-              <div className="h-6 w-6"><IconHome active={Boolean(is("/home") || pathname === "/")} /></div>
+            <Link href={homeHref} className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${is("/home") || is("/feature/design/home-wired") || pathname === "/" ? "text-primary font-medium" : "text-muted-foreground"}`} aria-label="Home">
+              <div className="h-6 w-6"><IconHome active={Boolean(is("/home") || is("/feature/design/home-wired") || pathname === "/")} /></div>
               <span>Home</span>
             </Link>
           </li>
           <li>
-            <Link href="/search" className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${is("/search") ? "text-primary font-medium" : "text-muted-foreground"}`} aria-label="Search">
-              <div className="h-6 w-6"><IconSearch active={Boolean(is("/search"))} /></div>
+            <Link href={searchHref} className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${is("/search") || is("/feature/design/search") ? "text-primary font-medium" : "text-muted-foreground"}`} aria-label="Search">
+              <div className="h-6 w-6"><IconSearch active={Boolean(is("/search") || is("/feature/design/search"))} /></div>
               <span>Search</span>
             </Link>
           </li>
@@ -93,8 +107,8 @@ export default function MobileTabBar() {
 
         <ul className="flex items-center justify-end gap-6">
           <li>
-            <Link href="/room" className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${is("/room") ? "text-primary font-medium" : "text-muted-foreground"}`} aria-label="Inbox">
-              <div className="h-6 w-6"><IconInbox active={Boolean(is("/room"))} /></div>
+            <Link href={inboxHref} className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${is("/room") || is("/feature/design/chat-wired") ? "text-primary font-medium" : "text-muted-foreground"}`} aria-label="Inbox">
+              <div className="h-6 w-6"><IconInbox active={Boolean(is("/room") || is("/feature/design/chat-wired"))} /></div>
               <span>Inbox</span>
             </Link>
           </li>

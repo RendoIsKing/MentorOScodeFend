@@ -44,6 +44,7 @@ export default function RootLayout({
   const router = useRouter();
   const pathname = usePathname();
   const isChatRoute = pathname === "/chat";
+  const isDesignRoute = Boolean(pathname?.startsWith("/feature/design"));
   // Feature flag loader for the new design system.
   // When localStorage 'ds' === 'figma', we add class 'ds-figma' on <html>.
   function DesignSystemFlag() {
@@ -130,13 +131,13 @@ export default function RootLayout({
                                 <CountryCodeProvider>
                                 <PushInit />
                                 <DesignSystemFlag />
-                                <div className={`${isChatRoute ? "md:pb-0" : "pb-tabbar md:pb-0"}`}>
+                                <div className={`${(isChatRoute || isDesignRoute) ? "md:pb-0" : "pb-tabbar md:pb-0"}`}>
                                   <ErrorBoundary fallback={<div className="p-4 text-muted-foreground text-sm">Kunne ikke laste. Prøv å oppdatere.</div>}>
                                     {postslot}
                                     {children}
                                   </ErrorBoundary>
                                 </div>
-                                {!isChatRoute && <MobileTabBar />}
+                                {(!isChatRoute && !isDesignRoute) && <MobileTabBar />}
                                 <Toaster />
                                 </CountryCodeProvider>
                               </UserTagsContextProvider>
@@ -158,13 +159,13 @@ export default function RootLayout({
                               <CountryCodeProvider>
                               <PushInit />
                               <DesignSystemFlag />
-                              <div className={`${isChatRoute ? "md:pb-0" : "pb-tabbar md:pb-0"}`}>
+                              <div className={`${(isChatRoute || isDesignRoute) ? "md:pb-0" : "pb-tabbar md:pb-0"}`}>
                                 <ErrorBoundary fallback={<div className="p-4 text-muted-foreground text-sm">Kunne ikke laste. Prøv å oppdatere.</div>}>
                                   {postslot}
                                   {children}
                                 </ErrorBoundary>
                               </div>
-                              {!isChatRoute && <MobileTabBar />}
+                              {(!isChatRoute && !isDesignRoute) && <MobileTabBar />}
                               <Toaster />
                               </CountryCodeProvider>
                             </UserTagsContextProvider>

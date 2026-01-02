@@ -19,7 +19,9 @@ export default function InboxPageResponsive() {
 
   // Feature flag: cut over inbox route to ui-v2 without breaking old UI.
   React.useEffect(() => {
-    const designEnabled = String(process.env.NEXT_PUBLIC_DESIGN_CHAT || "") === "1";
+    const designEnabled =
+      String(process.env.NEXT_PUBLIC_DESIGN_CHAT || "") === "1" ||
+      String(process.env.NEXT_PUBLIC_DESIGN || "") === "1";
     if (designEnabled) {
       router.replace("/feature/design/chat-wired");
       return;
