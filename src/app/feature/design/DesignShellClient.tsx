@@ -19,7 +19,11 @@ function pageFromPath(pathname: string): "home" | "search" | "chat" | "profile" 
 export default function DesignShellClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || "";
   const router = useRouter();
-  const hideNav = pathname.startsWith("/feature/design/create");
+  // Some design routes implement their own fixed bottom action bars (e.g. onboarding wizard).
+  // Hide the global bottom nav there to avoid blocking taps.
+  const hideNav =
+    pathname.startsWith("/feature/design/create") ||
+    pathname.startsWith("/feature/design/mentor-onboarding");
 
   return (
     <div className="min-h-dvh w-full">
