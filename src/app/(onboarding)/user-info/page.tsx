@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useClientHardwareInfo } from "@/hooks/use-client-hardware-info";
 
 import { Label } from "@radix-ui/react-dropdown-menu";
@@ -27,10 +27,10 @@ import Logo from "@/components/shared/Logo";
 import PageHeader from "@/components/shared/page-header";
 import { ABeeZee } from "next/font/google";
 import {
-  useCreateUserMutation,
   useLazyCheckUsernameQuery,
   useGetUserDetailsQuery,
 } from "@/redux/services/haveme";
+import { useUpdateMeMutation } from "@/redux/services/haveme/user";
 import { formatFullName } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/components/ui/use-toast";
@@ -48,13 +48,14 @@ const ProfileInfo = () => {
   const router = useRouter();
 
   const { isMobile } = useClientHardwareInfo();
-  const [otherGender, setOtherGender] = useState(false);
   const [usernameText, setUsernameText] = useState("");
   const [usernameAvailability, setUsernameAvailability] = useState(null);
 
   const [checkUsernameMethod] = useLazyCheckUsernameQuery();
-  const [createUserMethod] = useCreateUserMutation();
+  const [updateMe] = useUpdateMeMutation();
   const { data: meData } = useGetUserDetailsQuery();
+  const me = (meData as any)?.data ?? {};
+  const myId = String(me?._id || "");
   // googleId may not be declared on the TS type; check dynamically
   const isGoogleUser = Boolean((meData as any)?.data?.googleId);
 
@@ -99,7 +100,7 @@ const ProfileInfo = () => {
       // .optional()
       .refine(
         (value = "") => {
-          return form.getValues("type") === "others"
+          return form.getValues("genderType") === "other"
             ? value.trim().length > 0
             : true;
         },
@@ -158,21 +159,32 @@ const ProfileInfo = () => {
       }
     }
     if (available) {
-      let createUserObject = {
-        fullName: formatFullName(data.fullName),
-        userName: data.username,
-        email: data.emailAddress.toLowerCase(),
-        password: data.password,
-        gender:
-          data.genderType.toLowerCase() === "other"
-            ? data.otherGender
-            : data.genderType,
-      };
       try {
-        await createUserMethod(createUserObject).unwrap();
-        // Give the backend a brief moment to persist flags that middleware checks
-        await new Promise((resolve) => setTimeout(resolve, 250));
-        if (typeof window !== "undefined") window.location.href = "/user-photo";
+        // IMPORTANT: this step should UPDATE the currently authenticated OTP user,
+        // not create a new user record (which breaks the onboarding session).
+        if (!myId) {
+          toast({
+            variant: "destructive",
+            description: "Session not ready yet. Please go back and try again.",
+          });
+          return;
+        }
+
+        const payload: any = {
+          fullName: formatFullName(data.fullName),
+          userName: data.username,
+          gender: data.genderType.toLowerCase() === "other" ? data.otherGender : data.genderType,
+        };
+        if (!isGoogleUser) {
+          payload.email = String(data.emailAddress || "").toLowerCase();
+          payload.password = data.password;
+        }
+
+        await updateMe(payload).unwrap();
+        // Give the backend a brief moment to persist fields that middleware checks (username)
+        await new Promise((resolve) => setTimeout(resolve, 150));
+        router.replace("/user-photo");
+        router.refresh();
         try {
           toast({ variant: "success", description: "Details added successfully" });
         } catch {}
@@ -330,9 +342,6 @@ const ProfileInfo = () => {
                 render={({ field }) => (
                   <FormItem>
                     <>
-                      {field.value === "other"
-                        ? setOtherGender(true)
-                        : setOtherGender(false)}
                       <FormLabel
                         className={` font-normal ${fontItalic.className}`}
                       >
@@ -358,7 +367,7 @@ const ProfileInfo = () => {
                         </SelectContent>
                       </Select>
 
-                      {otherGender ? (
+                      {field.value === "other" ? (
                         <FormField
                           control={form.control}
                           name="otherGender"
