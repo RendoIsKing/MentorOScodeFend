@@ -59,13 +59,23 @@ export default function MobileTabBar() {
     pathname?.startsWith("/verify-otp") ||
     pathname?.startsWith("/google-user-info")
   );
+
+  // Also hide bottom bar during onboarding funnel (it can block Next/Continue buttons on mobile).
+  const isOnboardingPage = Boolean(
+    pathname === "/user-info" ||
+    pathname === "/google-user-info" ||
+    pathname === "/user-photo" ||
+    pathname === "/user-tags" ||
+    pathname === "/age-confirmation" ||
+    pathname === "/gender-select"
+  );
   const hasSessionCookie =
     typeof document !== "undefined" && document.cookie.includes("auth_token=");
 
   const { data } = useGetUserDetailsQuery(undefined, { skip: !hasSessionCookie });
 
-  // Do not render bottom bar on auth-related pages
-  if (isAuthPage) return null;
+  // Do not render bottom bar on auth/onboarding pages
+  if (isAuthPage || isOnboardingPage) return null;
   const profileUserName = (data?.data?.userName || data?.data?.fullName || '').toString();
   const profileHref = designEnabled
     ? "/feature/design/profile"

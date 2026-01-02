@@ -45,6 +45,14 @@ export default function RootLayout({
   const pathname = usePathname();
   const isChatRoute = pathname === "/chat";
   const isDesignRoute = Boolean(pathname?.startsWith("/feature/design"));
+  const isOnboardingRoute = Boolean(
+    pathname === "/user-info" ||
+      pathname === "/google-user-info" ||
+      pathname === "/user-photo" ||
+      pathname === "/user-tags" ||
+      pathname === "/age-confirmation" ||
+      pathname === "/gender-select"
+  );
   // Feature flag loader for the new design system.
   // When localStorage 'ds' === 'figma', we add class 'ds-figma' on <html>.
   function DesignSystemFlag() {
@@ -131,13 +139,13 @@ export default function RootLayout({
                                 <CountryCodeProvider>
                                 <PushInit />
                                 <DesignSystemFlag />
-                                <div className={`${(isChatRoute || isDesignRoute) ? "md:pb-0" : "pb-tabbar md:pb-0"}`}>
+                                <div className={`${(isChatRoute || isDesignRoute || isOnboardingRoute) ? "md:pb-0" : "pb-tabbar md:pb-0"}`}>
                                   <ErrorBoundary fallback={<div className="p-4 text-muted-foreground text-sm">Kunne ikke laste. Prøv å oppdatere.</div>}>
                                     {postslot}
                                     {children}
                                   </ErrorBoundary>
                                 </div>
-                                {(!isChatRoute && !isDesignRoute) && <MobileTabBar />}
+                                {(!isChatRoute && !isDesignRoute && !isOnboardingRoute) && <MobileTabBar />}
                                 <Toaster />
                                 </CountryCodeProvider>
                               </UserTagsContextProvider>
@@ -159,13 +167,13 @@ export default function RootLayout({
                               <CountryCodeProvider>
                               <PushInit />
                               <DesignSystemFlag />
-                              <div className={`${(isChatRoute || isDesignRoute) ? "md:pb-0" : "pb-tabbar md:pb-0"}`}>
+                              <div className={`${(isChatRoute || isDesignRoute || isOnboardingRoute) ? "md:pb-0" : "pb-tabbar md:pb-0"}`}>
                                 <ErrorBoundary fallback={<div className="p-4 text-muted-foreground text-sm">Kunne ikke laste. Prøv å oppdatere.</div>}>
                                   {postslot}
                                   {children}
                                 </ErrorBoundary>
                               </div>
-                              {(!isChatRoute && !isDesignRoute) && <MobileTabBar />}
+                              {(!isChatRoute && !isDesignRoute && !isOnboardingRoute) && <MobileTabBar />}
                               <Toaster />
                               </CountryCodeProvider>
                             </UserTagsContextProvider>

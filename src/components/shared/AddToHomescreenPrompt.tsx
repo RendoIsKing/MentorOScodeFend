@@ -1,17 +1,39 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Home as HomeIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export default function AddToHomescreenPrompt() {
+	const pathname = usePathname() || "";
 	const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 	const [show, setShow] = useState(false);
 	const [isIOS, setIsIOS] = useState(false);
 	const [isStandalone, setIsStandalone] = useState(false);
+	const [dismissed, setDismissed] = useState(false);
+
+	const isAuthishRoute =
+		pathname === "/signin" ||
+		pathname === "/signup" ||
+		pathname === "/forgotpassword" ||
+		pathname === "/verify-otp" ||
+		pathname === "/validate-otp" ||
+		pathname === "/new-password";
+
+	const isOnboardingRoute =
+		pathname === "/user-info" ||
+		pathname === "/google-user-info" ||
+		pathname === "/user-photo" ||
+		pathname === "/user-tags" ||
+		pathname === "/age-confirmation" ||
+		pathname === "/gender-select";
+
+	const DISMISS_KEY = "a2hs_dismissed_v1";
 
 	useEffect(() => {
 		try {
 			setIsIOS(/iphone|ipad|ipod/i.test(navigator.userAgent));
 			setIsStandalone((window.navigator as any).standalone || window.matchMedia("(display-mode: standalone)").matches);
+			setDismissed(window.localStorage.getItem(DISMISS_KEY) === "1");
 			const handler = (e: any) => {
 				e.preventDefault();
 				setDeferredPrompt(e);
@@ -23,9 +45,25 @@ export default function AddToHomescreenPrompt() {
 	}, []);
 
 	if (isStandalone) return null;
-	if (!show && !isIOS) return null;
+	if (dismissed) return null;
+	if (isAuthishRoute || isOnboardingRoute) return null;
+
+	// iOS Safari never fires beforeinstallprompt; show a static tip once until dismissed.
+	if (!show && isIOS) {
+		// Allow render; we’ll show below.
+	} else if (!show) {
+		return null;
+	}
 
 	const showInstallButton = Boolean(deferredPrompt) && !isIOS;
+
+	const dismiss = () => {
+		try {
+			window.localStorage.setItem(DISMISS_KEY, "1");
+		} catch {}
+		setDismissed(true);
+		setShow(false);
+	};
 
 	return (
 		<div className="fixed inset-x-3 bottom-6 z-[10000] rounded-xl bg-black/85 text-white p-3 backdrop-blur-md shadow-lg border border-white/10">
@@ -45,15 +83,15 @@ export default function AddToHomescreenPrompt() {
 								if (deferredPrompt) {
 									deferredPrompt.prompt();
 									const { outcome } = await deferredPrompt.userChoice;
-									if (outcome) setShow(false);
+									if (outcome) dismiss();
 								}
-							} catch { setShow(false); }
+							} catch { dismiss(); }
 						}}
 					>
 						Install
 					</button>
 				) : null}
-				<button className="ml-2 text-xs" onClick={() => setShow(false)}>{isIOS ? "Got it" : "Close"}</button>
+				<button className="ml-2 text-xs" onClick={dismiss}>{isIOS ? "Got it" : "Close"}</button>
 			</div>
 			{isIOS && (
 				<div className="mt-2 text-xs text-white/80">
