@@ -80,7 +80,7 @@ export default function MentorOnboardingWired() {
   const [updateMe, { isLoading: isSaving }] = useUpdateMeMutation();
   const [createProductPlan] = useCreateProductPlanMutation();
   const { data: plansData } = useGetPlanDetailsQuery();
-  const { data: meRes } = useGetUserDetailsQuery();
+  const { data: meRes, refetch: refetchMe } = useGetUserDetailsQuery();
   const me = (meRes as any)?.data ?? {};
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -156,6 +156,7 @@ export default function MentorOnboardingWired() {
         mentorYearsExperience: years,
         mentorHasFreeTrial: formData.offerFreeTrial,
       } as any).unwrap();
+      refetchMe();
     } catch {}
 
     // Best-effort: auto-create a FIXED subscription plan if none exists.

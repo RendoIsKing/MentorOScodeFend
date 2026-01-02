@@ -17,7 +17,7 @@ import { useGetSubscriberListQuery } from "@/redux/services/haveme/user";
 
 export default function MentorSettingsWired() {
   const router = useRouter();
-  const { data: meRes } = useGetUserDetailsQuery();
+  const { data: meRes, refetch: refetchMe } = useGetUserDetailsQuery();
   const me = (meRes as any)?.data ?? {};
   const myId = String(me?._id || "");
 
@@ -80,7 +80,15 @@ export default function MentorSettingsWired() {
   };
 
   const handleStartMentorOnboarding = () => {
-    router.push("/feature/design/mentor-onboarding");
+    // Persist mentor status right away so UI updates immediately (badge + dashboard entry points).
+    // Onboarding will fill in the rest of the mentor profile fields.
+    (async () => {
+      try {
+        await updateMe({ isMentor: true } as any).unwrap();
+        refetchMe();
+      } catch {}
+      router.push("/feature/design/mentor-onboarding");
+    })();
   };
 
   const handleCancel = () => {

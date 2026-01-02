@@ -22,7 +22,7 @@ function fileUrl(fileId?: string | null) {
 
 export default function EditProfilePageWired() {
   const router = useRouter();
-  const { data: meRes } = useGetUserDetailsQuery();
+  const { data: meRes, refetch: refetchMe } = useGetUserDetailsQuery();
   const meRaw = (meRes as any)?.data ?? {};
 
   const [updateMe, { isLoading: saving }] = useUpdateMeMutation();
@@ -84,6 +84,35 @@ export default function EditProfilePageWired() {
       ...(coverPhotoId ? { coverPhotoId } : {}),
     } as any).unwrap();
 
+    refetchMe();
+    router.refresh();
+    router.replace("/feature/design/profile");
+  };
+
+  const quitMentor = async () => {
+    if (!Boolean(meRaw?.isMentor)) return;
+    const ok = window.confirm("Quit being a mentor? You can become a mentor again later.");
+    if (!ok) return;
+
+    try {
+      await updateMe({
+        isMentor: false,
+      } as any).unwrap();
+    } catch {}
+
+    // Clear local mentor caches used by design flows
+    try {
+      const myId = String(meRaw?._id || "");
+      if (myId) {
+        window.localStorage.removeItem(`mentorDashboardAvatar:${myId}`);
+        window.localStorage.removeItem(`mentorAvatarDocs:${myId}`);
+      }
+      window.localStorage.removeItem("mentorProfile");
+      window.localStorage.removeItem("mentorAiSetup");
+    } catch {}
+
+    refetchMe();
+    router.refresh();
     router.replace("/feature/design/profile");
   };
 
@@ -235,6 +264,27 @@ export default function EditProfilePageWired() {
             </div>
           </div>
         </div>
+
+        {/* Quit Mentor (only if currently a mentor) */}
+        {Boolean(meRaw?.isMentor) && (
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-red-100">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg text-gray-900">Mentor Mode</h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  Stop being a mentor. Your mentor dashboard and mentor-only features will be removed.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={quitMentor}
+                className="border-red-300 text-red-600 hover:bg-red-50"
+              >
+                Quit being a mentor
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
