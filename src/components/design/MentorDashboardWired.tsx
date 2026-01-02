@@ -24,12 +24,16 @@ import {
   ChevronDown,
   Eye,
   CheckCircle,
+  CheckCircle2,
   Settings,
   Star,
+  FileText,
+  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useGetUserDetailsQuery } from "@/redux/services/haveme";
+import { useGetUserDetailsQuery, useUploadFileMutation } from "@/redux/services/haveme";
 import { useGetSubscriberListQuery } from "@/redux/services/haveme/user";
+import { useUpdateMeMutation } from "@/redux/services/haveme/user";
 import {
   useCreateProductPlanMutation,
   useDeletePlanMutation,
@@ -80,9 +84,24 @@ type DashboardMessage = {
   userId?: string;
 };
 
+type AvatarDocument = {
+  id: string;
+  name: string;
+  size: string;
+  uploadedDate: string;
+};
+
 function compactMoneyCents(n: number): string {
   if (!n || Number.isNaN(n)) return "$0";
   return `$${Math.round(n / 100).toLocaleString()}`;
+}
+
+function formatBytes(bytes: number): string {
+  if (!bytes || Number.isNaN(bytes)) return "—";
+  const kb = bytes / 1024;
+  if (kb < 1024) return `${Math.max(1, Math.round(kb))} KB`;
+  const mb = kb / 1024;
+  return `${mb.toFixed(1)} MB`;
 }
 
 function relTime(iso?: string | null) {
@@ -109,10 +128,149 @@ export default function MentorDashboardWired() {
 
   const isMentor = Boolean(me?.isMentor);
 
+  const [updateMe, { isLoading: savingAvatar }] = useUpdateMeMutation();
+  const [uploadFile] = useUploadFileMutation();
+
   const [activeTab, setActiveTab] = useState<TabType>("overview");
   const [searchQuery, setSearchQuery] = useState("");
   const [studentFilter, setStudentFilter] = useState<"all" | "active" | "inactive" | "new">("all");
   const [showDropdown, setShowDropdown] = useState(false);
+
+  // ----- Avatar tab (AI Avatar) - ported from export (was missing, leaving tab blank)
+  const [guidanceText, setGuidanceText] = useState("");
+  const [autoRespond, setAutoRespond] = useState(false);
+  const [dailyCheckIns, setDailyCheckIns] = useState(false);
+  const [avatarDocuments, setAvatarDocuments] = useState<AvatarDocument[]>([]);
+  const avatarFileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!myId) return;
+    // Hydrate from backend fields + localStorage fallback (no new endpoints)
+    const guidanceFromBackend = String(me?.mentorAiTrainingPhilosophy || "");
+    let nextGuidance = guidanceFromBackend;
+
+    try {
+      const raw = window.localStorage.getItem(`mentorDashboardAvatar:${myId}`);
+      if (raw) {
+        const x = JSON.parse(raw);
+        if (typeof x?.guidanceText === "string" && !nextGuidance) nextGuidance = x.guidanceText;
+        if (typeof x?.autoRespond === "boolean") setAutoRespond(x.autoRespond);
+        if (typeof x?.dailyCheckIns === "boolean") setDailyCheckIns(x.dailyCheckIns);
+      }
+    } catch {}
+    setGuidanceText(nextGuidance);
+
+    const ids = Array.isArray(me?.mentorAiKnowledgeBaseFileIds) ? me.mentorAiKnowledgeBaseFileIds.map(String) : [];
+    try {
+      const metaRaw = window.localStorage.getItem(`mentorAvatarDocs:${myId}`);
+      const meta = metaRaw ? JSON.parse(metaRaw) : {};
+      const docs: AvatarDocument[] = ids.map((id: string) => {
+        const m = meta?.[id];
+        const safeName = typeof m?.name === "string" ? m.name : `Document ${id.slice(0, 6)}`;
+        const safeSize = typeof m?.size === "string" ? m.size : "—";
+        const safeDate = typeof m?.uploadedDate === "string" ? m.uploadedDate : "—";
+        return { id, name: safeName, size: safeSize, uploadedDate: safeDate };
+      });
+      setAvatarDocuments(docs);
+    } catch {
+      setAvatarDocuments(
+        ids.map((id: string) => ({
+          id,
+          name: `Document ${id.slice(0, 6)}`,
+          size: "—",
+          uploadedDate: "—",
+        }))
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [myId, meRes]);
+
+  useEffect(() => {
+    if (!myId) return;
+    try {
+      window.localStorage.setItem(
+        `mentorDashboardAvatar:${myId}`,
+        JSON.stringify({ guidanceText, autoRespond, dailyCheckIns })
+      );
+    } catch {}
+  }, [myId, guidanceText, autoRespond, dailyCheckIns]);
+
+  const persistAvatarDocsMeta = (docs: AvatarDocument[]) => {
+    if (!myId) return;
+    try {
+      const next: Record<string, { name: string; size: string; uploadedDate: string }> = {};
+      for (const d of docs) next[d.id] = { name: d.name, size: d.size, uploadedDate: d.uploadedDate };
+      window.localStorage.setItem(`mentorAvatarDocs:${myId}`, JSON.stringify(next));
+    } catch {}
+  };
+
+  const saveAvatarGuidance = async () => {
+    try {
+      await updateMe({ mentorAiTrainingPhilosophy: guidanceText } as any).unwrap();
+    } catch {}
+  };
+
+  const onChooseAvatarFiles = () => avatarFileInputRef.current?.click();
+
+  const onAvatarFilesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const picked = Array.from(files);
+
+    const uploaded: AvatarDocument[] = [];
+    const newIds: string[] = [];
+
+    for (const f of picked) {
+      try {
+        const fd = new FormData();
+        fd.append("file", f);
+        const res: any = await uploadFile(fd).unwrap();
+        if (res?.id) {
+          const id = String(res.id);
+          newIds.push(id);
+          uploaded.push({
+            id,
+            name: f.name,
+            size: formatBytes(f.size),
+            uploadedDate: new Date().toLocaleDateString(),
+          });
+        }
+      } catch {
+        // ignore (export has no error UI)
+      }
+    }
+
+    if (uploaded.length) {
+      setAvatarDocuments((prev) => {
+        const next = [...prev, ...uploaded];
+        persistAvatarDocsMeta(next);
+        return next;
+      });
+
+      try {
+        const existing = Array.isArray(me?.mentorAiKnowledgeBaseFileIds) ? me.mentorAiKnowledgeBaseFileIds.map(String) : [];
+        const merged = [...existing, ...newIds];
+        await updateMe({ mentorAiKnowledgeBaseFileIds: merged } as any).unwrap();
+      } catch {}
+    }
+
+    // reset input so selecting the same file again still triggers change
+    try {
+      e.target.value = "";
+    } catch {}
+  };
+
+  const removeAvatarDoc = async (id: string) => {
+    setAvatarDocuments((prev) => {
+      const next = prev.filter((d) => d.id !== id);
+      persistAvatarDocsMeta(next);
+      return next;
+    });
+    try {
+      const remaining = avatarDocuments.filter((d) => d.id !== id).map((d) => d.id);
+      await updateMe({ mentorAiKnowledgeBaseFileIds: remaining } as any).unwrap();
+    } catch {}
+  };
 
   // ----- Students (subscribers)
   const { data: subscriberRes } = useGetSubscriberListQuery(myId as any, { skip: !isMentor || !myId });
@@ -689,6 +847,182 @@ export default function MentorDashboardWired() {
                 </Card>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* AVATAR TAB */}
+        {activeTab === "avatar" && (
+          <div className="space-y-6">
+            {/* Header */}
+            <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2.5 bg-gradient-to-br from-[#00AEEF]/20 to-[#0078D7]/20 rounded-xl">
+                  <User className="h-6 w-6 text-[#0078D7]" />
+                </div>
+                <h2 className="text-2xl text-gray-900">AI Avatar</h2>
+              </div>
+              <p className="text-gray-600">Teach your AI to coach students in your style</p>
+            </div>
+
+            {/* Coaching Style */}
+            <Card className="border-gray-100 shadow-md rounded-2xl overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 bg-gradient-to-br from-[#00AEEF]/10 to-[#0078D7]/10 rounded-lg">
+                    <MessageCircle className="w-4 h-4 text-[#0078D7]" />
+                  </div>
+                  <div>
+                    <h3 className="text-gray-900">Coaching Style</h3>
+                    <p className="text-sm text-gray-500 mt-0.5">How should your AI coach students?</p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                <textarea
+                  rows={6}
+                  value={guidanceText}
+                  onChange={(e) => setGuidanceText(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm text-gray-900 resize-none focus:outline-none focus:ring-2 focus:ring-[#0078D7]/20 focus:border-[#0078D7] mb-3 transition-all placeholder:text-gray-400"
+                  placeholder="Describe your coaching philosophy, tone, and approach..."
+                />
+
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-gray-400">{guidanceText.length} characters</p>
+                  <Button
+                    onClick={saveAvatarGuidance}
+                    disabled={savingAvatar}
+                    className="bg-gradient-to-r from-[#00AEEF] to-[#0078D7] hover:from-[#0078D7] hover:to-[#004C97] text-white shadow-lg shadow-[#00AEEF]/30 rounded-lg"
+                  >
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    Save Changes
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Knowledge Base */}
+            <Card className="border-gray-100 shadow-md rounded-2xl overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-gradient-to-br from-[#00AEEF]/10 to-[#0078D7]/10 rounded-lg">
+                      <FileText className="w-4 h-4 text-[#0078D7]" />
+                    </div>
+                    <div>
+                      <h3 className="text-gray-900">Knowledge Base</h3>
+                      <p className="text-sm text-gray-500 mt-0.5">Upload documents about your methods</p>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="bg-gradient-to-r from-[#00AEEF] to-[#0078D7] hover:from-[#0078D7] hover:to-[#004C97] text-white shadow-md shadow-[#00AEEF]/30 rounded-lg"
+                    onClick={onChooseAvatarFiles}
+                  >
+                    <Plus className="w-3.5 h-3.5 mr-1.5" />
+                    Add
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                <input ref={avatarFileInputRef} type="file" className="hidden" multiple onChange={onAvatarFilesSelected} />
+
+                {/* Document List */}
+                <div className="space-y-2">
+                  {avatarDocuments.map((doc) => (
+                    <div
+                      key={doc.id}
+                      className="flex items-center gap-3 p-4 bg-gradient-to-r from-gray-50 to-white border border-gray-100 rounded-xl group hover:shadow-md hover:from-[#00AEEF]/5 hover:to-[#0078D7]/5 transition-all"
+                    >
+                      <div className="w-11 h-11 bg-gradient-to-br from-[#00AEEF]/10 to-[#0078D7]/10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <FileText className="w-5 h-5 text-[#0078D7]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-gray-900 truncate">{doc.name}</p>
+                        <p className="text-xs text-gray-500">
+                          {doc.size} • {doc.uploadedDate}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeAvatarDoc(doc.id)}
+                        className="h-9 w-9 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                        aria-label="Remove document"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+
+                {avatarDocuments.length === 0 && (
+                  <div className="text-center py-12">
+                    <div className="p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl w-fit mx-auto mb-4">
+                      <FileText className="w-12 h-12 text-gray-400 mx-auto" />
+                    </div>
+                    <p className="text-sm text-gray-500 mb-1">No documents yet</p>
+                    <p className="text-xs text-gray-400">Upload PDFs, docs, or text files</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Behavior */}
+            <Card className="border-gray-100 shadow-md rounded-2xl overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 bg-gradient-to-br from-[#00AEEF]/10 to-[#0078D7]/10 rounded-lg">
+                    <Settings className="w-4 h-4 text-[#0078D7]" />
+                  </div>
+                  <h3 className="text-gray-900">Behavior</h3>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <button
+                    onClick={() => setAutoRespond(!autoRespond)}
+                    className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
+                      autoRespond ? "bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-100" : "bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${autoRespond ? "bg-gradient-to-br from-emerald-500/20 to-green-500/20" : "bg-gray-200"}`}>
+                        <CheckCircle className={`w-4 h-4 ${autoRespond ? "text-emerald-600" : "text-gray-500"}`} />
+                      </div>
+                      <p className="text-sm text-gray-900">Auto-respond to students</p>
+                    </div>
+                    <Badge
+                      className={`${
+                        autoRespond ? "bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-md shadow-emerald-500/30" : "bg-gray-200 text-gray-600"
+                      } text-xs px-3 py-1 cursor-pointer`}
+                    >
+                      {autoRespond ? "On" : "Off"}
+                    </Badge>
+                  </button>
+
+                  <button
+                    onClick={() => setDailyCheckIns(!dailyCheckIns)}
+                    className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
+                      dailyCheckIns ? "bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-100" : "bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${dailyCheckIns ? "bg-gradient-to-br from-emerald-500/20 to-green-500/20" : "bg-gray-200"}`}>
+                        <Clock className={`w-4 h-4 ${dailyCheckIns ? "text-emerald-600" : "text-gray-500"}`} />
+                      </div>
+                      <p className="text-sm text-gray-900">Send daily check-ins</p>
+                    </div>
+                    <Badge
+                      className={`${
+                        dailyCheckIns ? "bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-md shadow-emerald-500/30" : "bg-gray-200 text-gray-600"
+                      } text-xs px-3 py-1 cursor-pointer`}
+                    >
+                      {dailyCheckIns ? "On" : "Off"}
+                    </Badge>
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
 
