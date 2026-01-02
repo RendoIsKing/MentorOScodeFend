@@ -89,7 +89,7 @@ export default function SettingsPageWired() {
           icon: HelpCircle,
           label: "Help & Support",
           description: "Get help and contact support",
-          href: "/settings/report-a-problem",
+            href: "/feature/design/settings/help",
           color: "from-cyan-500/10 to-cyan-500/5",
           iconColor: "text-cyan-600",
         },
