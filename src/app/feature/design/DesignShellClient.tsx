@@ -19,22 +19,25 @@ function pageFromPath(pathname: string): "home" | "search" | "chat" | "profile" 
 export default function DesignShellClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || "";
   const router = useRouter();
+  const hideNav = pathname.startsWith("/feature/design/create");
 
   return (
     <div className="min-h-dvh w-full">
       {children}
-      <DesignBottomNav
-        currentPage={pageFromPath(pathname)}
-        onNavigate={(page) => {
-          if (page === "home") router.push("/feature/design/home-wired");
-          else if (page === "search") router.push("/feature/design/search");
-          else if (page === "chat") router.push("/feature/design/chat-wired");
-          else router.push("/feature/design/profile");
-        }}
-        onCreateClick={() => {
-          router.push("/upload");
-        }}
-      />
+      {!hideNav && (
+        <DesignBottomNav
+          currentPage={pageFromPath(pathname)}
+          onNavigate={(page) => {
+            if (page === "home") router.push("/feature/design/home-wired");
+            else if (page === "search") router.push("/feature/design/search");
+            else if (page === "chat") router.push("/feature/design/chat-wired");
+            else router.push("/feature/design/profile");
+          }}
+          onCreateClick={() => {
+            router.push("/feature/design/create");
+          }}
+        />
+      )}
     </div>
   );
 }
