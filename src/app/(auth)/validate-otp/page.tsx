@@ -119,7 +119,8 @@ export default function VerifyOtpPage() {
                       <InputOTP
                         maxLength={6}
                         pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-                        {...field}
+                        value={field.value}
+                        onChange={field.onChange}
                       >
                         <InputOTPGroup>
                           <InputOTPSlot index={0} />
@@ -152,7 +153,11 @@ export default function VerifyOtpPage() {
               </Button>
             </div>
             <div className="flex justify-center">
-              <Button className="w-11/12 lg:my-4" type="submit">
+              <Button
+                className="w-11/12 lg:my-4"
+                type="button"
+                onClick={form.handleSubmit(onSubmit)}
+              >
                 Continue
               </Button>
             </div>
