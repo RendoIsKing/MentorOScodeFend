@@ -1,3 +1,5 @@
+"use client";
+
 // import { fontItalic }/ from "@/app/layout";
 import React from "react";
 import { ABeeZee } from "next/font/google";
