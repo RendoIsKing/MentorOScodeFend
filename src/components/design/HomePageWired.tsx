@@ -396,7 +396,7 @@ export default function HomePageWired() {
                 className="flex flex-col items-center gap-1 drop-shadow-lg"
                 onClick={() => toggleSave(String(p.id))}
               >
-                <Bookmark className={cn("h-7 w-7", p.isSaved ? "fill-[hsl(var(--goals-primary))] text-[hsl(var(--goals-primary))]" : "")} />
+                <Bookmark className={cn("h-7 w-7", p.isSaved ? "fill-yellow-400 text-yellow-400" : "")} />
                 <span className="text-xs font-semibold">{p.saves}</span>
               </button>
 
@@ -434,13 +434,13 @@ export default function HomePageWired() {
 
       {/* Comments sheet (minimal wired) */}
       <Sheet open={Boolean(commentsPostId)} onOpenChange={(open) => (!open ? setCommentsPostId(null) : null)}>
-        <SheetContent side="bottom" className="p-0">
+        <SheetContent side="bottom" className="p-0 pb-[max(env(safe-area-inset-bottom),12px)]">
           <div className="p-4 border-b border-gray-200">
             <SheetHeader>
               <SheetTitle>Comments</SheetTitle>
             </SheetHeader>
           </div>
-          <div className="max-h-[60dvh] overflow-y-auto p-4 space-y-4">
+          <div className="max-h-[60dvh] overflow-y-auto p-4 space-y-4 pb-24">
             {commentsLoading ? (
               <div className="text-sm text-gray-500">Loading...</div>
             ) : comments.length === 0 ? (
@@ -468,11 +468,13 @@ export default function HomePageWired() {
               })
             )}
           </div>
-          <div className="p-4 border-t border-gray-200 flex gap-2">
+          {/* Sticky composer so it stays visible when keyboard opens */}
+          <div className="sticky bottom-0 bg-white p-4 border-t border-gray-200 flex gap-2">
             <Input
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
               placeholder="Add a comment..."
+              className="text-base"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
@@ -481,7 +483,7 @@ export default function HomePageWired() {
               }}
             />
             <Button onClick={submitComment} disabled={!commentText.trim()}>
-              Post
+              Send
             </Button>
           </div>
         </SheetContent>
