@@ -27,7 +27,6 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import EmptyState from "@/components/EmptyState";
-import DesignBottomNav from "@/components/design/DesignBottomNav";
 import { ImageWithFallback } from "@/components/design/figma/ImageWithFallback";
 import { useGetUserDetailsQuery } from "@/redux/services/haveme";
 import { useGetPostsByUserNameQuery } from "@/redux/services/haveme/posts";
@@ -57,7 +56,7 @@ export default function ProfilePageWired() {
 
   const posts = useMemo(() => thumbs.map((p) => p.thumbUrl), [thumbs]);
 
-  const [showCreatePostDialog, setShowCreatePostDialog] = useState(false);
+  // Bottom nav + Create button are provided by `src/app/feature/design/layout.tsx`
 
   const stats = [
     { label: "Posts", value: formatCount((meRaw as any)?.postsCount ?? 0) },
@@ -370,36 +369,7 @@ export default function ProfilePageWired() {
         </Tabs>
       </div>
 
-      <DesignBottomNav
-        currentPage="profile"
-        onNavigate={(page) => {
-          if (page === "home") router.push("/home");
-          else if (page === "chat") router.push("/room");
-          else if (page === "search") router.push("/feature/design/search");
-          else if (page === "profile") router.push("/feature/design/profile");
-        }}
-        onCreateClick={() => setShowCreatePostDialog(true)}
-      />
-
-      {/* Create Post Flow (wired later) */}
-      {showCreatePostDialog && (
-        <div
-          className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 pb-28"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.05)" }}
-          onClick={() => setShowCreatePostDialog(false)}
-        >
-          <div
-            className="bg-white rounded-2xl max-w-lg w-full flex flex-col shadow-2xl overflow-hidden p-6"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <p className="text-gray-900 font-semibold mb-2">Create</p>
-            <p className="text-gray-600 text-sm mb-4">Post creation flow will be wired to the existing backend uploader next.</p>
-            <Button onClick={() => setShowCreatePostDialog(false)} className="bg-[#0078D7] hover:bg-[#004C97]">
-              Close
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Bottom nav (and Create -> /upload) is provided by `src/app/feature/design/layout.tsx` */}
     </div>
   );
 }

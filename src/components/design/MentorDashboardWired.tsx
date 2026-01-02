@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import DesignBottomNav from "@/components/design/DesignBottomNav";
 import {
   Users,
   DollarSign,
@@ -859,15 +858,7 @@ export default function MentorDashboardWired() {
         </>
       )}
 
-      <DesignBottomNav
-        currentPage="profile"
-        onNavigate={(page) => {
-          if (page === "home") router.push("/home");
-          else if (page === "chat") router.push("/room");
-          else if (page === "search") router.push("/feature/design/search");
-          else if (page === "profile") router.push("/feature/design/profile");
-        }}
-      />
+      {/* Bottom nav is provided by `src/app/feature/design/layout.tsx` */}
     </div>
   );
 }

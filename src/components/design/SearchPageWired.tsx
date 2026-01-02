@@ -24,7 +24,6 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import EmptyState from "@/components/EmptyState";
-import DesignBottomNav from "@/components/design/DesignBottomNav";
 import { useGetUsersQuery } from "@/redux/services/haveme/search";
 import { useFollowUserMutation } from "@/redux/services/haveme/user";
 import { useGetPostsQuery } from "@/redux/services/haveme/posts";
@@ -524,15 +523,7 @@ export default function SearchPageWired() {
         )}
       </main>
 
-      <DesignBottomNav
-        currentPage="search"
-        onNavigate={(page) => {
-          if (page === "home") router.push("/home");
-          else if (page === "chat") router.push("/room");
-          else if (page === "search") router.push("/feature/design/search");
-          else if (page === "profile") router.push("/feature/design/profile");
-        }}
-      />
+      {/* Bottom nav is provided by `src/app/feature/design/layout.tsx` */}
     </div>
   );
 }
