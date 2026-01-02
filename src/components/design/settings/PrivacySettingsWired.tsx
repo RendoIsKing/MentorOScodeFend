@@ -105,7 +105,7 @@ export default function PrivacySettingsWired() {
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <Label className="font-medium cursor-pointer text-gray-900">Show Activity Status</Label>
-                <p className="text-sm text-gray-600">Let others see when you're active on mentorio</p>
+                <p className="text-sm text-gray-600">Let others see when you&apos;re active on mentorio</p>
               </div>
               <Button
                 variant={showActivityStatus ? "default" : "outline"}

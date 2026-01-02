@@ -102,7 +102,7 @@ export default function InterestsSettingsWired() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-gray-600">
-              Add topics you're interested in to help personalize your feed and connect with like-minded people.
+              Add topics you&apos;re interested in to help personalize your feed and connect with like-minded people.
             </p>
 
             <div className="flex flex-wrap gap-2">
