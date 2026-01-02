@@ -26,7 +26,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import FileUploadForm from "@/components/file-upload";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CircleX } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast"
 import MobileAvatarCoverPickers from "@/components/profile/MobileAvatarCoverPickers";
