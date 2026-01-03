@@ -102,9 +102,9 @@ const Signin = () => {
       if (formData.loginMethod.type === "email") {
         req.email = formData.loginMethod.email;
       } else if (formData.loginMethod.type === "phone") {
-        // Backend expects dialCode + phoneNumber (legacy), and supports other formats depending on backend version.
-        req.phoneNumber = formData.loginMethod.phoneNumber;
-        req.dialCode = formData.loginMethod.prefix;
+        // Backend password-login matches phone only when phoneNumber contains "--" (e.g. "+47--48290380").
+        // (OTP-init uses separate dialCode/phoneNumber, but password-login path parses the "--" format.)
+        req.phoneNumber = `${formData.loginMethod.prefix}--${formData.loginMethod.phoneNumber}`;
       } else if (formData.loginMethod.type === "username") {
         req.username = formData.loginMethod.username;
       }
