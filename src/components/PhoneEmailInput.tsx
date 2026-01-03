@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   parsePhoneNumber,
   getCountryCallingCode,
@@ -9,8 +9,6 @@ import { useFormContext } from "react-hook-form";
 import { AlertCircle } from "lucide-react";
 import { Input } from "./ui/input";
 import { useCountryCodeContext } from "@/context/countryCodeContext";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 const PhoneEmailInput = ({ className, ...props }) => {
   const form = useFormContext();
@@ -19,12 +17,6 @@ const PhoneEmailInput = ({ className, ...props }) => {
   const [inputType, setInputType] = useState<"phone" | "email" | "username">("phone");
 
   const error = form.formState.errors.loginMethod;
-
-  const placeholder = useMemo(() => {
-    if (inputType === "phone") return "Phone number";
-    if (inputType === "email") return "Email";
-    return "Username";
-  }, [inputType]);
 
   const normalizePhone = (raw: string) => {
     const trimmedValue = raw.trim();
@@ -53,17 +45,30 @@ const PhoneEmailInput = ({ className, ...props }) => {
     return null;
   };
 
+  const determineInputType = (value: string) => {
+    const v = value.trim();
+    if (!v) return "phone";
+    if (v.includes("@")) return "email";
+    // If there are letters, it's a username (prevents misclassifying "blooty" as a phone)
+    if (/[A-Za-z]/.test(v)) return "username";
+    // Otherwise treat as phone (digits, spaces, +, etc.)
+    return "phone";
+  };
+
   const handleInputChange = (value: string) => {
     const trimmedValue = value.trim();
     setInputValue(trimmedValue);
 
-    if (inputType === "email") {
+    const currentInputType = determineInputType(trimmedValue);
+    setInputType(currentInputType);
+
+    if (currentInputType === "email") {
       form.setValue("loginMethod", {
         type: "email",
         email: trimmedValue,
       });
       form.clearErrors("loginMethod");
-    } else if (inputType === "username") {
+    } else if (currentInputType === "username") {
       form.setValue("loginMethod", {
         type: "username",
         username: trimmedValue,
@@ -95,21 +100,6 @@ const PhoneEmailInput = ({ className, ...props }) => {
     form.trigger("loginMethod");
   };
 
-  // When toggling login method, keep the input text but re-validate and re-write form.loginMethod
-  useEffect(() => {
-    // Reset the target shape first to avoid union/schema mismatch
-    if (inputType === "email") {
-      form.setValue("loginMethod", { type: "email", email: "" });
-    } else if (inputType === "username") {
-      form.setValue("loginMethod", { type: "username", username: "" });
-    } else {
-      form.setValue("loginMethod", { type: "phone", prefix: "", phoneNumber: "" });
-    }
-    form.clearErrors("loginMethod");
-    if (inputValue) handleInputChange(inputValue);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputType]);
-
   const getErrorMessage = () => {
     if (!error) return null;
 
@@ -130,40 +120,14 @@ const PhoneEmailInput = ({ className, ...props }) => {
   const errorMessage = getErrorMessage();
 
   return (
-    <div className={cn("space-y-3", className)}>
-      <div className="grid grid-cols-3 gap-2">
-        <Button
-          type="button"
-          variant={inputType === "phone" ? "secondary" : "outline"}
-          size="sm"
-          onClick={() => setInputType("phone")}
-        >
-          Phone
-        </Button>
-        <Button
-          type="button"
-          variant={inputType === "email" ? "secondary" : "outline"}
-          size="sm"
-          onClick={() => setInputType("email")}
-        >
-          Email
-        </Button>
-        <Button
-          type="button"
-          variant={inputType === "username" ? "secondary" : "outline"}
-          size="sm"
-          onClick={() => setInputType("username")}
-        >
-          Username
-        </Button>
-      </div>
+    <div className={className}>
       <div className="relative">
         <Input
           {...props}
           type="text"
           value={inputValue}
           onChange={(e) => handleInputChange(e.target.value)}
-          placeholder={placeholder}
+          placeholder="Enter phone number, email or username"
           className="h-12 pl-6 border-muted-foreground/30"
         />
       </div>
