@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   parsePhoneNumber,
   getCountryCallingCode,
@@ -9,6 +9,8 @@ import { useFormContext } from "react-hook-form";
 import { AlertCircle } from "lucide-react";
 import { Input } from "./ui/input";
 import { useCountryCodeContext } from "@/context/countryCodeContext";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const PhoneEmailInput = ({ className, ...props }) => {
   const form = useFormContext();
@@ -18,89 +20,65 @@ const PhoneEmailInput = ({ className, ...props }) => {
 
   const error = form.formState.errors.loginMethod;
 
-  const determineInputType = (value: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^(\+?\d{1,3}[-\s.]?)?(\d{1,4}[-\s.]?){1,3}\d{1,4}$/;
+  const placeholder = useMemo(() => {
+    if (inputType === "phone") return "Phone number";
+    if (inputType === "email") return "Email";
+    return "Username";
+  }, [inputType]);
 
-    if (emailRegex.test(value)) return "email";
-    if (phoneRegex.test(value.replace(/\s+/g, ""))) return "phone";
-    return "username";
+  const normalizePhone = (raw: string) => {
+    const trimmedValue = raw.trim();
+    const cleanedValue = trimmedValue.replace(/[^\d+]/g, "");
+
+    if (cleanedValue && isValidPhoneNumber(cleanedValue)) {
+      const phone = parsePhoneNumber(cleanedValue);
+      if (phone) {
+        const dial = getCountryCallingCode(phone.country);
+        return { prefix: `+${dial}`, phoneNumber: phone.nationalNumber };
+      }
+      // fallback: keep digits as number, no prefix
+      return { prefix: "", phoneNumber: cleanedValue.replace(/^\+/, "") };
+    }
+
+    // Local/national number (no '+') — infer from selected country (defaults to NO)
+    if (cleanedValue && !cleanedValue.startsWith("+") && /^\d{6,15}$/.test(cleanedValue)) {
+      const cc = (countryCode || "NO") as any;
+      const dial = getCountryCallingCode(cc);
+      const e164 = `+${dial}${cleanedValue}`;
+      if (isValidPhoneNumber(e164)) {
+        return { prefix: `+${dial}`, phoneNumber: cleanedValue };
+      }
+    }
+
+    return null;
   };
 
   const handleInputChange = (value: string) => {
     const trimmedValue = value.trim();
     setInputValue(trimmedValue);
 
-    const currentInputType = determineInputType(trimmedValue);
-    setInputType(currentInputType);
-
-    if (currentInputType === "email") {
+    if (inputType === "email") {
       form.setValue("loginMethod", {
         type: "email",
         email: trimmedValue,
       });
       form.clearErrors("loginMethod");
-    } else if (currentInputType === "username") {
+    } else if (inputType === "username") {
       form.setValue("loginMethod", {
         type: "username",
         username: trimmedValue,
       });
       form.clearErrors("loginMethod");
     } else {
-      const cleanedValue = trimmedValue.replace(/[^\d+]/g, "");
-
-      if (cleanedValue && isValidPhoneNumber(cleanedValue)) {
-        try {
-          const phoneNumber = parsePhoneNumber(cleanedValue);
-
-          if (phoneNumber) {
-            const dialCode = getCountryCallingCode(phoneNumber.country);
-
-            form.setValue("loginMethod", {
-              type: "phone",
-              prefix: `+${dialCode}`,
-              phoneNumber: phoneNumber.nationalNumber,
-            });
-          } else {
-            form.setValue("loginMethod", {
-              type: "phone",
-              prefix: "",
-              phoneNumber: cleanedValue.replace(/^\+/, ""),
-            });
-          }
-
+      try {
+        const normalized = normalizePhone(trimmedValue);
+        if (normalized) {
+          form.setValue("loginMethod", { type: "phone", ...normalized });
           form.clearErrors("loginMethod");
-        } catch {
-          form.setError("loginMethod", {
-            type: "manual",
-            message: "Invalid phone number format",
-          });
+        } else {
+          throw new Error("Invalid phone");
         }
-      } else if (cleanedValue && !cleanedValue.startsWith("+") && /^\d{6,15}$/.test(cleanedValue)) {
-        // Allow local/national numbers by inferring country calling code from app context.
-        // This prevents sign-in payload from being empty for users typing just "48290380".
-        try {
-          const cc = (countryCode || "NO") as any;
-          const dialCode = getCountryCallingCode(cc);
-          const e164 = `+${dialCode}${cleanedValue}`;
-          if (isValidPhoneNumber(e164)) {
-            form.setValue("loginMethod", {
-              type: "phone",
-              prefix: `+${dialCode}`,
-              phoneNumber: cleanedValue,
-            });
-            form.clearErrors("loginMethod");
-          } else {
-            throw new Error("Invalid phone");
-          }
-        } catch {
-          form.setError("loginMethod", {
-            type: "manual",
-            message: "Invalid phone number",
-          });
-          form.setValue("loginMethod", { type: "phone", prefix: "", phoneNumber: "" });
-        }
-      } else {
+      } catch {
         form.setError("loginMethod", {
           type: "manual",
           message: "Invalid phone number",
@@ -116,6 +94,21 @@ const PhoneEmailInput = ({ className, ...props }) => {
 
     form.trigger("loginMethod");
   };
+
+  // When toggling login method, keep the input text but re-validate and re-write form.loginMethod
+  useEffect(() => {
+    // Reset the target shape first to avoid union/schema mismatch
+    if (inputType === "email") {
+      form.setValue("loginMethod", { type: "email", email: "" });
+    } else if (inputType === "username") {
+      form.setValue("loginMethod", { type: "username", username: "" });
+    } else {
+      form.setValue("loginMethod", { type: "phone", prefix: "", phoneNumber: "" });
+    }
+    form.clearErrors("loginMethod");
+    if (inputValue) handleInputChange(inputValue);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputType]);
 
   const getErrorMessage = () => {
     if (!error) return null;
@@ -137,14 +130,40 @@ const PhoneEmailInput = ({ className, ...props }) => {
   const errorMessage = getErrorMessage();
 
   return (
-    <div>
+    <div className={cn("space-y-3", className)}>
+      <div className="grid grid-cols-3 gap-2">
+        <Button
+          type="button"
+          variant={inputType === "phone" ? "secondary" : "outline"}
+          size="sm"
+          onClick={() => setInputType("phone")}
+        >
+          Phone
+        </Button>
+        <Button
+          type="button"
+          variant={inputType === "email" ? "secondary" : "outline"}
+          size="sm"
+          onClick={() => setInputType("email")}
+        >
+          Email
+        </Button>
+        <Button
+          type="button"
+          variant={inputType === "username" ? "secondary" : "outline"}
+          size="sm"
+          onClick={() => setInputType("username")}
+        >
+          Username
+        </Button>
+      </div>
       <div className="relative">
         <Input
           {...props}
           type="text"
           value={inputValue}
           onChange={(e) => handleInputChange(e.target.value)}
-          placeholder="Enter phone number, email or username"
+          placeholder={placeholder}
           className="h-12 pl-6 border-muted-foreground/30"
         />
       </div>
