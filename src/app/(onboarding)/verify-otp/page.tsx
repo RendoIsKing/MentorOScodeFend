@@ -71,6 +71,12 @@ export default function VerifyOtpPage() {
           if (typeof document !== 'undefined') {
             document.cookie = `onboarding=start; Path=/; Max-Age=600; SameSite=None; Secure`;
           }
+          // In iOS PWAs, httpOnly auth cookies from XHR can behave inconsistently with client-side navigation.
+          // Force a full navigation so middleware sees the fresh cookie without requiring the user to reload manually.
+          if (typeof window !== "undefined") {
+            window.location.href = "/user-info?from=verify";
+            return;
+          }
           router.push("/user-info?from=verify");
 
           toast({
@@ -96,6 +102,10 @@ export default function VerifyOtpPage() {
           // After OTP, force onboarding start
           if (typeof document !== 'undefined') {
             document.cookie = `onboarding=start; Path=/; Max-Age=600; SameSite=None; Secure`;
+          }
+          if (typeof window !== "undefined") {
+            window.location.href = "/user-info?from=verify";
+            return;
           }
           router.push("/user-info?from=verify");
 

@@ -1,3 +1,5 @@
+ "use client";
+
 import React, { createContext, useState, useMemo } from "react";
 
 interface ICountryCodeContext {
@@ -28,12 +30,21 @@ export const useCountryCodeContext = () => {
 const CountryCodeProvider: React.FC<ICountryCodeProviderProps> = ({
   children,
 }) => {
-  const [countryCode, setCountryCode] = useState<string>("");
+  // Default to Norway for mentorio.no (prevents sign-in failures when user enters local phone number without +country).
+  const [countryCode, setCountryCode] = useState<string>(() => {
+    try {
+      const v = window.localStorage.getItem("countryCode");
+      return v ? String(v) : "NO";
+    } catch {
+      return "NO";
+    }
+  });
 
   // Memoize the context value
   const contextValue = useMemo(() => {
     const updateCountryCode = (code: string) => {
-        setCountryCode(code)
+        setCountryCode(code);
+        try { window.localStorage.setItem("countryCode", String(code)); } catch {}
     };
     return {
         countryCode: countryCode,

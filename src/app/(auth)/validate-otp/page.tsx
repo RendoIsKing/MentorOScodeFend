@@ -68,6 +68,11 @@ export default function VerifyOtpPage() {
       .unwrap()
       .then((res) => {
         //console.log("res", res);
+        // Force full navigation so freshly set httpOnly auth cookies are visible to middleware immediately (PWA/iOS quirk)
+        if (typeof window !== "undefined") {
+          window.location.href = "/new-password";
+          return;
+        }
         router.replace("/new-password");
 
         toast({

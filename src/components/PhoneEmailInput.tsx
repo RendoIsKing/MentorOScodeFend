@@ -8,9 +8,11 @@ import {
 import { useFormContext } from "react-hook-form";
 import { AlertCircle } from "lucide-react";
 import { Input } from "./ui/input";
+import { useCountryCodeContext } from "@/context/countryCodeContext";
 
 const PhoneEmailInput = ({ className, ...props }) => {
   const form = useFormContext();
+  const { countryCode } = useCountryCodeContext();
   const [inputValue, setInputValue] = useState("");
   const [inputType, setInputType] = useState<"phone" | "email" | "username">("phone");
 
@@ -73,6 +75,30 @@ const PhoneEmailInput = ({ className, ...props }) => {
             type: "manual",
             message: "Invalid phone number format",
           });
+        }
+      } else if (cleanedValue && !cleanedValue.startsWith("+") && /^\d{6,15}$/.test(cleanedValue)) {
+        // Allow local/national numbers by inferring country calling code from app context.
+        // This prevents sign-in payload from being empty for users typing just "48290380".
+        try {
+          const cc = (countryCode || "NO") as any;
+          const dialCode = getCountryCallingCode(cc);
+          const e164 = `+${dialCode}${cleanedValue}`;
+          if (isValidPhoneNumber(e164)) {
+            form.setValue("loginMethod", {
+              type: "phone",
+              prefix: `+${dialCode}`,
+              phoneNumber: cleanedValue,
+            });
+            form.clearErrors("loginMethod");
+          } else {
+            throw new Error("Invalid phone");
+          }
+        } catch {
+          form.setError("loginMethod", {
+            type: "manual",
+            message: "Invalid phone number",
+          });
+          form.setValue("loginMethod", { type: "phone", prefix: "", phoneNumber: "" });
         }
       } else {
         form.setError("loginMethod", {
