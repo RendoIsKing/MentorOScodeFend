@@ -96,50 +96,31 @@ const Signin = () => {
       }
       inFlightRef.current = true;
       setBusy(true);
-      const payload: any = {
-        password: formData.password,
-      };
 
+      // Use the existing RTK Query mutation so we match the backend's expected payload
+      const req: any = { password: formData.password };
       if (formData.loginMethod.type === "email") {
-        payload.email = formData.loginMethod.email;
+        req.email = formData.loginMethod.email;
       } else if (formData.loginMethod.type === "phone") {
-        payload.phoneNumber = `${formData.loginMethod.prefix}--${formData.loginMethod.phoneNumber}`;
+        // Backend expects dialCode + phoneNumber (legacy), and supports other formats depending on backend version.
+        req.phoneNumber = formData.loginMethod.phoneNumber;
+        req.dialCode = formData.loginMethod.prefix;
       } else if (formData.loginMethod.type === "username") {
-        payload.username = formData.loginMethod.username;
+        req.username = formData.loginMethod.username;
       }
 
-      // Always use same-origin proxy so auth cookies attach to the web origin
-      const apiBase = "/api/backend";
-      const res = await fetch(`${apiBase}/v1/auth/user-login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
+      const body: any = await loginUser(req).unwrap();
 
-      const body = await res.json();
-
-      if (res.status === 429) {
-        const windowMs = computeServerWindowMs(res);
-        const retryMs = windowMs || undefined;
-        const waitMs = updateBackoff(isFinite(retryMs as any) ? (retryMs as number) : undefined);
-        startCooldown(waitMs);
-        const left = Math.ceil((waitMs + 2000) / 1000);
-        toast({ variant: "destructive", description: `Too many attempts. Please wait ${left}s and try again.` });
-        return;
-      }
-
-      if (res.ok && (body.token || body.message === "User login successfully")) {
-        const authPayload = body.token
-          ? body
-          : { token: "session", user: body.user };
-        appDispatch(setAuthData(authPayload));
+      const token = body?.token || body?.data?.token || "session";
+      const user = body?.user || body?.data || undefined;
+      if (token) {
+        appDispatch(setAuthData({ token, user } as any));
         try {
           localStorage.removeItem("auth_login_backoff_ms");
           localStorage.removeItem("auth_login_cooldown_until");
         } catch {}
         router.push("/home");
-        toast({ variant: "success", title: `Logged in${authPayload.user?.name ? ` as ${authPayload.user.name}` : ""}` });
+        toast({ variant: "success", title: `Logged in${user?.name ? ` as ${user.name}` : ""}` });
       } else {
         throw new Error(body?.message || "Invalid login credentials");
       }

@@ -105,16 +105,21 @@ export const havemeApi = createApi({
     loginUser: builder.mutation<IUserLoginResponse, IUserLoginRequest>({
       query: (body) => {
         // Dynamically construct the request body based on login method
-        const requestBody = body.email
+        const requestBody = body.username
           ? {
-              email: body.email,
+              username: body.username,
               password: body.password,
             }
-          : {
-              phoneNumber: body.phoneNumber,
-              dialCode: body.dialCode.replace("+", ""),
-              password: body.password,
-            };
+          : body.email
+            ? {
+                email: body.email,
+                password: body.password,
+              }
+            : {
+                phoneNumber: body.phoneNumber,
+                dialCode: String(body.dialCode || body.prefix || "").replace("+", ""),
+                password: body.password,
+              };
 
         return {
           url: "/auth/user-login",
